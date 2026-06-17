@@ -245,10 +245,6 @@ function deleteAsset(assetId) {
     loadAssets();
 }
 
-function editAsset(assetId) {
-    alert("Edit Asset Coming Soon");
-}
-
 function viewAsset(assetId) {
 
     const assets = getAssets();
@@ -420,4 +416,213 @@ function filterAssets() {
             : "none";
 
     });
+}
+
+function editAsset(assetId) {
+
+    const existingModal =
+        document.getElementById(
+            "editAssetModal"
+        );
+
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    const assets = getAssets();
+
+    const asset =
+        assets.find(
+            a => a.id === assetId
+        );
+
+    if (!asset) {
+        return;
+    }
+
+    const modalHtml = `
+
+    <div class="modal fade"
+         id="editAssetModal"
+         tabindex="-1">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Edit Asset
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <input
+                        type="hidden"
+                        id="editAssetId"
+                        value="${asset.id}">
+
+                    <div class="mb-3">
+
+                        <label>Asset ID</label>
+
+                        <input
+                            class="form-control"
+                            value="${asset.id}"
+                            readonly>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>Asset Name</label>
+
+                        <input
+                            id="editAssetName"
+                            class="form-control"
+                            value="${asset.name}">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>Category</label>
+
+                        <select
+                            id="editAssetCategory"
+                            class="form-control">
+
+                            <option ${asset.category === "Laptop" ? "selected" : ""}>Laptop</option>
+
+                            <option ${asset.category === "Desktop" ? "selected" : ""}>Desktop</option>
+
+                            <option ${asset.category === "Mobile" ? "selected" : ""}>Mobile</option>
+
+                            <option ${asset.category === "Monitor" ? "selected" : ""}>Monitor</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>Status</label>
+
+                        <select
+                            id="editAssetStatus"
+                            class="form-control">
+
+                            <option ${asset.status === "Available" ? "selected" : ""}>
+                                Available
+                            </option>
+
+                            <option ${asset.status === "Maintenance" ? "selected" : ""}>
+                                Maintenance
+                            </option>
+
+                            <option ${asset.status === "Retired" ? "selected" : ""}>
+                                Retired
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="saveAssetEdit()">
+
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    `;
+
+    document.body.insertAdjacentHTML(
+        "beforeend",
+        modalHtml
+    );
+
+    new bootstrap.Modal(
+        document.getElementById(
+            "editAssetModal"
+        )
+    ).show();
+}
+
+function saveAssetEdit() {
+
+    const assetId =
+        document.getElementById(
+            "editAssetId"
+        ).value;
+
+    const assets =
+        getAssets();
+
+    const asset =
+        assets.find(
+            a => a.id === assetId
+        );
+
+    if (!asset) {
+        return;
+    }
+
+    asset.name =
+        document.getElementById(
+            "editAssetName"
+        ).value;
+
+    asset.category =
+        document.getElementById(
+            "editAssetCategory"
+        ).value;
+
+    asset.status =
+        document.getElementById(
+            "editAssetStatus"
+        ).value;
+
+    addActivity(
+        `Asset ${asset.name} updated`
+    );
+
+    saveAssets(assets);
+
+    bootstrap.Modal.getInstance(
+        document.getElementById(
+            "editAssetModal"
+        )
+    ).hide();
+
+    loadAssets();
 }

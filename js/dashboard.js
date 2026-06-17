@@ -92,9 +92,14 @@ function loadDashboard() {
             <h5>Recent Activities</h5>
 
             <ul class="activity-list mt-3">
-                ${getActivities().map(item =>
-                    `<li>${item}</li>`
-                ).join('')}
+                ${getActivities()
+                    .slice()
+                    .reverse()
+                    .slice(0, 5)
+                    .map(item =>
+                        `<li>${item}</li>`
+                    ).join('')
+                }
             </ul>
 
         </div>
@@ -104,16 +109,28 @@ function loadDashboard() {
         <div class="card-custom">
             <h5>Quick Actions</h5>
 
-            <button class="btn btn-primary w-100 mt-3">
+            <button
+                class="btn btn-primary w-100 mt-3"
+                onclick="loadWorkforce()">
+
                 Add Employee
+
             </button>
 
-            <button class="btn btn-outline-primary w-100 mt-2">
+            <button
+                class="btn btn-outline-primary w-100 mt-2"
+                onclick="loadAssets()">
+
                 Add Asset
+
             </button>
 
-            <button class="btn btn-outline-primary w-100 mt-2">
+            <button
+                class="btn btn-outline-primary w-100 mt-2"
+                onclick="loadAssignments()">
+
                 Assign Asset
+
             </button>
 
         </div>
@@ -150,19 +167,64 @@ new Chart(deptCtx, {
 
 const assetCtx = document.getElementById('assetChart');
 
+const assets = getAssets();
+
+const laptops =
+    assets.filter(
+        a => a.category === "Laptop"
+    ).length;
+
+const desktops =
+    assets.filter(
+        a => a.category === "Desktop"
+    ).length;
+
+const mobiles =
+    assets.filter(
+        a => a.category === "Mobile"
+    ).length;
+
+const monitors =
+    assets.filter(
+        a => a.category === "Monitor"
+    ).length;
+
 new Chart(assetCtx, {
+
     type: 'bar',
+
     data: {
-        labels: ['Laptop', 'Desktop', 'Mobile', 'Monitor'],
+
+        labels: [
+            'Laptop',
+            'Desktop',
+            'Mobile',
+            'Monitor'
+        ],
+
         datasets: [{
+
             label: 'Assets',
-            data: [250, 120, 150, 92]
+
+            data: [
+                laptops,
+                desktops,
+                mobiles,
+                monitors
+            ]
+
         }]
+
     },
+
     options: {
+
         responsive: true,
-        maintainAspectRatio: false,
+
+        maintainAspectRatio: false
+
     }
+
 });
 
 }

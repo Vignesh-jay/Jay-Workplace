@@ -249,54 +249,224 @@ function deleteEmployee(employeeId) {
     loadWorkforce();
 }
 
+function filterEmployees() {
+
+    const searchText =
+        document
+            .getElementById("employeeSearch")
+            .value
+            .toLowerCase();
+
+    const rows =
+        document.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+
+        row.style.display =
+            row.innerText
+                .toLowerCase()
+                .includes(searchText)
+            ? ""
+            : "none";
+
+    });
+
+}
+
+function filterEmployees() {
+
+    const searchText =
+        document
+            .getElementById("employeeSearch")
+            .value
+            .toLowerCase();
+
+    const rows =
+        document.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+
+        row.style.display =
+            row.innerText
+                .toLowerCase()
+                .includes(searchText)
+            ? ""
+            : "none";
+
+    });
+
+}
+
 function editEmployee(employeeId) {
-    alert("Edit Employee Coming Soon");
+
+    const existingModal =
+        document.getElementById(
+            "editEmployeeModal"
+        );
+
+    if (existingModal) {
+        existingModal.remove();
+    }
+    const employees = getEmployees();
+
+    const employee =
+        employees.find(
+            e => e.id === employeeId
+        );
+
+    if (!employee) {
+        return;
+    }
+
+    const modalHtml = `
+
+    <div class="modal fade"
+         id="editEmployeeModal"
+         tabindex="-1">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Edit Employee
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <input
+                        type="hidden"
+                        id="editEmployeeId"
+                        value="${employee.id}">
+
+                    <div class="mb-3">
+
+                        <label>Name</label>
+
+                        <input
+                            id="editEmployeeName"
+                            class="form-control"
+                            value="${employee.name}">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>Department</label>
+
+                        <input
+                            id="editEmployeeDepartment"
+                            class="form-control"
+                            value="${employee.department}">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>Designation</label>
+
+                        <input
+                            id="editEmployeeDesignation"
+                            class="form-control"
+                            value="${employee.designation}">
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="saveEmployeeEdit()">
+
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    `;
+
+    document.body.insertAdjacentHTML(
+        "beforeend",
+        modalHtml
+    );
+
+    new bootstrap.Modal(
+        document.getElementById(
+            "editEmployeeModal"
+        )
+    ).show();
 }
 
-function filterEmployees() {
+function saveEmployeeEdit() {
 
-    const searchText =
-        document
-            .getElementById("employeeSearch")
-            .value
-            .toLowerCase();
+    const employeeId =
+        document.getElementById(
+            "editEmployeeId"
+        ).value;
 
-    const rows =
-        document.querySelectorAll("tbody tr");
+    const employees =
+        getEmployees();
 
-    rows.forEach(row => {
+    const employee =
+        employees.find(
+            e => e.id === employeeId
+        );
 
-        row.style.display =
-            row.innerText
-                .toLowerCase()
-                .includes(searchText)
-            ? ""
-            : "none";
+    if (!employee) {
+        return;
+    }
 
-    });
+    employee.name =
+        document.getElementById(
+            "editEmployeeName"
+        ).value;
 
-}
+    employee.department =
+        document.getElementById(
+            "editEmployeeDepartment"
+        ).value;
 
-function filterEmployees() {
+    employee.designation =
+        document.getElementById(
+            "editEmployeeDesignation"
+        ).value;
 
-    const searchText =
-        document
-            .getElementById("employeeSearch")
-            .value
-            .toLowerCase();
+    addActivity(
+        `Employee ${employee.name} updated`
+    );
+    saveEmployees(employees);
 
-    const rows =
-        document.querySelectorAll("tbody tr");
+    bootstrap.Modal.getInstance(
+        document.getElementById(
+            "editEmployeeModal"
+        )
+    ).hide();
 
-    rows.forEach(row => {
-
-        row.style.display =
-            row.innerText
-                .toLowerCase()
-                .includes(searchText)
-            ? ""
-            : "none";
-
-    });
-
+    loadWorkforce();
 }
