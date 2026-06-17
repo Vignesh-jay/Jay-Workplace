@@ -24,6 +24,8 @@ document.getElementById("content").innerHTML = `
             type="text"
             class="form-control search-input"
             placeholder="Search employee..."
+            id="employeeSearch"
+            onkeyup="filterEmployees()"
         >
 
         <button
@@ -249,4 +251,52 @@ function deleteEmployee(employeeId) {
 
 function editEmployee(employeeId) {
     alert("Edit Employee Coming Soon");
+}
+
+function filterEmployees() {
+
+    const searchText =
+        document
+            .getElementById("employeeSearch")
+            .value
+            .toLowerCase();
+
+    const rows =
+        document.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+
+        row.style.display =
+            row.innerText
+                .toLowerCase()
+                .includes(searchText)
+            ? ""
+            : "none";
+
+    });
+
+}
+
+function filterEmployees() {
+
+    const searchText =
+        document
+            .getElementById("employeeSearch")
+            .value
+            .toLowerCase();
+
+    const rows =
+        document.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+
+        row.style.display =
+            row.innerText
+                .toLowerCase()
+                .includes(searchText)
+            ? ""
+            : "none";
+
+    });
+
 }

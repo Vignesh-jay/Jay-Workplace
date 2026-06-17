@@ -25,6 +25,8 @@ document.getElementById("content").innerHTML = `
             type="text"
             class="form-control search-input"
             placeholder="Search assignment..."
+            id="assignmentSearch"
+            onkeyup="filterAssignments()"
         >
 
         <button
@@ -44,6 +46,7 @@ document.getElementById("content").innerHTML = `
                 <th>Employee</th>
                 <th>Assigned Date</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
 
@@ -60,10 +63,34 @@ document.getElementById("content").innerHTML = `
                 <td>${item.assignedDate}</td>
 
                 <td>
-                    <span class="status-badge active">
+                    <span class="status-badge ${
+                        item.status === "Assigned"
+                            ? "assigned"
+                            : "available"
+                    }">
                         ${item.status}
                     </span>
                 </td>
+
+                <td>
+
+                ${item.status === "Assigned" ? `
+
+                    <button
+                        class="btn btn-sm btn-outline-success"
+                        onclick="returnAsset('${item.assetId}')">
+
+                        Return
+
+                    </button>
+
+                ` : `
+                    <span class="text-muted">
+                        Completed
+                    </span>
+                `}
+
+            </td>
 
             </tr>
 
@@ -175,4 +202,67 @@ function showAssignAssetModal() {
     new bootstrap.Modal(
         document.getElementById("assignAssetModal")
     ).show();
+}
+
+function returnAsset(assetId) {
+
+    if (!confirm("Return this asset?")) {
+        return;
+    }
+
+    const assets = getAssets();
+
+    const assignments = getAssignments();
+
+    const asset =
+        assets.find(a => a.id === assetId);
+
+    const assignment =
+        assignments.find(
+            a =>
+                a.assetId === assetId &&
+                a.status === "Assigned"
+        );
+
+    if (!asset || !assignment) {
+        return;
+    }
+
+    asset.status = "Available";
+
+    assignment.status = "Returned";
+
+    saveAssets(assets);
+
+    saveAssignments(assignments);
+
+    addActivity(
+        `${asset.name} returned by ${assignment.employeeName}`
+    );
+
+    loadAssignments();
+}
+
+function filterAssignments() {
+
+    const searchText =
+        document
+            .getElementById("assignmentSearch")
+            .value
+            .toLowerCase();
+
+    const rows =
+        document.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+
+        row.style.display =
+            row.innerText
+                .toLowerCase()
+                .includes(searchText)
+            ? ""
+            : "none";
+
+    });
+
 }
