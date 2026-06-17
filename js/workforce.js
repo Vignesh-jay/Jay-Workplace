@@ -138,9 +138,17 @@ function showAddEmployeeModal() {
 
                     <div class="mb-3">
                         <label>Department</label>
-                        <input
+                        <select
                             id="employeeDepartment"
                             class="form-control">
+
+                            ${getDepartments().map(dep => `
+                                <option value="${dep}">
+                                    ${dep}
+                                </option>
+                            `).join('')}
+
+                        </select>
                     </div>
 
                     <div class="mb-3">
@@ -364,10 +372,21 @@ function editEmployee(employeeId) {
 
                         <label>Department</label>
 
-                        <input
+                        <select
                             id="editEmployeeDepartment"
-                            class="form-control"
-                            value="${employee.department}">
+                            class="form-control">
+
+                            ${getDepartments().map(dep => `
+                                <option
+                                    value="${dep}"
+                                    ${employee.department === dep ? "selected" : ""}>
+
+                                    ${dep}
+
+                                </option>
+                            `).join('')}
+
+                        </select>
 
                     </div>
 

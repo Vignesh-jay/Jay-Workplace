@@ -1,11 +1,19 @@
-const STORAGE_KEYS = {
-    employees: "jay_employees",
-    assets: "jay_assets",
-    assignments: "jay_assignments",
-    activities: "jay_activities"
-};
-
 function initializeStore() {
+
+    if (!localStorage.getItem(STORAGE_KEYS.departments)) {
+
+        localStorage.setItem(
+            STORAGE_KEYS.departments,
+            JSON.stringify([
+                "IT",
+                "HR",
+                "Finance",
+                "Operations",
+                "Admin"
+            ])
+        );
+
+    }
 
     if (!localStorage.getItem(STORAGE_KEYS.employees)) {
         localStorage.setItem(
@@ -86,4 +94,31 @@ function saveActivities(activityList) {
         STORAGE_KEYS.activities,
         JSON.stringify(activityList)
     );
+}
+
+const STORAGE_KEYS = {
+    employees: "jay_employees",
+    assets: "jay_assets",
+    assignments: "jay_assignments",
+    activities: "jay_activities",
+    departments: "jay_departments"
+};
+
+function getDepartments() {
+
+    return JSON.parse(
+        localStorage.getItem(
+            STORAGE_KEYS.departments
+        )
+    ) || [];
+
+}
+
+function saveDepartments(departments) {
+
+    localStorage.setItem(
+        STORAGE_KEYS.departments,
+        JSON.stringify(departments)
+    );
+
 }

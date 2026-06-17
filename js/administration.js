@@ -23,6 +23,13 @@ document.getElementById("content").innerHTML = `
             <p class="text-muted">
                 Configure departments and organizational structure.
             </p>
+            <button
+                class="btn btn-primary mt-3"
+                onclick="loadDepartments()">
+
+                Manage Departments
+
+            </button>
         </div>
     </div>
 
@@ -38,9 +45,18 @@ document.getElementById("content").innerHTML = `
     <div class="col-md-6">
         <div class="card-custom">
             <h5>Audit Logs</h5>
+
             <p class="text-muted">
                 Review system activity and changes.
             </p>
+
+            <button
+                class="btn btn-primary mt-3"
+                onclick="loadAuditLogs()">
+
+                View Logs
+
+            </button>
         </div>
     </div>
 
