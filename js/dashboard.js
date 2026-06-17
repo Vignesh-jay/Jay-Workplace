@@ -1,5 +1,8 @@
 function loadDashboard() {
 
+    const expiringAssets =
+    getExpiringAssets();
+
     const employeeList = getEmployees();
     const assetList = getAssets();
 
@@ -67,8 +70,8 @@ function loadDashboard() {
         <div class="card-custom">
             <h5>Department Distribution</h5>
             <div class="chart-wrapper">
-    <canvas id="deptChart"></canvas>
-</div>
+                <canvas id="deptChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -76,11 +79,10 @@ function loadDashboard() {
         <div class="card-custom">
             <h5>Asset Categories</h5>
             <div class="chart-wrapper">
-    <canvas id="assetChart"></canvas>
-</div>
+                <canvas id="assetChart"></canvas>
+            </div>
         </div>
     </div>
-
 </div>
 
 <!-- Recent Activities + Quick Actions -->
@@ -114,8 +116,64 @@ function loadDashboard() {
 
         </div>
     </div>
-
     <div class="col-lg-4">
+
+        <div class="card-custom">
+
+            <h5>
+                ⚠ Warranty Expiring Soon
+            </h5>
+
+            ${expiringAssets.map(asset => {
+
+                const daysLeft =
+                    Math.ceil(
+                        (
+                            new Date(asset.warrantyExpiry)
+                            -
+                            new Date()
+                        ) /
+                        (1000 * 60 * 60 * 24)
+                    );
+
+                const badgeClass =
+                    daysLeft <= 30
+                        ? "bg-danger"
+                        : daysLeft <= 60
+                            ? "bg-warning"
+                            : "bg-success";
+
+                return `
+
+                    <div class="mb-3">
+
+                        <strong>
+                            ${asset.name} - ${asset.serialNumber}
+                        </strong>
+
+                        <br>
+
+                        <span class="badge ${badgeClass}">
+
+                            ${daysLeft}
+                            Days Remaining
+
+                        </span>
+
+                    </div>
+
+                `;
+
+            }).join('') ||
+
+                `<p class="text-muted">
+                    No upcoming expiries.
+                </p>`
+
+            }
+
+        </div>
+            <br>
         <div class="card-custom">
             <h5>Quick Actions</h5>
 
@@ -145,7 +203,6 @@ function loadDashboard() {
 
         </div>
     </div>
-
 </div>
 
 `;
@@ -154,25 +211,73 @@ renderCharts();
 
 function renderCharts() {
 
-const deptCtx = document.getElementById('deptChart');
+const employees =
+    getEmployees();
+
+const departmentCounts = {};
+
+employees.forEach(emp => {
+
+    departmentCounts[
+        emp.department
+    ] =
+        (
+            departmentCounts[
+                emp.department
+            ] || 0
+        ) + 1;
+
+});
+
+const deptLabels =
+    Object.keys(
+        departmentCounts
+    );
+
+const deptData =
+    Object.values(
+        departmentCounts
+    );
+
+const deptCtx =
+    document.getElementById(
+        'deptChart'
+    );
 
 new Chart(deptCtx, {
+
     type: 'doughnut',
+
     data: {
-        labels: ['IT', 'HR', 'Finance', 'Admin', 'Operations'],
+
+        labels: deptLabels,
+
         datasets: [{
-            data: [85, 25, 40, 32, 66]
+
+            data: deptData
+
         }]
+
     },
+
     options: {
+
         responsive: true,
+
         maintainAspectRatio: false,
+
         plugins: {
+
             legend: {
+
                 position: 'bottom'
+
             }
+
         }
+
     }
+
 });
 
 const assetCtx = document.getElementById('assetChart');

@@ -52,3 +52,31 @@ function addActivity(message) {
     );
 
 }
+
+function getExpiringAssets(days = 90) {
+
+    const assets = getAssets();
+
+    const today = new Date();
+
+    return assets.filter(asset => {
+
+        if (!asset.warrantyExpiry) {
+            return false;
+        }
+
+        const expiryDate =
+            new Date(asset.warrantyExpiry);
+
+        const diffDays =
+            Math.ceil(
+                (expiryDate - today) /
+                (1000 * 60 * 60 * 24)
+            );
+
+        return diffDays >= 0 &&
+               diffDays <= days;
+
+    });
+
+}
