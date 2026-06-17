@@ -293,6 +293,12 @@ function saveAsset() {
 
     addAsset(asset);
 
+    addAssetHistory(
+        asset.id,
+        "Created",
+        `${asset.name} added to inventory`
+    );
+
     addActivity(
         `${asset.name} added to inventory`
     );
@@ -315,6 +321,12 @@ function deleteAsset(assetId) {
 
     deleteAssetById(assetId);
 
+    addAssetHistory(
+        asset.id,
+        "Deleted",
+        `${asset.name} removed from inventory`
+    );
+
     loadAssets();
 }
 
@@ -331,9 +343,40 @@ function viewAsset(assetId) {
         return;
     }
 
-    const history = assignments.filter(
-        a => a.assetId === assetId
+    const history = getAssetHistory().filter(
+        h => h.assetId === assetId
     );
+
+    const totalAssignments =
+        history.filter(
+            h => h.action === "Assigned"
+        ).length;
+
+    const warrantyDaysRemaining =
+        asset.warrantyExpiry
+            ? Math.ceil(
+                (
+                    new Date(
+                        asset.warrantyExpiry
+                    ) -
+                    new Date()
+                ) /
+                (1000 * 60 * 60 * 24)
+            )
+            : null;
+
+    const assetAgeDays =
+        asset.purchaseDate
+            ? Math.ceil(
+                (
+                    new Date() -
+                    new Date(
+                        asset.purchaseDate
+                    )
+                ) /
+                (1000 * 60 * 60 * 24)
+            )
+            : null;
 
     const currentAssignment =
         history.find(
@@ -409,23 +452,132 @@ function viewAsset(assetId) {
 
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-3">
 
-                            <p>
-                                <strong>Current Holder:</strong>
+                            <small class="text-muted">
+
+                                Current Holder
+
+                            </small>
+
+                            <div>
+
                                 ${
                                     currentAssignment
-                                    ? currentAssignment.employeeName
-                                    : "Not Assigned"
+                                        ? currentAssignment.employeeName
+                                        : "Not Assigned"
                                 }
-                            </p>
+
+                            </div>
 
                         </div>
 
                     </div>
 
                     <hr>
+                    <div class="card border-0 bg-light mb-4">
 
+                        <div class="card-body">
+
+                            <h6 class="fw-bold">
+
+                                Asset Statistics
+
+                            </h6>
+
+                            <div class="row mt-3">
+
+                                <div class="col-md-3">
+
+                                    <small class="text-muted">
+
+                                        Status
+
+                                    </small>
+
+                                    <div>
+
+                                        ${asset.status}
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <small class="text-muted">
+
+                                        Assignments
+
+                                    </small>
+
+                                    <div>
+
+                                        ${totalAssignments}
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <small class="text-muted">
+
+                                        Warranty Left
+
+                                    </small>
+
+                                    <div>
+
+                                        ${
+                                            warrantyDaysRemaining
+                                                ? warrantyDaysRemaining <= 30
+
+                                                    ? `<span class="badge bg-danger">
+                                                            ${warrantyDaysRemaining} Days
+                                                    </span>`
+
+                                                    : warrantyDaysRemaining <= 90
+
+                                                    ? `<span class="badge bg-warning">
+                                                            ${warrantyDaysRemaining} Days
+                                                    </span>`
+
+                                                    : `<span class="badge bg-success">
+                                                            ${warrantyDaysRemaining} Days
+                                                    </span>`
+                                                : "-"
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <small class="text-muted">
+
+                                        Asset Age
+
+                                    </small>
+
+                                    <div>
+
+                                        ${
+                                            assetAgeDays
+                                                ? assetAgeDays + " Days"
+                                                : "-"
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
                     <h6 class="mt-4">
                         Asset Timeline
                     </h6>
@@ -457,29 +609,31 @@ function viewAsset(assetId) {
                             <div class="timeline-item">
 
                                 <div class="timeline-dot ${
-                                    item.status === "Assigned"
-                                    ? "bg-success"
-                                    : "bg-warning"
+                                    item.action === "Assigned"
+                                        ? "bg-success"
+                                        : item.action === "Returned"
+                                            ? "bg-warning"
+                                            : item.action === "Updated"
+                                                ? "bg-info"
+                                                : item.action === "Deleted"
+                                                    ? "bg-danger"
+                                                    : "bg-primary"
                                 }"></div>
 
                                 <div class="timeline-content">
 
                                     <strong>
-
-                                        ${item.status}
-
+                                        ${item.action}
                                     </strong>
 
                                     <br>
 
-                                    ${item.employeeName}
+                                    ${item.details}
 
                                     <br>
 
                                     <small class="text-muted">
-
-                                        ${item.assignedDate}
-
+                                        ${item.timestamp}
                                     </small>
 
                                 </div>
@@ -498,6 +652,17 @@ function viewAsset(assetId) {
 
     </div>
     `;
+
+    const existingModal =
+        document.getElementById(
+            "assetDetailsModal"
+        );
+
+    if (existingModal) {
+
+        existingModal.remove();
+
+    }
 
     document.body.insertAdjacentHTML(
         "beforeend",
@@ -673,6 +838,10 @@ function editAsset(assetId) {
                             id="editAssetStatus"
                             class="form-control">
 
+                            <option ${asset.status === "Assigned" ? "selected" : ""}>
+                                Assigned
+                            </option>
+
                             <option ${asset.status === "Available" ? "selected" : ""}>
                                 Available
                             </option>
@@ -788,6 +957,12 @@ function saveAssetEdit() {
     );
 
     saveAssets(assets);
+
+    addAssetHistory(
+        asset.id,
+        "Updated",
+        "Asset details modified"
+    );
 
     bootstrap.Modal.getInstance(
         document.getElementById(

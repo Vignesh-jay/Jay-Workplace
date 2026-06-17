@@ -47,6 +47,12 @@ function saveAssignment() {
     asset.status = "Assigned";
 
     saveAssets(assets);
+
+    addAssetHistory(
+        asset.id,
+        "Assigned",
+        `Assigned to ${employee.name}`
+    );
     
     addAssignment(assignment);
 

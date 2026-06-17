@@ -67,6 +67,14 @@ function initializeStore() {
         saveActivities(migrated);
 
     }
+    if (!localStorage.getItem(STORAGE_KEYS.assetHistory)) {
+
+    localStorage.setItem(
+        STORAGE_KEYS.assetHistory,
+        JSON.stringify([])
+    );
+
+}
 }
 
 function getEmployees() {
@@ -91,6 +99,16 @@ function getActivities() {
     return JSON.parse(
         localStorage.getItem(STORAGE_KEYS.activities)
     ) || [];
+}
+
+function getAssetHistory() {
+
+    return JSON.parse(
+        localStorage.getItem(
+            STORAGE_KEYS.assetHistory
+        )
+    ) || [];
+
 }
 
 function saveAssets(assetList) {
@@ -121,12 +139,22 @@ function saveActivities(activityList) {
     );
 }
 
+function saveAssetHistory(history) {
+
+    localStorage.setItem(
+        STORAGE_KEYS.assetHistory,
+        JSON.stringify(history)
+    );
+
+}
+
 const STORAGE_KEYS = {
     employees: "jay_employees",
     assets: "jay_assets",
     assignments: "jay_assignments",
     activities: "jay_activities",
-    departments: "jay_departments"
+    departments: "jay_departments",
+    assetHistory: "jay_asset_history"
 };
 
 function getDepartments() {
@@ -144,6 +172,36 @@ function saveDepartments(departments) {
     localStorage.setItem(
         STORAGE_KEYS.departments,
         JSON.stringify(departments)
+    );
+
+}
+
+function addAssetHistory(
+    assetId,
+    action,
+    details
+) {
+
+    const history =
+        getAssetHistory();
+
+    history.unshift({
+
+        assetId,
+
+        action,
+
+        details,
+
+        timestamp:
+            new Date().toLocaleString(
+                'en-IN'
+            )
+
+    });
+
+    saveAssetHistory(
+        history
     );
 
 }

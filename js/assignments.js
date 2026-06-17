@@ -232,6 +232,17 @@ function returnAsset(assetId) {
 
     assignment.status = "Returned";
 
+    assignment.returnedDate =
+        new Date().toLocaleString(
+            'en-IN'
+        );
+
+    addAssetHistory(
+        asset.id,
+        "Returned",
+        `Returned by ${assignment.employeeName}`
+    );
+
     saveAssets(assets);
 
     saveAssignments(assignments);
