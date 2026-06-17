@@ -1,6 +1,10 @@
-window.onload = () => {
+document.addEventListener("DOMContentLoaded", () => {
+
+    initializeStore();
+
     loadDashboard();
-};
+
+});
 
 function setActiveMenu(menuId){
 

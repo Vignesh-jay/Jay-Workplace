@@ -1,6 +1,8 @@
 function loadAssets(){
 
-setActiveMenu('nav-assets');
+    const assetList = getAssets();
+
+    setActiveMenu('nav-assets');
 
 document.getElementById("content").innerHTML = `
 
@@ -25,7 +27,10 @@ document.getElementById("content").innerHTML = `
             placeholder="Search asset..."
         >
 
-        <button class="btn btn-primary">
+        <button
+            class="btn btn-primary"
+            onclick="showAddAssetModal()"
+>
             <i class="fas fa-plus"></i>
             Add Asset
         </button>
@@ -45,7 +50,7 @@ document.getElementById("content").innerHTML = `
 
         <tbody>
 
-            ${assets.map(asset => `
+            ${assetList.map(asset => `
 
             <tr>
 
@@ -77,4 +82,122 @@ document.getElementById("content").innerHTML = `
 
 `;
 
+}
+
+function showAddAssetModal() {
+
+    const modalHtml = `
+    <div class="modal fade"
+         id="addAssetModal"
+         tabindex="-1">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Add Asset
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label>Asset ID</label>
+
+                        <input
+                            id="assetId"
+                            class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Asset Name</label>
+
+                        <input
+                            id="assetName"
+                            class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Category</label>
+
+                        <select
+                            id="assetCategory"
+                            class="form-control">
+
+                            <option>Laptop</option>
+                            <option>Desktop</option>
+                            <option>Mobile</option>
+                            <option>Monitor</option>
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="saveAsset()">
+                        Save Asset
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    `;
+
+    document.body.insertAdjacentHTML(
+        "beforeend",
+        modalHtml
+    );
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("addAssetModal")
+    );
+
+    modal.show();
+}
+
+function saveAsset() {
+
+    const asset = {
+
+        id:
+            document.getElementById("assetId").value,
+
+        name:
+            document.getElementById("assetName").value,
+
+        category:
+            document.getElementById("assetCategory").value,
+
+        status: "Available"
+    };
+
+    addAsset(asset);
+
+    loadAssets();
+
+    bootstrap.Modal.getInstance(
+        document.getElementById("addAssetModal")
+    ).hide();
 }

@@ -1,6 +1,23 @@
 function loadDashboard() {
-setActiveMenu('nav-dashboard');
-document.getElementById("content").innerHTML = `
+
+    const employeeList = getEmployees();
+    const assetList = getAssets();
+
+    const totalEmployees = employeeList.length;
+
+    const totalAssets = assetList.length;
+
+    const assignedAssets = assetList.filter(
+        asset => asset.status === "Assigned"
+    ).length;
+
+    const availableAssets = assetList.filter(
+        asset => asset.status === "Available"
+    ).length;
+
+    setActiveMenu('nav-dashboard');
+
+    document.getElementById("content").innerHTML = `
 
 <div class="mb-4">
     <h2 class="fw-bold">Welcome Back, Admin 👋</h2>
@@ -15,28 +32,28 @@ document.getElementById("content").innerHTML = `
     <div class="col-md-3">
         <div class="card-custom">
             <p>Total Employees</p>
-            <div class="kpi-number">${dashboardData.employees}</div>
+            <div class="kpi-number">${totalEmployees}</div>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="card-custom">
             <p>Total Assets</p>
-            <div class="kpi-number">${dashboardData.assets}</div>
+            <div class="kpi-number">${totalAssets}</div>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="card-custom">
             <p>Assigned Assets</p>
-            <div class="kpi-number">${dashboardData.assigned}</div>
+            <div class="kpi-number">${assignedAssets}</div>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="card-custom">
             <p>Available Assets</p>
-            <div class="kpi-number">${dashboardData.available}</div>
+            <div class="kpi-number">${availableAssets}</div>
         </div>
     </div>
 
