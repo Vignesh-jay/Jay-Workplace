@@ -426,41 +426,69 @@ function viewAsset(assetId) {
 
                     <hr>
 
-                    <h6>Assignment History</h6>
+                    <h6 class="mt-4">
+                        Asset Timeline
+                    </h6>
 
-                    <table class="table">
+                    <div class="timeline mt-3">
 
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Employee</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
+                        <div class="timeline-item">
 
-                        <tbody>
+                            <div class="timeline-dot bg-primary"></div>
 
-                            ${history.map(item => `
-                                <tr>
+                            <div class="timeline-content">
 
-                                    <td>
-                                        ${item.assignedDate}
-                                    </td>
+                                <strong>
+                                    Asset Added
+                                </strong>
 
-                                    <td>
-                                        ${item.employeeName}
-                                    </td>
+                                <br>
 
-                                    <td>
+                                <small class="text-muted">
+                                    ${asset.purchaseDate || "Unknown Date"}
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        ${history.map(item => `
+
+                            <div class="timeline-item">
+
+                                <div class="timeline-dot ${
+                                    item.status === "Assigned"
+                                    ? "bg-success"
+                                    : "bg-warning"
+                                }"></div>
+
+                                <div class="timeline-content">
+
+                                    <strong>
+
                                         ${item.status}
-                                    </td>
 
-                                </tr>
-                            `).join('')}
+                                    </strong>
 
-                        </tbody>
+                                    <br>
 
-                    </table>
+                                    ${item.employeeName}
+
+                                    <br>
+
+                                    <small class="text-muted">
+
+                                        ${item.assignedDate}
+
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        `).join('')}
+
+                    </div>
 
                 </div>
 
