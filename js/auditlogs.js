@@ -1,3 +1,6 @@
+employee.name =
+    `${employee.firstName} ${employee.lastName}`;
+
 function loadAuditLogs() {
 
     const activities =

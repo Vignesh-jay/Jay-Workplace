@@ -270,3 +270,22 @@ function saveEmployeeHistory(history) {
     );
 
 }
+
+function getAssignmentHistory() {
+
+    return JSON.parse(
+        localStorage.getItem(
+            "jay_assignment_history"
+        )
+    ) || [];
+
+}
+
+function saveAssignmentHistory(history) {
+
+    localStorage.setItem(
+        "jay_assignment_history",
+        JSON.stringify(history)
+    );
+
+}

@@ -1,3 +1,6 @@
+employee.name =
+    `${employee.firstName} ${employee.lastName}`;
+
 function loadAssignments(){
 
     const assignmentList = getAssignments();
@@ -146,7 +149,7 @@ function showAssignAssetModal() {
 
                             ${employees.map(emp => `
                                 <option value="${emp.id}">
-                                    ${emp.name}
+                                    ${emp.firstName} ${emp.lastName}
                                 </option>
                             `).join('')}
 
@@ -241,6 +244,12 @@ function returnAsset(assetId) {
         asset.id,
         "Returned",
         `Returned by ${assignment.employeeName}`
+    );
+
+    addAssignmentHistory(
+        asset.id,
+        "Returned",
+        `${asset.name} returned by ${assignment.employeeName}`
     );
 
     saveAssets(assets);

@@ -1,3 +1,6 @@
+employee.name =
+    `${employee.firstName} ${employee.lastName}`;
+
 function addAsset(asset) {
 
     const assets = getAssets();

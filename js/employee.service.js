@@ -1,3 +1,6 @@
+employee.name =
+    `${employee.firstName} ${employee.lastName}`;
+
 function addEmployee(employee) {
 
     const employees = getEmployees();
@@ -22,4 +25,30 @@ function deleteEmployeeById(employeeId) {
     );
 
     saveEmployees(updatedEmployees);
+}
+
+function addAssignmentHistory(
+    assignmentId,
+    action,
+    details
+) {
+
+    const history =
+        getAssignmentHistory();
+
+    history.push({
+
+        assignmentId,
+        action,
+        details,
+
+        timestamp:
+            new Date().toLocaleString(
+                'en-IN'
+            )
+
+    });
+
+    saveAssignmentHistory(history);
+
 }

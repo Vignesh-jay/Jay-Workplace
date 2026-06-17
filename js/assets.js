@@ -1,3 +1,6 @@
+employee.name =
+    `${employee.firstName} ${employee.lastName}`;
+
 function loadAssets(){
 
     let assetList = getAssets();
@@ -343,9 +346,13 @@ function viewAsset(assetId) {
         return;
     }
 
-    const history = getAssetHistory().filter(
-        h => h.assetId === assetId
-    );
+    const history = getAssetHistory()
+        .filter(h => h.assetId === assetId)
+        .sort(
+            (a, b) =>
+                new Date(b.timestamp) -
+                new Date(a.timestamp)
+        );
 
     const totalAssignments =
         history.filter(
@@ -379,8 +386,10 @@ function viewAsset(assetId) {
             : null;
 
     const currentAssignment =
-        history.find(
-            a => a.status === "Assigned"
+        getAssignments().find(
+            a =>
+                a.assetId === assetId &&
+                a.status === "Assigned"
         );
 
     const modalHtml = `

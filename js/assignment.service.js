@@ -1,3 +1,6 @@
+employee.name =
+    `${employee.firstName} ${employee.lastName}`;
+
 function addAssignment(assignment) {
 
     const assignments = getAssignments();
@@ -36,7 +39,7 @@ function saveAssignment() {
         assetName: asset.name,
 
         employeeId: employee.id,
-        employeeName: employee.name,
+        employeeName: `${employee.firstName} ${employee.lastName}`,
 
         assignedDate:
             new Date().toISOString().split('T')[0],
@@ -51,7 +54,7 @@ function saveAssignment() {
     addAssetHistory(
         asset.id,
         "Assigned",
-        `Assigned to ${employee.name}`
+        `Assigned to ${employee.firstName} ${employee.lastName}`
     );
 
     addEmployeeHistory(

@@ -1,3 +1,6 @@
+employee.name =
+    `${employee.firstName} ${employee.lastName}`;
+
 function loadWorkforce() {
 
     const employeeList = getEmployees();
@@ -435,6 +438,9 @@ function saveEmployee() {
 
         return;
     }
+
+    employee.name =
+    `${employee.firstName} ${employee.lastName}`;
     const existingEmployees = getEmployees();
 
     const employeeExists = existingEmployees.some(
@@ -851,6 +857,9 @@ function saveEmployeeEdit() {
         document.getElementById(
             "editEmployeeStatus"
         ).value;
+
+    employee.name =
+    `${employee.firstName} ${employee.lastName}`;
 
     addActivity(
         `Employee ${employee.firstName} ${employee.lastName} updated`

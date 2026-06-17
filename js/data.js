@@ -1,3 +1,6 @@
+employee.name =
+    `${employee.firstName} ${employee.lastName}`;
+
 const dashboardData = {
     employees: 248,
     assets: 612,
