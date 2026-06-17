@@ -247,6 +247,12 @@ function returnAsset(assetId) {
 
     saveAssignments(assignments);
 
+    addEmployeeHistory(
+    assignment.employeeId,
+    "Asset Returned",
+    asset.name
+);
+
     addActivity(
         `${asset.name} returned by ${assignment.employeeName}`
     );

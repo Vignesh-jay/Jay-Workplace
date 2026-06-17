@@ -58,7 +58,10 @@ document.getElementById("content").innerHTML = `
 
                 <td>${emp.id}</td>
 
-                <td>${emp.name}</td>
+                <td>
+                    ${emp.firstName}
+                    ${emp.lastName}
+                </td>
 
                 <td>${emp.department}</td>
 
@@ -111,61 +114,210 @@ function showAddEmployeeModal() {
          id="addEmployeeModal"
          tabindex="-1">
 
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
 
             <div class="modal-content">
 
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        Add Employee
-                    </h5>
+    <div class="modal-header">
 
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-                </div>
+        <h5 class="modal-title">
+            Add Employee
+        </h5>
 
-                <div class="modal-body">
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal">
+        </button>
 
-                    <div class="mb-3">
-                        <label>Employee ID</label>
-                        <input
-                            id="employeeId"
-                            class="form-control">
-                    </div>
+    </div>
 
-                    <div class="mb-3">
-                        <label>Name</label>
-                        <input
-                            id="employeeName"
-                            class="form-control">
-                    </div>
+    <div class="modal-body">
+        <div class="text-muted small mb-3">
+            Fields marked with
+            <span class="text-danger">*</span>
+            are required.
+        </div>
+        <div class="row g-3">
 
-                    <div class="mb-3">
-                        <label>Department</label>
-                        <select
-                            id="employeeDepartment"
-                            class="form-control">
+            <div class="col-md-6">
 
-                            ${getDepartments().map(dep => `
-                                <option value="${dep}">
-                                    ${dep}
-                                </option>
-                            `).join('')}
+                <label class="form-label">
+                    Employee ID
+                    <span class="text-danger">*</span>
+                </label>
 
-                        </select>
-                    </div>
+                <input
+                    id="employeeId"
+                    class="form-control">
 
-                    <div class="mb-3">
-                        <label>Designation</label>
-                        <input
-                            id="employeeDesignation"
-                            class="form-control">
-                    </div>
+            </div>
 
-                </div>
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Email Address
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input
+                    id="employeeEmail"
+                    class="form-control">
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    First Name
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input
+                    id="employeeFirstName"
+                    class="form-control">
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Last Name
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input
+                    id="employeeLastName"
+                    class="form-control">
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Department
+                    <span class="text-danger">*</span>
+                </label>
+
+                <select
+                    id="employeeDepartment"
+                    class="form-select">
+
+                    ${getDepartments().map(dep => `
+                        <option>${dep}</option>
+                    `).join('')}
+
+                </select>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Designation
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input
+                    id="employeeDesignation"
+                    class="form-control">
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Manager
+                </label>
+
+                <input
+                    id="employeeManager"
+                    class="form-control">
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Location
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input
+                    id="employeeLocation"
+                    class="form-control">
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Date of Joining
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="employeeJoiningDate"
+                    class="form-control">
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Date of Leaving (if Applicable)
+                </label>
+
+                <input
+                    type="date"
+                    id="employeeLeavingDate"
+                    class="form-control">
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Employment Type
+                    <span class="text-danger">*</span>
+                </label>
+
+                <select
+                    id="employeeType"
+                    class="form-select">
+
+                    <option>Full Time</option>
+                    <option>Contract</option>
+                    <option>Intern</option>
+
+                </select>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+                    Status
+                    <span class="text-danger">*</span>
+                </label>
+
+                <select
+                    id="employeeStatus"
+                    class="form-select">
+
+                    <option>Active</option>
+                    <option>Inactive</option>
+                    <option>On Leave</option>
+                    <option>Resigned</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
 
                 <div class="modal-footer">
 
@@ -205,28 +357,81 @@ function saveEmployee() {
     const employee = {
 
         id:
-            document.getElementById("employeeId").value,
+            document.getElementById(
+                "employeeId"
+            ).value,
 
-        name:
-            document.getElementById("employeeName").value,
+        firstName:
+            document.getElementById(
+                "employeeFirstName"
+            ).value,
+
+        lastName:
+            document.getElementById(
+                "employeeLastName"
+            ).value,
+
+        email:
+            document.getElementById(
+                "employeeEmail"
+            ).value,
 
         department:
-            document.getElementById("employeeDepartment").value,
+            document.getElementById(
+                "employeeDepartment"
+            ).value,
 
         designation:
-            document.getElementById("employeeDesignation").value,
+            document.getElementById(
+                "employeeDesignation"
+            ).value,
 
-        status: "Active"
+        manager:
+            document.getElementById(
+                "employeeManager"
+            ).value,
+
+        joiningDate:
+            document.getElementById(
+                "employeeJoiningDate"
+            ).value,
+
+        leavingDate:
+            document.getElementById(
+                "employeeLeavingDate"
+            ).value,
+
+        location:
+            document.getElementById(
+                "employeeLocation"
+            ).value,
+
+        employmentType:
+            document.getElementById(
+                "employeeType"
+            ).value,
+
+        status:
+            document.getElementById(
+                "employeeStatus"
+            ).value
+
     };
 
     if (
         !employee.id ||
-        !employee.name ||
         !employee.department ||
-        !employee.designation
+        !employee.designation ||
+        !employee.status ||
+        !employee.email ||  
+        !employee.joiningDate ||
+        !employee.employmentType ||
+        !employee.location ||
+        !employee.firstName ||
+        !employee.lastName
     ) {
 
-        alert("Please fill all fields");
+        alert("Please fill all Required fields");
 
         return;
     }
@@ -246,6 +451,21 @@ function saveEmployee() {
     }
 
     addEmployee(employee);
+
+    addEmployeeHistory(
+        employee.id,
+        "Created",
+        "Employee onboarded"
+    );
+    
+    addActivity(
+        `New employee added: ${employee.firstName} ${employee.lastName}`
+    );
+
+    alert(
+        `Employee ${employee.firstName} ${employee.lastName} added successfully`
+    );
+
     loadWorkforce();
 
     bootstrap.Modal.getInstance(
@@ -260,6 +480,15 @@ function deleteEmployee(employeeId) {
     }
 
     deleteEmployeeById(employeeId);
+
+    addEmployeeHistory(
+        employeeId,
+        "Deleted",
+        "Employee removed"
+    );
+    addActivity(
+        `Employee with ID ${employeeId} deleted`
+    );
 
     loadWorkforce();
 }
@@ -364,47 +593,143 @@ function editEmployee(employeeId) {
                         id="editEmployeeId"
                         value="${employee.id}">
 
-                    <div class="mb-3">
+                    <div class="row g-3">
 
-                        <label>Name</label>
+                        <div class="col-md-6">
+                            <label>First Name</label>
+                            <input
+                                id="editEmployeeFirstName"
+                                class="form-control"
+                                value="${employee.firstName || ''}">
+                        </div>
 
-                        <input
-                            id="editEmployeeName"
-                            class="form-control"
-                            value="${employee.name}">
+                        <div class="col-md-6">
+                            <label>Last Name</label>
+                            <input
+                                id="editEmployeeLastName"
+                                class="form-control"
+                                value="${employee.lastName || ''}">
+                        </div>
 
-                    </div>
+                        <div class="col-md-6">
+                            <label>Email Address</label>
+                            <input
+                                id="editEmployeeEmail"
+                                class="form-control"
+                                value="${employee.email || ''}">
+                        </div>
 
-                    <div class="mb-3">
+                        <div class="col-md-6">
+                            <label>Department</label>
+                            <select
+                                id="editEmployeeDepartment"
+                                class="form-select">
 
-                        <label>Department</label>
+                                ${getDepartments().map(dep => `
+                                    <option
+                                        value="${dep}"
+                                        ${employee.department === dep ? 'selected' : ''}>
+                                        ${dep}
+                                    </option>
+                                `).join('')}
 
-                        <select
-                            id="editEmployeeDepartment"
-                            class="form-control">
+                            </select>
+                        </div>
 
-                            ${getDepartments().map(dep => `
+                        <div class="col-md-6">
+                            <label>Designation</label>
+                            <input
+                                id="editEmployeeDesignation"
+                                class="form-control"
+                                value="${employee.designation || ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Manager</label>
+                            <input
+                                id="editEmployeeManager"
+                                class="form-control"
+                                value="${employee.manager || ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Location</label>
+                            <input
+                                id="editEmployeeLocation"
+                                class="form-control"
+                                value="${employee.location || ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Date of Joining</label>
+                            <input
+                                type="date"
+                                id="editEmployeeJoiningDate"
+                                class="form-control"
+                                value="${employee.joiningDate || ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Date of Leaving</label>
+                            <input
+                                type="date"
+                                id="editEmployeeLeavingDate"
+                                class="form-control"
+                                value="${employee.leavingDate || ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Employment Type</label>
+                            <select
+                                id="editEmployeeType"
+                                class="form-select">
+
                                 <option
-                                    value="${dep}"
-                                    ${employee.department === dep ? "selected" : ""}>
-
-                                    ${dep}
-
+                                    ${employee.employmentType === 'Full Time' ? 'selected' : ''}>
+                                    Full Time
                                 </option>
-                            `).join('')}
 
-                        </select>
+                                <option
+                                    ${employee.employmentType === 'Contract' ? 'selected' : ''}>
+                                    Contract
+                                </option>
 
-                    </div>
+                                <option
+                                    ${employee.employmentType === 'Intern' ? 'selected' : ''}>
+                                    Intern
+                                </option>
 
-                    <div class="mb-3">
+                            </select>
+                        </div>
 
-                        <label>Designation</label>
+                        <div class="col-md-6">
+                            <label>Status</label>
+                            <select
+                                id="editEmployeeStatus"
+                                class="form-select">
 
-                        <input
-                            id="editEmployeeDesignation"
-                            class="form-control"
-                            value="${employee.designation}">
+                                <option
+                                    ${employee.status === 'Active' ? 'selected' : ''}>
+                                    Active
+                                </option>
+
+                                <option
+                                    ${employee.status === 'Inactive' ? 'selected' : ''}>
+                                    Inactive
+                                </option>
+
+                                <option
+                                    ${employee.status === 'On Leave' ? 'selected' : ''}>
+                                    On Leave
+                                </option>
+
+                                <option
+                                    ${employee.status === 'Resigned' ? 'selected' : ''}>
+                                    Resigned
+                                </option>
+
+                            </select>
+                        </div>
 
                     </div>
 
@@ -468,9 +793,18 @@ function saveEmployeeEdit() {
         return;
     }
 
-    employee.name =
+    const oldEmployee = {
+        ...employee
+    };
+
+    employee.firstName =
         document.getElementById(
-            "editEmployeeName"
+            "editEmployeeFirstName"
+        ).value;
+
+    employee.lastName =
+        document.getElementById(
+            "editEmployeeLastName"
         ).value;
 
     employee.department =
@@ -483,10 +817,101 @@ function saveEmployeeEdit() {
             "editEmployeeDesignation"
         ).value;
 
+    employee.email =
+    document.getElementById(
+        "editEmployeeEmail"
+    ).value;
+
+    employee.manager =
+        document.getElementById(
+            "editEmployeeManager"
+        ).value;
+
+    employee.location =
+        document.getElementById(
+            "editEmployeeLocation"
+        ).value;
+
+    employee.joiningDate =
+        document.getElementById(
+            "editEmployeeJoiningDate"
+        ).value;
+
+    employee.leavingDate =
+        document.getElementById(
+            "editEmployeeLeavingDate"
+        ).value;
+
+    employee.employmentType =
+        document.getElementById(
+            "editEmployeeType"
+        ).value;
+
+    employee.status =
+        document.getElementById(
+            "editEmployeeStatus"
+        ).value;
+
     addActivity(
-        `Employee ${employee.name} updated`
+        `Employee ${employee.firstName} ${employee.lastName} updated`
     );
+
+    const changes = [];
+
+    if (oldEmployee.firstName !== employee.firstName)
+        changes.push(
+            `First Name: ${oldEmployee.firstName} → ${employee.firstName}`
+        );
+
+    if (oldEmployee.lastName !== employee.lastName)
+        changes.push(
+            `Last Name: ${oldEmployee.lastName} → ${employee.lastName}`
+        );
+
+    if (oldEmployee.email !== employee.email)
+        changes.push(
+            `Email: ${oldEmployee.email} → ${employee.email}`
+        );
+
+    if (oldEmployee.department !== employee.department)
+        changes.push(
+            `Department: ${oldEmployee.department} → ${employee.department}`
+        );
+
+    if (oldEmployee.designation !== employee.designation)
+        changes.push(
+            `Designation: ${oldEmployee.designation} → ${employee.designation}`
+        );
+
+    if (oldEmployee.manager !== employee.manager)
+        changes.push(
+            `Manager: ${oldEmployee.manager} → ${employee.manager}`
+        );
+
+    if (oldEmployee.location !== employee.location)
+        changes.push(
+            `Location: ${oldEmployee.location} → ${employee.location}`
+        );
+
+    if (oldEmployee.status !== employee.status)
+        changes.push(
+            `Status: ${oldEmployee.status} → ${employee.status}`
+        );
+
+    if (oldEmployee.employmentType !== employee.employmentType)
+        changes.push(
+            `Employment Type: ${oldEmployee.employmentType} → ${employee.employmentType}`
+        );
+
     saveEmployees(employees);
+
+    addEmployeeHistory(
+        employee.id,
+        "Updated",
+        changes.length > 0
+            ? changes.join("<br>")
+            : "No changes detected"
+    );
 
     bootstrap.Modal.getInstance(
         document.getElementById(
@@ -519,6 +944,13 @@ function viewEmployee(employeeId) {
             item =>
                 item.employeeId === employeeId &&
                 item.status === "Assigned"
+        );
+
+    const history =
+    (getEmployeeHistory() || [])
+        .filter(
+            item =>
+                item.employeeId === employeeId
         );
 
     const modalHtml = `
@@ -560,7 +992,8 @@ function viewEmployee(employeeId) {
 
                             <p>
                                 <strong>Name:</strong>
-                                ${employee.name}
+                                ${employee.firstName || ''}
+                                ${employee.lastName || ''}
                             </p>
 
                             <p>
@@ -578,12 +1011,86 @@ function viewEmployee(employeeId) {
                                 ${employee.status}
                             </p>
 
+                            <p>
+                                <strong>Email:</strong>
+                                ${employee.email}
+                            </p>
+
+                            <p>
+                                <strong>Manager:</strong>
+                                ${employee.manager}
+                            </p>
+
+                            <p>
+                                <strong>Location:</strong>
+                                ${employee.location}
+                            </p>
+
+                            <p>
+                                <strong>Employment Type:</strong>
+                                ${employee.employmentType}
+                            </p>
+
+                            <p>
+                                <strong>Joining Date:</strong>
+                                ${employee.joiningDate}
+                            </p>
+
                         </div>
 
                     </div>
 
-                    <hr>
+                        <hr>
 
+                        <h5>
+                            Employee Timeline
+                        </h5>
+
+                        <div class="timeline">
+
+                        ${history.length > 0 ?
+
+                            history.map(item => `
+
+                                <div class="timeline-item">
+
+                                    <div class="timeline-dot"></div>
+
+                                    <div class="timeline-content">
+
+                                        <strong>
+                                            ${item.action}
+                                        </strong>
+
+                                        <br>
+
+                                        ${item.details}
+
+                                        <br>
+
+                                        <small class="text-muted">
+
+                                            ${item.timestamp}
+
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            `).join('')
+
+                        :
+
+                            `<p class="text-muted">
+                                No history available.
+                            </p>`
+
+                        }
+
+                        </div>
+
+                    <hr>
                     <h6>
                         Assigned Assets
                     </h6>
@@ -638,7 +1145,17 @@ function viewEmployee(employeeId) {
             "employeeProfileModal"
         )
     ).show();
+    
     addActivity(
-        `Viewed employee profile: ${employee.name}`
+        `Viewed employee profile: ${employee.firstName} ${employee.lastName}`
     );
+}
+
+function getEmployeeName(employee) {
+
+    return [
+        employee.firstName,
+        employee.lastName
+    ].join(" ");
+
 }

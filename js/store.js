@@ -154,7 +154,8 @@ const STORAGE_KEYS = {
     assignments: "jay_assignments",
     activities: "jay_activities",
     departments: "jay_departments",
-    assetHistory: "jay_asset_history"
+    assetHistory: "jay_asset_history",
+    employeeHistory: "jay_employee_history"
 };
 
 function getDepartments() {
@@ -202,6 +203,70 @@ function addAssetHistory(
 
     saveAssetHistory(
         history
+    );
+
+}
+
+function getEmployeeHistory() {
+
+    return JSON.parse(
+        localStorage.getItem(
+            STORAGE_KEYS.employeeHistory
+        )
+    ) || [];
+
+}
+
+function saveEmployeeHistory(history) {
+
+    localStorage.setItem(
+        STORAGE_KEYS.employeeHistory,
+        JSON.stringify(history)
+    );
+
+}
+
+function addEmployeeHistory(
+    employeeId,
+    action,
+    details
+) {
+
+    const history =
+        getEmployeeHistory();
+
+    history.unshift({
+
+        employeeId,
+
+        action,
+
+        details,
+
+        timestamp:
+            new Date().toLocaleString(
+                "en-IN"
+            )
+
+    });
+
+    saveEmployeeHistory(history);
+
+}
+
+function getEmployeeHistory() {
+    return JSON.parse(
+        localStorage.getItem(
+            "jay_employee_history"
+        )
+    ) || [];
+}
+
+function saveEmployeeHistory(history) {
+
+    localStorage.setItem(
+        "jay_employee_history",
+        JSON.stringify(history)
     );
 
 }
