@@ -93,12 +93,22 @@ function loadDashboard() {
 
             <ul class="activity-list mt-3">
                 ${getActivities()
-                    .slice()
-                    .reverse()
-                    .slice(0, 5)
-                    .map(item =>
-                        `<li>${item}</li>`
-                    ).join('')
+                    .slice(0,5)
+                    .map(item => `
+
+                        <li>
+
+                            <strong>
+                                ${item.timestamp}
+                            </strong>
+
+                            <br>
+
+                            ${item.message}
+
+                        </li>
+
+                    `).join('')
                 }
             </ul>
 

@@ -42,6 +42,31 @@ function initializeStore() {
             JSON.stringify(dashboardData.activities)
         );
     }
+    const activities =
+        JSON.parse(
+            localStorage.getItem(
+                STORAGE_KEYS.activities
+            )
+        ) || [];
+
+    if (
+        activities.length > 0 &&
+        typeof activities[0] === "string"
+    ) {
+
+        const migrated =
+            activities.map(item => ({
+
+                message: item,
+
+                timestamp:
+                    "Legacy Activity"
+
+            }));
+
+        saveActivities(migrated);
+
+    }
 }
 
 function getEmployees() {

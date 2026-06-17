@@ -37,6 +37,8 @@ function loadAuditLogs() {
 
                 <th>#</th>
 
+                <th>Date & Time</th>
+
                 <th>Activity</th>
 
             </tr>
@@ -51,7 +53,9 @@ function loadAuditLogs() {
 
                 <td>${index+1}</td>
 
-                <td>${item}</td>
+                <td>${item.timestamp}</td>
+
+                <td>${item.message}</td>
 
             </tr>
 
