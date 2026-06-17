@@ -261,3 +261,11 @@ body{
     background:#FEF3C7;
     color:#B45309;
 }
+
+.btn-sm {
+    margin-right: 4px;
+}
+
+.table td:last-child {
+    white-space: nowrap;
+}

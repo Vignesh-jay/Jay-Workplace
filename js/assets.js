@@ -45,7 +45,9 @@ document.getElementById("content").innerHTML = `
                 <th>Asset Name</th>
                 <th>Category</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
+            
         </thead>
 
         <tbody>
@@ -61,13 +63,23 @@ document.getElementById("content").innerHTML = `
                 <td>${asset.category}</td>
 
                 <td>
-
                     <span class="status-badge ${asset.status.toLowerCase()}">
-
                         ${asset.status}
-
                     </span>
+                </td>
 
+                <td>
+                    <button
+                        class="btn btn-sm btn-outline-primary"
+                        onclick="editAsset('${asset.id}')">
+                        Edit
+                    </button>
+
+                    <button
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="deleteAsset('${asset.id}')">
+                        Delete
+                    </button>
                 </td>
 
             </tr>
@@ -200,4 +212,19 @@ function saveAsset() {
     bootstrap.Modal.getInstance(
         document.getElementById("addAssetModal")
     ).hide();
+}
+
+function deleteAsset(assetId) {
+
+    if (!confirm("Delete this asset?")) {
+        return;
+    }
+
+    deleteAssetById(assetId);
+
+    loadAssets();
+}
+
+function editAsset(assetId) {
+    alert("Edit Asset Coming Soon");
 }

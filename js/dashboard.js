@@ -92,7 +92,7 @@ function loadDashboard() {
             <h5>Recent Activities</h5>
 
             <ul class="activity-list mt-3">
-                ${dashboardData.activities.map(item =>
+                ${getActivities().map(item =>
                     `<li>${item}</li>`
                 ).join('')}
             </ul>
