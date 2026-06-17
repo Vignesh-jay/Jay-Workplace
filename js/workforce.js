@@ -71,6 +71,13 @@ document.getElementById("content").innerHTML = `
                 </td>
                 <td>
                     <button
+                        class="btn btn-sm btn-outline-info"
+                        onclick="viewEmployee('${emp.id}')">
+
+                        View
+
+                    </button>
+                    <button
                         class="btn btn-sm btn-outline-primary"
                         onclick="editEmployee('${emp.id}')">
                         Edit
@@ -488,4 +495,150 @@ function saveEmployeeEdit() {
     ).hide();
 
     loadWorkforce();
+}
+
+function viewEmployee(employeeId) {
+
+    const employees =
+        getEmployees();
+
+    const assignments =
+        getAssignments();
+
+    const employee =
+        employees.find(
+            e => e.id === employeeId
+        );
+
+    if (!employee) {
+        return;
+    }
+
+    const employeeAssets =
+        assignments.filter(
+            item =>
+                item.employeeId === employeeId &&
+                item.status === "Assigned"
+        );
+
+    const modalHtml = `
+
+    <div class="modal fade"
+         id="employeeProfileModal"
+         tabindex="-1">
+
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+
+                        Employee Profile
+
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <p>
+                                <strong>ID:</strong>
+                                ${employee.id}
+                            </p>
+
+                            <p>
+                                <strong>Name:</strong>
+                                ${employee.name}
+                            </p>
+
+                            <p>
+                                <strong>Department:</strong>
+                                ${employee.department}
+                            </p>
+
+                            <p>
+                                <strong>Designation:</strong>
+                                ${employee.designation}
+                            </p>
+
+                            <p>
+                                <strong>Status:</strong>
+                                ${employee.status}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <h6>
+                        Assigned Assets
+                    </h6>
+
+                    ${
+                        employeeAssets.length > 0
+                        ? `
+                        <ul>
+
+                            ${employeeAssets.map(asset => `
+
+                                <li>
+                                    ${asset.assetName}
+                                </li>
+
+                            `).join('')}
+
+                        </ul>
+                        `
+                        : `
+                        <p class="text-muted">
+                            No assets assigned.
+                        </p>
+                        `
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    `;
+
+    const existingModal =
+        document.getElementById(
+            "employeeProfileModal"
+        );
+
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    document.body.insertAdjacentHTML(
+        "beforeend",
+        modalHtml
+    );
+
+    new bootstrap.Modal(
+        document.getElementById(
+            "employeeProfileModal"
+        )
+    ).show();
+    addActivity(
+        `Viewed employee profile: ${employee.name}`
+    );
 }

@@ -171,6 +171,35 @@ function showAddAssetModal() {
 
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label>Serial Number</label>
+                        <input
+                            id="assetSerial"
+                            class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Vendor</label>
+                        <input
+                            id="assetVendor"
+                            class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Purchase Date</label>
+                        <input
+                            type="date"
+                            id="purchaseDate"
+                            class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Warranty Expiry</label>
+                        <input
+                            type="date"
+                            id="warrantyExpiry"
+                            class="form-control">
+                    </div>
 
                 </div>
 
@@ -214,24 +243,68 @@ function saveAsset() {
     const asset = {
 
         id:
-            document.getElementById("assetId").value,
+            document.getElementById(
+                "assetId"
+            ).value.trim(),
 
         name:
-            document.getElementById("assetName").value,
+            document.getElementById(
+                "assetName"
+            ).value.trim(),
 
         category:
-            document.getElementById("assetCategory").value,
+            document.getElementById(
+                "assetCategory"
+            ).value,
+
+        serialNumber:
+            document.getElementById(
+                "assetSerial"
+            ).value.trim(),
+
+        vendor:
+            document.getElementById(
+                "assetVendor"
+            ).value.trim(),
+
+        purchaseDate:
+            document.getElementById(
+                "purchaseDate"
+            ).value,
+
+        warrantyExpiry:
+            document.getElementById(
+                "warrantyExpiry"
+            ).value,
 
         status: "Available"
+
     };
+
+    if (!asset.id || !asset.name) {
+
+        alert(
+            "Asset ID and Asset Name are required."
+        );
+
+        return;
+
+    }
 
     addAsset(asset);
 
-    loadAssets();
+    addActivity(
+        `${asset.name} added to inventory`
+    );
 
     bootstrap.Modal.getInstance(
-        document.getElementById("addAssetModal")
+        document.getElementById(
+            "addAssetModal"
+        )
     ).hide();
+
+    loadAssets();
+
 }
 
 function deleteAsset(assetId) {
@@ -310,7 +383,25 @@ function viewAsset(assetId) {
                                 <strong>Category:</strong>
                                 ${asset.category}
                             </p>
+                            <p>
+                                <strong>Serial Number:</strong>
+                                ${asset.serialNumber || "-"}
+                            </p>
 
+                            <p>
+                                <strong>Vendor:</strong>
+                                ${asset.vendor || "-"}
+                            </p>
+
+                            <p>
+                                <strong>Purchase Date:</strong>
+                                ${asset.purchaseDate || "-"}
+                            </p>
+
+                            <p>
+                                <strong>Warranty Expiry:</strong>
+                                ${asset.warrantyExpiry || "-"}
+                            </p>
                             <p>
                                 <strong>Status:</strong>
                                 ${asset.status}
@@ -512,6 +603,39 @@ function editAsset(assetId) {
                         </select>
 
                     </div>
+                    <div class="mb-3">
+                        <label>Serial Number</label>
+                        <input
+                            id="editAssetSerial"
+                            class="form-control"
+                            value="${asset.serialNumber || ''}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Vendor</label>
+                        <input
+                            id="editAssetVendor"
+                            class="form-control"
+                            value="${asset.vendor || ''}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Purchase Date</label>
+                        <input
+                            type="date"
+                            id="editAssetPurchaseDate"
+                            class="form-control"
+                            value="${asset.purchaseDate || ''}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Warranty Expiry</label>
+                        <input
+                            type="date"
+                            id="editAssetWarrantyExpiry"
+                            class="form-control"
+                            value="${asset.warrantyExpiry || ''}">
+                    </div>
 
                     <div class="mb-3">
 
@@ -610,6 +734,25 @@ function saveAssetEdit() {
     asset.status =
         document.getElementById(
             "editAssetStatus"
+        ).value;
+    asset.serialNumber =
+        document.getElementById(
+            "editAssetSerial"
+        ).value;
+
+    asset.vendor =
+        document.getElementById(
+            "editAssetVendor"
+        ).value;
+
+    asset.purchaseDate =
+        document.getElementById(
+            "editAssetPurchaseDate"
+        ).value;
+
+    asset.warrantyExpiry =
+        document.getElementById(
+            "editAssetWarrantyExpiry"
         ).value;
 
     addActivity(
