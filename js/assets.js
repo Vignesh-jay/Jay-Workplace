@@ -298,11 +298,7 @@ function saveAsset() {
 
     addAssetHistory(
         asset.id,
-        "Created",
-        `${asset.name} added to inventory`
-    );
-
-    addActivity(
+        "Added to Inventory",
         `${asset.name} added to inventory`
     );
 
@@ -321,6 +317,11 @@ function deleteAsset(assetId) {
     if (!confirm("Delete this asset?")) {
         return;
     }
+
+    const asset =
+    getAssets().find(
+        a => a.id === assetId
+    );
 
     deleteAssetById(assetId);
 
@@ -390,6 +391,17 @@ function viewAsset(assetId) {
             a =>
                 a.assetId === assetId &&
                 a.status === "Assigned"
+        );
+
+    const assignmentHistory =
+    getAssignments()
+        .filter(
+            a => a.assetId === assetId
+        )
+        .sort(
+            (a, b) =>
+                new Date(b.assignedDate) -
+                new Date(a.assignedDate)
         );
 
     const modalHtml = `
@@ -587,31 +599,89 @@ function viewAsset(assetId) {
                         </div>
 
                     </div>
+
+                        <hr>
+
+                        <h6>
+                            Assignment History
+                        </h6>
+
+                        ${
+                            assignmentHistory.length > 0
+
+                            ? `
+
+                            <table class="table table-sm">
+
+                                <thead>
+
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Assigned</th>
+                                        <th>Returned</th>
+                                        <th>Status</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    ${assignmentHistory.map(item => `
+
+                                        <tr>
+
+                                            <td>
+                                                ${item.employeeName}
+                                            </td>
+
+                                            <td>
+                                                ${item.assignedDate}
+                                            </td>
+
+                                            <td>
+                                                ${item.returnedDate || "-"}
+                                            </td>
+
+                                            <td>
+
+                                                <span class="badge ${
+                                                    item.status === "Assigned"
+                                                        ? "bg-success"
+                                                        : "bg-secondary"
+                                                }">
+
+                                                    ${item.status}
+
+                                                </span>
+
+                                            </td>
+
+                                        </tr>
+
+                                    `).join('')}
+
+                                </tbody>
+
+                            </table>
+
+                            `
+
+                            : `
+
+                            <p class="text-muted">
+
+                                No assignment history.
+
+                            </p>
+
+                            `
+                        }
+
                     <h6 class="mt-4">
                         Asset Timeline
                     </h6>
 
                     <div class="timeline mt-3">
-
-                        <div class="timeline-item">
-
-                            <div class="timeline-dot bg-primary"></div>
-
-                            <div class="timeline-content">
-
-                                <strong>
-                                    Asset Added
-                                </strong>
-
-                                <br>
-
-                                <small class="text-muted">
-                                    ${asset.purchaseDate || "Unknown Date"}
-                                </small>
-
-                            </div>
-
-                        </div>
 
                         ${history.map(item => `
 
@@ -651,6 +721,26 @@ function viewAsset(assetId) {
 
                         `).join('')}
 
+                        <div class="timeline-item">
+
+                            <div class="timeline-dot bg-secondary"></div>
+
+                            <div class="timeline-content">
+
+                                <strong>
+                                    Asset Purchased
+                                </strong>
+
+                                <br>
+
+                                <small class="text-muted">
+                                    Date : ${asset.purchaseDate || "Unknown Date"}<br>
+                                    Warranty Expiry : ${asset.warrantyExpiry || "Unknown Warranty Expiry"}
+                                </small>
+
+                            </div>
+
+                        </div>
                     </div>
 
                 </div>
@@ -927,6 +1017,10 @@ function saveAssetEdit() {
         return;
     }
 
+    const oldAsset = {
+        ...asset
+    };
+
     asset.name =
         document.getElementById(
             "editAssetName"
@@ -967,10 +1061,49 @@ function saveAssetEdit() {
 
     saveAssets(assets);
 
+    const changes = [];
+
+    if (oldAsset.name !== asset.name)
+        changes.push(
+            `Asset Name: ${oldAsset.name} → ${asset.name}`
+        );
+
+    if (oldAsset.category !== asset.category)
+        changes.push(
+            `Category: ${oldAsset.category} → ${asset.category}`
+        );
+
+    if (oldAsset.serialNumber !== asset.serialNumber)
+        changes.push(
+            `Serial Number: ${oldAsset.serialNumber || "-"} → ${asset.serialNumber || "-"}`
+        );
+
+    if (oldAsset.vendor !== asset.vendor)
+        changes.push(
+            `Vendor: ${oldAsset.vendor || "-"} → ${asset.vendor || "-"}`
+        );
+
+    if (oldAsset.purchaseDate !== asset.purchaseDate)
+        changes.push(
+            `Purchase Date: ${oldAsset.purchaseDate || "-"} → ${asset.purchaseDate || "-"}`
+        );
+
+    if (oldAsset.warrantyExpiry !== asset.warrantyExpiry)
+        changes.push(
+            `Warranty Expiry: ${oldAsset.warrantyExpiry || "-"} → ${asset.warrantyExpiry || "-"}`
+        );
+
+    if (oldAsset.status !== asset.status)
+        changes.push(
+            `Status: ${oldAsset.status} → ${asset.status}`
+        );
+
     addAssetHistory(
         asset.id,
         "Updated",
-        "Asset details modified"
+        changes.length > 0
+            ? changes.join("<br>")
+            : "No changes detected"
     );
 
     bootstrap.Modal.getInstance(

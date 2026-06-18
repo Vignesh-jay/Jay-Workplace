@@ -42,7 +42,7 @@ function saveAssignment() {
         employeeName: `${employee.firstName} ${employee.lastName}`,
 
         assignedDate:
-            new Date().toISOString().split('T')[0],
+            formatDateTime(),
 
         status: "Assigned"
     };

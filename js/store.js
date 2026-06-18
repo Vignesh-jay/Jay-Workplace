@@ -194,10 +194,7 @@ function addAssetHistory(
 
         details,
 
-        timestamp:
-            new Date().toLocaleString(
-                'en-IN'
-            )
+        timestamp:  formatDateTime()
 
     });
 
@@ -243,10 +240,7 @@ function addEmployeeHistory(
 
         details,
 
-        timestamp:
-            new Date().toLocaleString(
-                "en-IN"
-            )
+        timestamp: formatDateTime()
 
     });
 

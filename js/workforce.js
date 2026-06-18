@@ -463,10 +463,6 @@ function saveEmployee() {
         "Created",
         "Employee onboarded"
     );
-    
-    addActivity(
-        `New employee added: ${employee.firstName} ${employee.lastName}`
-    );
 
     alert(
         `Employee ${employee.firstName} ${employee.lastName} added successfully`

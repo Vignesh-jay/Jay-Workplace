@@ -236,9 +236,7 @@ function returnAsset(assetId) {
     assignment.status = "Returned";
 
     assignment.returnedDate =
-        new Date().toLocaleString(
-            'en-IN'
-        );
+        formatDateTime();
 
     addAssetHistory(
         asset.id,

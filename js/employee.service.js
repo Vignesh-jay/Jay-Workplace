@@ -42,10 +42,7 @@ function addAssignmentHistory(
         action,
         details,
 
-        timestamp:
-            new Date().toLocaleString(
-                'en-IN'
-            )
+        timestamp: formatDateTime()
 
     });
 
