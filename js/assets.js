@@ -277,7 +277,11 @@ function saveAsset() {
                 "warrantyExpiry"
             ).value,
 
-        status: "Available"
+        status: "Available",
+
+        retiredDate: "",
+
+        retirementReason: ""
 
     };
 
@@ -932,7 +936,8 @@ function editAsset(assetId) {
 
                         <select
                             id="editAssetStatus"
-                            class="form-control">
+                            class="form-control"
+                            onchange="toggleRetirementReason()">
 
                             <option ${asset.status === "Assigned" ? "selected" : ""}>
                                 Assigned
@@ -948,6 +953,60 @@ function editAsset(assetId) {
 
                             <option ${asset.status === "Retired" ? "selected" : ""}>
                                 Retired
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                <div
+                        class="mb-3"
+                        id="retirementReasonContainer"
+                        style="
+                            display:
+                            ${asset.status === 'Retired'
+                                ? 'block'
+                                : 'none'
+                            };
+                        "
+                    >
+
+                        <label>
+                            Retirement Reason
+                        </label>
+
+                        <select
+                            id="retirementReason"
+                            class="form-control">
+
+                            <option
+                                ${asset.retirementReason === "End of Life" ? "selected" : ""}
+                            >
+                                End of Life
+                            </option>
+
+                            <option
+                                ${asset.retirementReason === "Hardware Failure" ? "selected" : ""}
+                            >
+                                Hardware Failure
+                            </option>
+
+                            <option
+                                ${asset.retirementReason === "Lost" ? "selected" : ""}
+                            >
+                                Lost
+                            </option>
+
+                            <option
+                                ${asset.retirementReason === "Stolen" ? "selected" : ""}
+                            >
+                                Stolen
+                            </option>
+
+                            <option
+                                ${asset.retirementReason === "Disposed" ? "selected" : ""}
+                            >
+                                Disposed
                             </option>
 
                         </select>
@@ -1052,9 +1111,57 @@ function saveAssetEdit() {
             "editAssetWarrantyExpiry"
         ).value;
 
+    if (asset.status === "Retired") {
+
+        asset.retirementReason =
+            document.getElementById(
+                "retirementReason"
+            ).value;
+
+        if (!asset.retiredDate) {
+
+            asset.retiredDate =
+                formatDateTime();
+
+        }
+
+    }
+
     addActivity(
         `Asset ${asset.name} updated`
     );
+
+    if (asset.status === "Retired") {
+
+        const activeAssignment =
+            getAssignments().find(
+                a =>
+                    a.assetId === asset.id &&
+                    a.status === "Assigned"
+            );
+
+        if (activeAssignment) {
+
+            alert(
+                "Asset is currently assigned and cannot be retired."
+            );
+
+            return;
+        }
+    }
+
+    if (
+        oldAsset.status !== "Retired" &&
+        asset.status === "Retired"
+    ) {
+
+        addAssetHistory(
+            asset.id,
+            "Retired",
+            `Reason: ${asset.retirementReason}`
+        );
+
+    }
 
     saveAssets(assets);
 
@@ -1110,4 +1217,20 @@ function saveAssetEdit() {
     ).hide();
 
     loadAssets();
+}
+
+function toggleRetirementReason() {
+
+    const status =
+        document.getElementById(
+            "editAssetStatus"
+        ).value;
+
+    document.getElementById(
+        "retirementReasonContainer"
+    ).style.display =
+        status === "Retired"
+            ? "block"
+            : "none";
+
 }
