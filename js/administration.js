@@ -271,6 +271,23 @@ function resetSystem() {
     saveAssets([]);
     saveAssignments([]);
     saveActivities([]);
+    saveDepartments([]);
+    saveAuditLogs([]);
+    saveSettings({});
+    saveRoles([]);
+    savePermissions([]);
+    saveUsers([]);
+    saveNotifications([]);
+    activityLogs = [];
+    assignments = [];
+    departments = [];
+    auditLogs = [];
+    settings = {};
+    roles = [];
+    permissions = [];
+    users = [];
+    notifications = [];
+    
 
     alert(
         "All data has been reset."
