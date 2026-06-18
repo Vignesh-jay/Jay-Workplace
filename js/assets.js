@@ -1,6 +1,3 @@
-employee.name =
-    `${employee.firstName} ${employee.lastName}`;
-
 function loadAssets(){
 
     let assetList = getAssets();

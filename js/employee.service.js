@@ -1,6 +1,3 @@
-employee.name =
-    `${employee.firstName} ${employee.lastName}`;
-
 function addEmployee(employee) {
 
     const employees = getEmployees();

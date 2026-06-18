@@ -1,6 +1,3 @@
-employee.name =
-    `${employee.firstName} ${employee.lastName}`;
-
 function loadReports(){
     const employeeList = getEmployees();
 const assetList = getAssets();
