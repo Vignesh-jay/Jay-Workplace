@@ -477,6 +477,26 @@ function saveEmployee() {
 
 function deleteEmployee(employeeId) {
 
+    const assignedAssets =
+        getAssignments().filter(
+            a =>
+                a.employeeId === employeeId &&
+                a.status === "Assigned"
+        );
+
+    if (assignedAssets.length > 0) {
+
+        alert(
+            `Cannot delete employee.\n\nOutstanding Assets:\n\n${
+                assignedAssets
+                    .map(a => a.assetName)
+                    .join("\n")
+            }`
+        );
+
+        return;
+    }
+
     if (!confirm("Delete this employee?")) {
         return;
     }
@@ -488,6 +508,7 @@ function deleteEmployee(employeeId) {
         "Deleted",
         "Employee removed"
     );
+
     addActivity(
         `Employee with ID ${employeeId} deleted`
     );
@@ -907,6 +928,29 @@ function saveEmployeeEdit() {
         changes.push(
             `Employment Type: ${oldEmployee.employmentType} → ${employee.employmentType}`
         );
+
+    const assignedAssets =
+    getAssignments().filter(
+        a =>
+            a.employeeId === employee.id &&
+            a.status === "Assigned"
+    );
+
+    if (
+        (employee.status === "Resigned" || employee.status === "Inactive" )&&
+        assignedAssets.length > 0
+    ) {
+
+        alert(
+            `Cannot mark employee as Resigned / Inactive.\n\nOutstanding Assets:\n\n${
+                assignedAssets
+                    .map(a => a.assetName)
+                    .join("\n")
+            }`
+        );
+
+        return;
+    }
 
     saveEmployees(employees);
 
