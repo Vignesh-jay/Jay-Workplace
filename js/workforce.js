@@ -28,11 +28,31 @@ document.getElementById("content").innerHTML = `
             onkeyup="filterEmployees()"
         >
 
+        <select
+            id="locationFilter"
+            class="form-select"
+            onchange="filterEmployees()">
+
+            <option value="">
+                All Locations
+            </option>
+
+            ${getLocations().map(location => `
+                <option value="${location.name}">
+                    ${location.name}
+                </option>
+            `).join("")}
+
+        </select>
+
         <button
             class="btn btn-primary"
             onclick="showAddEmployeeModal()">
+
             <i class="fas fa-plus"></i>
+
             Add Employee
+
         </button>
 
     </div>
@@ -44,6 +64,7 @@ document.getElementById("content").innerHTML = `
             <th>ID</th>
             <th>Name</th>
             <th>Department</th>
+            <th>Location</th>
             <th>Designation</th>
             <th>Status</th>
             <th>Actions</th>
@@ -64,6 +85,8 @@ document.getElementById("content").innerHTML = `
                 </td>
 
                 <td>${emp.department}</td>
+
+                <td>${emp.location || '-'}</td>
 
                 <td>${emp.designation}</td>
 
@@ -108,6 +131,8 @@ document.getElementById("content").innerHTML = `
 }
 
 function showAddEmployeeModal() {
+
+    const locations = getLocations();
 
     const modalHtml = `
     <div class="modal fade"
@@ -243,9 +268,21 @@ function showAddEmployeeModal() {
                     <span class="text-danger">*</span>
                 </label>
 
-                <input
+                <select
                     id="employeeLocation"
-                    class="form-control">
+                    class="form-select">
+
+                    <option value="">
+                        Select Location
+                    </option>
+
+                    ${locations.map(location => `
+                        <option value="${location.name}">
+                            ${location.name}
+                        </option>
+                    `).join("")}
+
+                </select>
 
             </div>
 
@@ -521,41 +558,33 @@ function filterEmployees() {
             .value
             .toLowerCase();
 
-    const rows =
-        document.querySelectorAll("tbody tr");
-
-    rows.forEach(row => {
-
-        row.style.display =
-            row.innerText
-                .toLowerCase()
-                .includes(searchText)
-            ? ""
-            : "none";
-
-    });
-
-}
-
-function filterEmployees() {
-
-    const searchText =
+    const selectedLocation =
         document
-            .getElementById("employeeSearch")
-            .value
-            .toLowerCase();
+            .getElementById("locationFilter")
+            .value;
 
     const rows =
         document.querySelectorAll("tbody tr");
 
     rows.forEach(row => {
 
+        const rowText =
+            row.innerText.toLowerCase();
+
+        const locationCell =
+            row.children[3]?.innerText || "";
+
+        const matchesSearch =
+            rowText.includes(searchText);
+
+        const matchesLocation =
+            !selectedLocation ||
+            locationCell === selectedLocation;
+
         row.style.display =
-            row.innerText
-                .toLowerCase()
-                .includes(searchText)
-            ? ""
-            : "none";
+            matchesSearch && matchesLocation
+                ? ""
+                : "none";
 
     });
 
@@ -582,6 +611,7 @@ function editEmployee(employeeId) {
         return;
     }
 
+    const locations = getLocations();
     const modalHtml = `
 
     <div class="modal fade"
@@ -674,10 +704,19 @@ function editEmployee(employeeId) {
 
                         <div class="col-md-6">
                             <label>Location</label>
-                            <input
+                            <select
                                 id="editEmployeeLocation"
-                                class="form-control"
-                                value="${employee.location || ''}">
+                                class="form-select">
+
+                                ${locations.map(location => `
+                                    <option
+                                        value="${location.name}"
+                                        ${employee.location === location.name ? 'selected' : ''}>
+                                        ${location.name}
+                                    </option>
+                                `).join('')}
+
+                            </select>
                         </div>
 
                         <div class="col-md-6">

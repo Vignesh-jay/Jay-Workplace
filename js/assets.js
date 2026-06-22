@@ -28,8 +28,24 @@ document.getElementById("content").innerHTML = `
             class="form-control search-input"
             placeholder="Search asset..."
             id="assetSearch"
-            onkeyup="filterAssets()"
         >
+
+        <select
+            id="assetLocationFilter"
+            class="form-select"
+            onchange="filterAssets()">
+
+            <option value="">
+                All Locations
+            </option>
+
+            ${getLocations().map(location => `
+                <option value="${location.name}">
+                    ${location.name}
+                </option>
+            `).join("")}
+
+        </select>
 
         <button
             class="btn btn-primary"
@@ -48,6 +64,7 @@ document.getElementById("content").innerHTML = `
                 <th>Asset ID</th>
                 <th>Asset Name</th>
                 <th>Category</th>
+                <th>Location</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -65,6 +82,8 @@ document.getElementById("content").innerHTML = `
                 <td>${asset.name}</td>
 
                 <td>${asset.category}</td>
+
+                <td>${asset.location || "-"}</td>
 
                 <td>
                     <span class="status-badge ${asset.status.toLowerCase()}">
@@ -171,6 +190,25 @@ function showAddAssetModal() {
 
                         </select>
                     </div>
+
+                    <div class="mb-3">
+
+                        <label>Location</label>
+
+                        <select
+                            id="assetLocation"
+                            class="form-control">
+
+                            ${getLocations().map(location => `
+                                <option value="${location.name}">
+                                    ${location.name}
+                                </option>
+                            `).join("")}
+
+                        </select>
+
+                    </div>
+
                     <div class="mb-3">
                         <label>Serial Number</label>
                         <input
@@ -255,6 +293,11 @@ function saveAsset() {
         category:
             document.getElementById(
                 "assetCategory"
+            ).value,
+
+        location:
+            document.getElementById(
+                "assetLocation"
             ).value,
 
         serialNumber:
@@ -448,6 +491,12 @@ function viewAsset(assetId) {
                                 <strong>Category:</strong>
                                 ${asset.category}
                             </p>
+
+                            <p>
+                                <strong>Location:</strong>
+                                ${asset.location || "-"}
+                            </p>
+
                             <p>
                                 <strong>Serial Number:</strong>
                                 ${asset.serialNumber || "-"}
@@ -780,9 +829,18 @@ function filterAssets() {
 
     const searchText =
         document
-            .getElementById("assetSearch")
+            .getElementById(
+                "assetSearch"
+            )
             .value
             .toLowerCase();
+
+    const selectedLocation =
+        document
+            .getElementById(
+                "assetLocationFilter"
+            )
+            .value;
 
     const rows =
         document.querySelectorAll(
@@ -794,12 +852,24 @@ function filterAssets() {
         const text =
             row.innerText.toLowerCase();
 
+        const location =
+            row.children[3]?.innerText;
+
+        const matchesSearch =
+            text.includes(searchText);
+
+        const matchesLocation =
+            !selectedLocation ||
+            location === selectedLocation;
+
         row.style.display =
-            text.includes(searchText)
-            ? ""
-            : "none";
+            matchesSearch &&
+            matchesLocation
+                ? ""
+                : "none";
 
     });
+
 }
 
 function editAsset(assetId) {
@@ -896,6 +966,35 @@ function editAsset(assetId) {
                         </select>
 
                     </div>
+
+                    <div class="mb-3">
+
+                        <label>Location</label>
+
+                        <select
+                            id="editAssetLocation"
+                            class="form-control">
+
+                            ${getLocations().map(location => `
+
+                                <option
+                                    value="${location.name}"
+                                    ${
+                                        asset.location === location.name
+                                            ? "selected"
+                                            : ""
+                                    }>
+
+                                    ${location.name}
+
+                                </option>
+
+                            `).join("")}
+
+                        </select>
+
+                    </div>
+
                     <div class="mb-3">
                         <label>Serial Number</label>
                         <input
@@ -1085,6 +1184,11 @@ function saveAssetEdit() {
     asset.category =
         document.getElementById(
             "editAssetCategory"
+        ).value;
+
+    asset.location =
+        document.getElementById(
+            "editAssetLocation"
         ).value;
 
     asset.status =

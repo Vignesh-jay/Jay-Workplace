@@ -136,6 +136,44 @@ const assignments = [
 
 ];
 
+const defaultLocations = [
+    {
+        id: "LOC001",
+        code: "BLR",
+        name: "Bangalore",
+        state: "Karnataka",
+        status: "Active"
+    },
+    {
+        id: "LOC002",
+        code: "CHE",
+        name: "Chennai",
+        state: "Tamil Nadu",
+        status: "Active"
+    },
+    {
+        id: "LOC003",
+        code: "MUM",
+        name: "Mumbai",
+        state: "Maharashtra",
+        status: "Active"
+    },
+    {
+        id: "LOC004",
+        code: "DEL",
+        name: "Delhi",
+        state: "Delhi",
+        status: "Active"
+    },
+    {
+        id: "LOC005",
+        code: "HYD",
+        name: "Hyderabad",
+        state: "Telangana",
+        status: "Active"
+    }
+];
+
 function formatDateTime(date = new Date()) {
 
     return new Date(date).toLocaleString(

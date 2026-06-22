@@ -35,6 +35,22 @@ document.getElementById("content").innerHTML = `
 
     <div class="col-md-6">
         <div class="card-custom">
+            <h5>Location Management</h5>
+            <p>
+                    Manage office locations.
+                </p>
+            <button
+                class="btn btn-primary mt-3"
+                onclick="loadLocations()">
+
+                Manage Locations
+
+            </button>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card-custom">
             <h5>Roles & Permissions</h5>
             <p class="text-muted">
                 Manage access control and user permissions.
