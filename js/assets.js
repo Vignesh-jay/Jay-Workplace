@@ -73,7 +73,21 @@ document.getElementById("content").innerHTML = `
 
         <tbody>
 
-            ${assetList.map(asset => `
+            ${assetList.map(asset => {
+
+                const activeAssignment =
+                    getAssignments().find(
+                        a =>
+                            a.assetId === asset.id &&
+                            a.status === "Assigned"
+                    );
+
+                const displayStatus =
+                    activeAssignment
+                        ? "Assigned"
+                        : asset.status;
+
+                return `
 
             <tr>
 
@@ -87,7 +101,7 @@ document.getElementById("content").innerHTML = `
 
                 <td>
                     <span class="status-badge ${asset.status.toLowerCase()}">
-                        ${asset.status}
+                        ${displayStatus}
                     </span>
                 </td>
 
@@ -112,7 +126,9 @@ document.getElementById("content").innerHTML = `
 
             </tr>
 
-            `).join('')}
+            `;
+
+            }).join("")}
 
         </tbody>
 
@@ -324,7 +340,15 @@ function saveAsset() {
 
         retiredDate: "",
 
-        retirementReason: ""
+        retirementReason: "",
+
+        transferredTo: "",
+
+        previousAssetId: "",
+
+        transferDate: "",
+
+        transferRemarks: ""
 
     };
 
@@ -357,6 +381,22 @@ function saveAsset() {
 }
 
 function deleteAsset(assetId) {
+
+    const activeAssignment =
+        getAssignments().find(
+            a =>
+                a.assetId === assetId &&
+                a.status === "Assigned"
+        );
+
+    if (activeAssignment) {
+
+        alert(
+            "Assigned assets cannot be deleted."
+        );
+
+        return;
+    }
 
     if (!confirm("Delete this asset?")) {
         return;
@@ -448,6 +488,11 @@ function viewAsset(assetId) {
                 new Date(a.assignedDate)
         );
 
+    const displayStatus =
+        currentAssignment
+            ? "Assigned"
+            : asset.status;
+
     const modalHtml = `
     <div class="modal fade"
          id="assetDetailsModal"
@@ -518,7 +563,7 @@ function viewAsset(assetId) {
                             </p>
                             <p>
                                 <strong>Status:</strong>
-                                ${asset.status}
+                                ${displayStatus}
                             </p>
 
                         </div>
@@ -546,6 +591,22 @@ function viewAsset(assetId) {
                     </div>
 
                     <hr>
+                    <div class="row">
+                        <button
+                            class="btn btn-warning"
+                            onclick="
+                                document.querySelectorAll('.modal').forEach(m => m.remove());
+                                showAssetTransferModal('${asset.id}');
+                                ">
+
+                            <i class="fas fa-exchange-alt"></i>
+
+                            Transfer Asset
+
+                        </button>
+
+                    </div>
+                    <hr>
                     <div class="card border-0 bg-light mb-4">
 
                         <div class="card-body">
@@ -568,7 +629,7 @@ function viewAsset(assetId) {
 
                                     <div>
 
-                                        ${asset.status}
+                                        ${displayStatus}
 
                                     </div>
 
@@ -874,6 +935,8 @@ function filterAssets() {
 
 function editAsset(assetId) {
 
+
+
     const existingModal =
         document.getElementById(
             "editAssetModal"
@@ -891,10 +954,35 @@ function editAsset(assetId) {
         );
 
     if (!asset) {
-        return;
-    }
+            return;
+        }
+
+    const activeAssignment =
+        getAssignments().find(
+            a =>
+                a.assetId === asset.id &&
+                a.status === "Assigned"
+        );
+
+    const isAssigned =
+        !!activeAssignment; 
 
     const modalHtml = `
+
+    ${isAssigned ? `
+
+    <div class="alert alert-warning">
+
+        This asset is currently assigned to
+        ${activeAssignment.employeeName}.
+
+        Return the asset before changing
+        status, location, retiring or
+        transferring.
+
+    </div>
+
+    ` : ""}
 
     <div class="modal fade"
          id="editAssetModal"
@@ -971,27 +1059,10 @@ function editAsset(assetId) {
 
                         <label>Location</label>
 
-                        <select
-                            id="editAssetLocation"
-                            class="form-control">
-
-                            ${getLocations().map(location => `
-
-                                <option
-                                    value="${location.name}"
-                                    ${
-                                        asset.location === location.name
-                                            ? "selected"
-                                            : ""
-                                    }>
-
-                                    ${location.name}
-
-                                </option>
-
-                            `).join("")}
-
-                        </select>
+                        <input
+                            class="form-control"
+                            value="${asset.location || ''}"
+                            readonly>
 
                     </div>
 
@@ -1036,11 +1107,8 @@ function editAsset(assetId) {
                         <select
                             id="editAssetStatus"
                             class="form-control"
+                            ${isAssigned ? "disabled" : ""}
                             onchange="toggleRetirementReason()">
-
-                            <option ${asset.status === "Assigned" ? "selected" : ""}>
-                                Assigned
-                            </option>
 
                             <option ${asset.status === "Available" ? "selected" : ""}>
                                 Available
@@ -1184,11 +1252,6 @@ function saveAssetEdit() {
     asset.category =
         document.getElementById(
             "editAssetCategory"
-        ).value;
-
-    asset.location =
-        document.getElementById(
-            "editAssetLocation"
         ).value;
 
     asset.status =
@@ -1336,5 +1399,347 @@ function toggleRetirementReason() {
         status === "Retired"
             ? "block"
             : "none";
+
+}
+
+function showAssetTransferModal(
+    assetId
+) {
+
+    const assets =
+        getAssets();
+
+    const asset =
+        assets.find(
+            a => a.id === assetId
+        );
+
+    if (!asset) {
+        return;
+    }
+
+    const activeAssignment =
+        getAssignments().find(
+            a =>
+                a.assetId === asset.id &&
+                a.status === "Assigned"
+        );
+
+    if (activeAssignment) {
+
+        alert(
+            `Asset is currently assigned to ${activeAssignment.employeeName}.
+            
+Please return the asset before transferring.`
+        );
+
+        return;
+    }
+
+    if (
+        asset.status === "Retired"
+    ) {
+
+        alert(
+            "Retired assets cannot be transferred."
+        );
+
+        return;
+    }
+
+    if (
+        asset.status === "Transferred"
+    ) {
+
+        alert(
+            "Asset already transferred."
+        );
+
+        return;
+    }
+
+    showTransferAssetForm(
+        asset
+    );
+
+}
+
+function showTransferAssetForm(
+    asset
+) {
+
+    const locations =
+        getLocations();
+
+    const modal =
+        document.createElement("div");
+
+    modal.className =
+        "modal fade show";
+
+    modal.style.display =
+        "block";
+
+    modal.innerHTML = `
+
+<div class="modal-dialog">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h5>
+Transfer Asset
+</h5>
+
+<button
+    class="btn-close"
+    onclick="this.closest('.modal').remove()">
+</button>
+
+</div>
+
+<div class="modal-body">
+
+<div class="mb-3">
+
+<label>
+Current Asset ID
+</label>
+
+<input
+    class="form-control"
+    value="${asset.id}"
+    readonly>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+New Asset ID
+</label>
+
+<input
+    id="transferAssetId"
+    class="form-control">
+
+</div>
+
+<div class="mb-3">
+
+<label>
+Current Location
+</label>
+
+<input
+    class="form-control"
+    value="${asset.location}"
+    readonly>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+Transfer To
+</label>
+
+<select
+    id="transferLocation"
+    class="form-select">
+
+${locations
+.filter(
+    l =>
+        l.name !== asset.location
+)
+.map(
+    l => `
+<option>
+${l.name}
+</option>
+`
+).join("")}
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+Remarks
+</label>
+
+<textarea
+    id="transferRemarks"
+    class="form-control">
+</textarea>
+
+</div>
+
+</div>
+
+<div class="modal-footer">
+
+<button
+    class="btn btn-secondary"
+    onclick="this.closest('.modal').remove()">
+
+Cancel
+
+</button>
+
+<button
+    class="btn btn-primary"
+    onclick="saveAssetTransfer('${asset.id}')">
+
+Transfer
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+    document.body.appendChild(
+        modal
+    );
+
+}
+
+function saveAssetTransfer(
+    oldAssetId
+) {
+
+    const assets =
+        getAssets();
+
+    const oldAsset =
+        assets.find(
+            a =>
+                a.id === oldAssetId
+        );
+
+    const newAssetId =
+        document.getElementById(
+            "transferAssetId"
+        ).value.trim();
+
+    const newLocation =
+        document.getElementById(
+            "transferLocation"
+        ).value;
+
+    const remarks =
+        document.getElementById(
+            "transferRemarks"
+        ).value;
+
+    if (!newAssetId) {
+
+        alert(
+            "Enter new Asset ID"
+        );
+
+        return;
+    }
+
+    const existingAsset =
+        assets.find(
+            a => a.id === newAssetId
+        );
+
+    if (existingAsset) {
+
+        alert(
+            "Asset ID already exists."
+        );
+
+        return;
+    }
+
+    const newAsset = {
+
+        ...oldAsset,
+
+        transferredTo: "",
+
+        transferDate: "",
+
+        transferRemarks: "",
+
+        id:
+            newAssetId,
+
+        location:
+            newLocation,
+
+        previousAssetId:
+            oldAsset.id,
+
+        status:
+            "Available"
+    };
+
+    oldAsset.status =
+        "Transferred";
+
+    oldAsset.transferredTo =
+        newAssetId;
+
+    oldAsset.transferDate =
+        formatDateTime();
+
+    oldAsset.transferRemarks =
+        remarks;
+
+    assets.push(
+        newAsset
+    );
+
+    saveAssets(
+        assets
+    );
+
+    addAssetTransfer({
+
+        id: Date.now(),
+
+        oldAssetId:
+            oldAsset.id,
+
+        newAssetId,
+
+        fromLocation:
+            oldAsset.location,
+
+        toLocation:
+            newLocation,
+
+        remarks,
+
+        transferDate:
+            formatDateTime()
+
+    });
+
+    addActivity(
+        `Asset transferred:
+${oldAsset.id}
+→
+${newAssetId}`
+    );
+
+    alert(
+        "Asset transferred successfully."
+    );
+
+    loadAssets();
 
 }
