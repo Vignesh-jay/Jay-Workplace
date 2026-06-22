@@ -135,7 +135,7 @@ document.getElementById("content").innerHTML = `
 
             <tr>
                 <td>Version</td>
-                <td>1.0.0 MVP</td>
+                <td>1.1.0 MVP</td>
             </tr>
 
             <tr>
@@ -196,18 +196,26 @@ function exportBackup() {
     const backup = {
 
         employees: getEmployees(),
+
         assets: getAssets(),
+
         assignments: getAssignments(),
+
         activities: getActivities(),
 
         departments: getDepartments(),
+
         locations: getLocations(),
 
-        employeeTransfers:
-            getEmployeeTransfers(),
+        auditLogs: getAuditLogs(),
 
-        assetTransfers:
-            getAssetTransfers()
+        assetTransfers: getAssetTransfers(),
+
+        assetHistory: getAssetHistory(),
+
+        exportDate: formatDateTime(),
+
+        version: "1.1.0"
 
     };
 
@@ -296,12 +304,16 @@ function restoreBackup() {
                 backup.locations || []
             );
 
-            saveEmployeeTransfers(
-                backup.employeeTransfers || []
+            saveAuditLogs(
+                backup.auditLogs || []
             );
 
             saveAssetTransfers(
                 backup.assetTransfers || []
+            );
+
+            saveAssetHistory(
+                backup.assetHistory || []
             );
 
             alert(
@@ -310,10 +322,13 @@ function restoreBackup() {
 
             location.reload();
 
-        } catch {
+        } catch(error) {
+
+            console.error(error);
 
             alert(
-                "Invalid backup file"
+                "Restore failed: " +
+                error.message
             );
 
         }
@@ -331,46 +346,12 @@ function resetSystem() {
         return;
     }
 
-    saveEmployees([]);
-    saveAssets([]);
-    saveAssignments([]);
-    saveActivities([]);
-    saveDepartments([]);
-    saveAuditLogs([]);
-    saveSettings({});
-    saveRoles([]);
-    savePermissions([]);
-    saveUsers([]);
-    saveNotifications([]);
-    saveLocations([]);
-    saveEmployeeTransfers([]);
-    saveAssetTransfers([]);
-    activityLogs = [];
-    assignments = [];
-    departments = [];
-    auditLogs = [];
-    settings = {};
-    roles = [];
-    permissions = [];
-    users = [];
-    notifications = [];
-    
+    localStorage.clear();
 
     alert(
         "All data has been reset."
     );
 
-    localStorage.removeItem(
-        "jayworkplace_locations"
-    );
-
-    localStorage.removeItem(
-        "jayworkplace_employee_transfers"
-    );
-
-    localStorage.removeItem(
-        "jayworkplace_asset_transfers"
-    );
-
     location.reload();
+
 }

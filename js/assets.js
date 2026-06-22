@@ -1124,7 +1124,7 @@ function editAsset(assetId) {
 
     ${isAssigned ? `
 
-    <div class="alert alert-warning">
+    <div class="modal-body">
 
         This asset is currently assigned to
         ${activeAssignment.employeeName}.
@@ -1136,6 +1136,11 @@ function editAsset(assetId) {
     </div>
 
     ` : ""}
+
+    <input
+        type="hidden"
+        id="editAssetId"
+        value="${asset.id}">
 
     <div class="modal fade"
          id="editAssetModal"

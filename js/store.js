@@ -1,80 +1,18 @@
 function initializeStore() {
 
-    if (!localStorage.getItem(STORAGE_KEYS.departments)) {
+    Object.values(STORAGE_KEYS).forEach(key => {
 
-        localStorage.setItem(
-            STORAGE_KEYS.departments,
-            JSON.stringify([
-                "IT",
-                "HR",
-                "Finance",
-                "Operations",
-                "Admin"
-            ])
-        );
+        if (!localStorage.getItem(key)) {
 
-    }
+            localStorage.setItem(
+                key,
+                JSON.stringify([])
+            );
 
-    if (!localStorage.getItem(STORAGE_KEYS.employees)) {
-        localStorage.setItem(
-            STORAGE_KEYS.employees,
-            JSON.stringify(employees)
-        );
-    }
+        }
 
-    if (!localStorage.getItem(STORAGE_KEYS.assets)) {
-        localStorage.setItem(
-            STORAGE_KEYS.assets,
-            JSON.stringify(assets)
-        );
-    }
+    });
 
-    if (!localStorage.getItem(STORAGE_KEYS.assignments)) {
-        localStorage.setItem(
-            STORAGE_KEYS.assignments,
-            JSON.stringify(assignments)
-        );
-    }
-
-    if (!localStorage.getItem(STORAGE_KEYS.activities)) {
-        localStorage.setItem(
-            STORAGE_KEYS.activities,
-            JSON.stringify(dashboardData.activities)
-        );
-    }
-    const activities =
-        JSON.parse(
-            localStorage.getItem(
-                STORAGE_KEYS.activities
-            )
-        ) || [];
-
-    if (
-        activities.length > 0 &&
-        typeof activities[0] === "string"
-    ) {
-
-        const migrated =
-            activities.map(item => ({
-
-                message: item,
-
-                timestamp:
-                    "Legacy Activity"
-
-            }));
-
-        saveActivities(migrated);
-
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.assetHistory)) {
-
-    localStorage.setItem(
-        STORAGE_KEYS.assetHistory,
-        JSON.stringify([])
-    );
-
-}
 }
 
 function getEmployees() {

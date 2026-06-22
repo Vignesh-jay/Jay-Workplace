@@ -59,43 +59,6 @@ function loadLocations() {
             </div>
         </div>
     `;
-
-    document
-    .getElementById("btnAddLocation")
-    .addEventListener("click", () => {
-
-        const name =
-            prompt("Location Name");
-
-        if (!name) {
-            return;
-        }
-
-        const locations =
-            getLocations();
-
-        const newLocation = {
-
-            id:
-                "LOC" +
-                Date.now(),
-
-            code:
-                name.substring(0, 3)
-                    .toUpperCase(),
-
-            name,
-
-            state: "",
-
-            status: "Active"
-        };
-
-        addLocation(newLocation);
-
-        loadLocations();
-
-    });
 }
 
 function removeLocation(id) {
@@ -359,13 +322,19 @@ function saveLocation(locationId = null) {
 
     }
 
-    bootstrap.Modal
-        .getInstance(
-            document.getElementById(
-                "locationModal"
-            )
-        )
-        .hide();
+    const modalElement =
+        document.getElementById(
+            "locationModal"
+        );
+
+    const modal =
+        bootstrap.Modal.getInstance(
+            modalElement
+        );
+
+    modal.hide();
+
+    modalElement.remove();
 
     loadLocations();
 }

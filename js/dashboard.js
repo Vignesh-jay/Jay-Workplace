@@ -1,5 +1,20 @@
 function loadDashboard() {
 
+    const employees = getEmployees();
+    const assets = getAssets();
+
+    if (
+        getEmployees().length === 0 &&
+        getAssets().length === 0 &&
+        getDepartments().length === 0 &&
+        getLocations().length === 0
+    ) {
+
+        loadFirstRunScreen();
+
+        return;
+    }
+
     const expiringAssets =
     getExpiringAssets();
 
@@ -237,6 +252,172 @@ function loadDashboard() {
 renderCharts();
 }
 
+function loadWelcomeDashboard() {
+
+    document.getElementById("content").innerHTML = `
+
+    <div class="card-custom text-center p-5">
+
+        <h1 class="mb-3">
+            Welcome to Jay Workplace 👋
+        </h1>
+
+        <p class="text-muted mb-4">
+            Your Asset & Workforce Management Platform
+        </p>
+
+        <div class="row g-4 mt-2">
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm p-3">
+                    <h5>1️⃣ Locations</h5>
+                    <p class="small text-muted">
+                        Create office locations.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm p-3">
+                    <h5>2️⃣ Departments</h5>
+                    <p class="small text-muted">
+                        Create departments.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm p-3">
+                    <h5>3️⃣ Employees</h5>
+                    <p class="small text-muted">
+                        Add workforce records.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm p-3">
+                    <h5>4️⃣ Assets</h5>
+                    <p class="small text-muted">
+                        Register company assets.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-5">
+
+            <button
+                class="btn btn-primary me-2"
+                onclick="loadAdministration()">
+
+                Setup Locations & Departments
+
+            </button>
+
+            <button
+                class="btn btn-success"
+                onclick="loadWorkforce()">
+
+                Add Employees
+
+            </button>
+
+        </div>
+
+    </div>
+
+    `;
+}
+
+function loadFirstRunScreen() {
+
+    document.getElementById("content").innerHTML = `
+
+    <div class="card-custom text-center p-5">
+
+        <h1>
+            Welcome to Jay Workplace 👋
+        </h1>
+
+        <p class="text-muted mb-5">
+
+            Setup a new workplace or restore
+            an existing backup.
+
+        </p>
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <div class="card h-100 p-4">
+
+                    <h4>
+                        📥 Import Existing Data
+                    </h4>
+
+                    <p class="text-muted">
+
+                        Restore employees,
+                        assets, assignments,
+                        locations and history.
+
+                    </p>
+
+                    <input
+                        type="file"
+                        id="startupRestoreFile"
+                        class="form-control">
+
+                    <button
+                        class="btn btn-success mt-3"
+                        onclick="startupRestoreBackup()">
+
+                        Import Backup
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <div class="card h-100 p-4">
+
+                    <h4>
+                        ✨ Start New
+                    </h4>
+
+                    <p class="text-muted">
+
+                        Create locations,
+                        departments,
+                        employees and assets.
+
+                    </p>
+
+                    <button
+                        class="btn btn-primary mt-4"
+                        onclick="loadWelcomeDashboard();">
+
+                        Start New Setup
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `;
+}
+
 function renderCharts() {
 
 const employees =
@@ -370,4 +551,88 @@ new Chart(assetCtx, {
 
 });
 
+}
+
+function startupRestoreBackup() {
+
+    document.getElementById(
+        "restoreFile"
+    )?.remove();
+
+    const file =
+        document.getElementById(
+            "startupRestoreFile"
+        ).files[0];
+
+    if (!file) {
+
+        alert(
+            "Select a backup file"
+        );
+
+        return;
+    }
+
+    const reader =
+        new FileReader();
+
+    reader.onload =
+        function(e) {
+
+            try {
+
+                const backup =
+                    JSON.parse(
+                        e.target.result
+                    );
+
+                saveEmployees(
+                    backup.employees || []
+                );
+
+                saveAssets(
+                    backup.assets || []
+                );
+
+                saveAssignments(
+                    backup.assignments || []
+                );
+
+                saveActivities(
+                    backup.activities || []
+                );
+
+                saveDepartments(
+                    backup.departments || []
+                );
+
+                saveLocations(
+                    backup.locations || []
+                );
+
+                saveAssetTransfers(
+                    backup.assetTransfers || []
+                );
+
+                saveAssetHistory(
+                    backup.assetHistory || []
+                );
+
+                alert(
+                    "Backup restored successfully"
+                );
+
+                location.reload();
+
+            } catch(error) {
+
+                alert(
+                    "Invalid backup file"
+                );
+
+            }
+
+        };
+
+    reader.readAsText(file);
 }
