@@ -154,6 +154,21 @@ document.getElementById("content").innerHTML = `
             </tr>
 
             <tr>
+                <td>Locations</td>
+                <td>${getLocations().length}</td>
+            </tr>
+
+            <tr>
+                <td>Employee Transfers</td>
+                <td>${getEmployeeTransfers().length}</td>
+            </tr>
+
+            <tr>
+                <td>Asset Transfers</td>
+                <td>${getAssetTransfers().length}</td>
+            </tr>
+
+            <tr>
                 <td>Storage</td>
                 <td>Local Storage</td>
             </tr>
@@ -175,7 +190,16 @@ function exportBackup() {
         employees: getEmployees(),
         assets: getAssets(),
         assignments: getAssignments(),
-        activities: getActivities()
+        activities: getActivities(),
+
+        departments: getDepartments(),
+        locations: getLocations(),
+
+        employeeTransfers:
+            getEmployeeTransfers(),
+
+        assetTransfers:
+            getAssetTransfers()
 
     };
 
@@ -256,6 +280,22 @@ function restoreBackup() {
                 backup.activities || []
             );
 
+            saveDepartments(
+                backup.departments || []
+            );
+
+            saveLocations(
+                backup.locations || []
+            );
+
+            saveEmployeeTransfers(
+                backup.employeeTransfers || []
+            );
+
+            saveAssetTransfers(
+                backup.assetTransfers || []
+            );
+
             alert(
                 "Backup restored successfully"
             );
@@ -294,6 +334,9 @@ function resetSystem() {
     savePermissions([]);
     saveUsers([]);
     saveNotifications([]);
+    saveLocations([]);
+    saveEmployeeTransfers([]);
+    saveAssetTransfers([]);
     activityLogs = [];
     assignments = [];
     departments = [];
@@ -307,6 +350,18 @@ function resetSystem() {
 
     alert(
         "All data has been reset."
+    );
+
+    localStorage.removeItem(
+        "jayworkplace_locations"
+    );
+
+    localStorage.removeItem(
+        "jayworkplace_employee_transfers"
+    );
+
+    localStorage.removeItem(
+        "jayworkplace_asset_transfers"
     );
 
     location.reload();
