@@ -8,15 +8,43 @@ function loadDashboard() {
 
     const totalEmployees = employeeList.length;
 
-    const totalAssets = assetList.length;
+    const totalAssets =
+        getAssets().filter(
+            asset =>
+                asset.status !== "Retired" &&
+                asset.status !== "Transferred"
+        ).length;
 
-    const assignedAssets = assetList.filter(
-        asset => asset.status === "Assigned"
-    ).length;
+    const assignedAssets =
+        getAssignments().filter(
+            a => a.status === "Assigned"
+        ).length;
 
-    const availableAssets = assetList.filter(
-        asset => asset.status === "Available"
-    ).length;
+    const activeAssignedAssetIds =
+        getAssignments()
+            .filter(
+                a => a.status === "Assigned"
+            )
+            .map(
+                a => a.assetId
+            );
+
+    const availableAssets =
+        getAssets().filter(
+            asset =>
+                asset.status === "Available" &&
+                !activeAssignedAssetIds.includes(asset.id)
+        ).length;
+
+    const retiredAssets =
+        getAssets().filter(
+            a => a.status === "Retired"
+        ).length;
+
+    const transferredAssets =
+        getAssets().filter(
+            a => a.status === "Transferred"
+        ).length;
 
     setActiveMenu('nav-dashboard');
 

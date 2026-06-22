@@ -145,7 +145,15 @@ document.getElementById("content").innerHTML = `
 
             <tr>
                 <td>Assets</td>
-                <td>${getAssets().length}</td>
+                <td>
+                ${
+                    getAssets().filter(
+                        a =>
+                            a.status !== "Retired" &&
+                            a.status !== "Transferred"
+                    ).length
+                }
+                </td>
             </tr>
 
             <tr>
