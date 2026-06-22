@@ -111,17 +111,43 @@ document.getElementById("content").innerHTML = `
                         onclick="viewAsset('${asset.id}')">
                         View
                     </button>
-                    <button
-                        class="btn btn-sm btn-outline-primary"
-                        onclick="editAsset('${asset.id}')">
-                        Edit
-                    </button>
+                    ${
+                        asset.status !== "Transferred"
 
-                    <button
-                        class="btn btn-sm btn-outline-danger"
-                        onclick="deleteAsset('${asset.id}')">
-                        Delete
-                    </button>
+                        ? `
+
+                        <button
+                            class="btn btn-sm btn-outline-primary"
+                            onclick="editAsset('${asset.id}')">
+
+                            Edit
+
+                        </button>
+
+                        `
+
+                        : ""
+
+                    }
+
+                    ${
+                        asset.status !== "Transferred"
+
+                        ? `
+
+                        <button
+                            class="btn btn-sm btn-outline-danger"
+                            onclick="deleteAsset('${asset.id}')">
+
+                            Delete
+
+                        </button>
+
+                        `
+
+                        : ""
+
+                    }
                 </td>
 
             </tr>
@@ -382,6 +408,23 @@ function saveAsset() {
 
 function deleteAsset(assetId) {
 
+    const asset =
+        getAssets().find(
+            a => a.id === assetId
+        );
+
+    if (
+        asset.status === "Transferred"
+    ) {
+
+        alert(
+            "Transferred assets cannot be deleted."
+        );
+
+        return;
+
+    }
+
     const activeAssignment =
         getAssignments().find(
             a =>
@@ -401,11 +444,6 @@ function deleteAsset(assetId) {
     if (!confirm("Delete this asset?")) {
         return;
     }
-
-    const asset =
-    getAssets().find(
-        a => a.id === assetId
-    );
 
     deleteAssetById(assetId);
 
@@ -478,15 +516,28 @@ function viewAsset(assetId) {
         );
 
     const assignmentHistory =
-    getAssignments()
-        .filter(
-            a => a.assetId === assetId
-        )
-        .sort(
-            (a, b) =>
-                new Date(b.assignedDate) -
-                new Date(a.assignedDate)
-        );
+        getAssignments()
+            .filter(
+                a => a.assetId === assetId
+            )
+            .sort(
+                (a, b) =>
+                    new Date(b.assignedDate) -
+                    new Date(a.assignedDate)
+            );
+
+    const transferHistory =
+        getAssetTransfers()
+            .filter(
+                t =>
+                    t.oldAssetId === asset.id ||
+                    t.newAssetId === asset.id
+            )
+            .sort(
+                (a, b) =>
+                    new Date(b.transferDate) -
+                    new Date(a.transferDate)
+            );
 
     const displayStatus =
         currentAssignment
@@ -595,9 +646,19 @@ function viewAsset(assetId) {
                         <button
                             class="btn btn-warning"
                             onclick="
-                                document.querySelectorAll('.modal').forEach(m => m.remove());
+                                const modal =
+                                    bootstrap.Modal.getInstance(
+                                        document.getElementById(
+                                            'assetDetailsModal'
+                                        )
+                                    );
+
+                                if (modal) {
+                                    modal.hide();
+                                }
+
                                 showAssetTransferModal('${asset.id}');
-                                ">
+                            ">
 
                             <i class="fas fa-exchange-alt"></i>
 
@@ -713,80 +774,155 @@ function viewAsset(assetId) {
 
                         <hr>
 
-                        <h6>
-                            Assignment History
-                        </h6>
+                            <h6>
+                                Assignment History
+                            </h6>
 
-                        ${
-                            assignmentHistory.length > 0
+                            ${
+                                assignmentHistory.length > 0
 
-                            ? `
+                                ? `
 
-                            <table class="table table-sm">
+                                <table class="table table-sm">
 
-                                <thead>
+                                    <thead>
 
-                                    <tr>
-                                        <th>Employee</th>
-                                        <th>Assigned</th>
-                                        <th>Returned</th>
-                                        <th>Status</th>
-                                    </tr>
+                                        <tr>
+                                            <th>Employee</th>
+                                            <th>Assigned</th>
+                                            <th>Returned</th>
+                                            <th>Status</th>
+                                        </tr>
 
-                                </thead>
+                                    </thead>
 
-                                <tbody>
+                                    <tbody>
 
-                                    ${assignmentHistory.map(item => `
+                                        ${assignmentHistory.map(item => `
+
+                                            <tr>
+
+                                                <td>
+                                                    ${item.employeeName}
+                                                </td>
+
+                                                <td>
+                                                    ${item.assignedDate}
+                                                </td>
+
+                                                <td>
+                                                    ${item.returnedDate || "-"}
+                                                </td>
+
+                                                <td>
+
+                                                    <span class="badge ${
+                                                        item.status === "Assigned"
+                                                            ? "bg-success"
+                                                            : "bg-secondary"
+                                                    }">
+
+                                                        ${item.status}
+
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        `).join('')}
+
+                                    </tbody>
+
+                                </table>
+
+                                `
+
+                                : `
+
+                                <p class="text-muted">
+
+                                    No assignment history.
+
+                                </p>
+
+                                `
+                            }
+
+                        <hr>
+
+                            <h6>
+                                Transfer History
+                            </h6>
+
+                            ${
+                                transferHistory.length > 0
+
+                                ? `
+
+                                <table class="table table-sm">
+
+                                    <thead>
 
                                         <tr>
 
-                                            <td>
-                                                ${item.employeeName}
-                                            </td>
-
-                                            <td>
-                                                ${item.assignedDate}
-                                            </td>
-
-                                            <td>
-                                                ${item.returnedDate || "-"}
-                                            </td>
-
-                                            <td>
-
-                                                <span class="badge ${
-                                                    item.status === "Assigned"
-                                                        ? "bg-success"
-                                                        : "bg-secondary"
-                                                }">
-
-                                                    ${item.status}
-
-                                                </span>
-
-                                            </td>
+                                            <th>Old Asset</th>
+                                            <th>New Asset</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Date</th>
 
                                         </tr>
 
-                                    `).join('')}
+                                    </thead>
 
-                                </tbody>
+                                    <tbody>
 
-                            </table>
+                                        ${transferHistory.map(t => `
 
-                            `
+                                            <tr>
 
-                            : `
+                                                <td>
+                                                    ${t.oldAssetId}
+                                                </td>
 
-                            <p class="text-muted">
+                                                <td>
+                                                    ${t.newAssetId}
+                                                </td>
 
-                                No assignment history.
+                                                <td>
+                                                    ${t.fromLocation}
+                                                </td>
 
-                            </p>
+                                                <td>
+                                                    ${t.toLocation}
+                                                </td>
 
-                            `
-                        }
+                                                <td>
+                                                    ${t.transferDate}
+                                                </td>
+
+                                            </tr>
+
+                                        `).join("")}
+
+                                    </tbody>
+
+                                </table>
+
+                                `
+
+                                : `
+
+                                <p class="text-muted">
+
+                                    No transfer history.
+
+                                </p>
+
+                                `
+
+                            }
 
                     <h6 class="mt-4">
                         Asset Timeline
@@ -935,8 +1071,6 @@ function filterAssets() {
 
 function editAsset(assetId) {
 
-
-
     const existingModal =
         document.getElementById(
             "editAssetModal"
@@ -953,9 +1087,28 @@ function editAsset(assetId) {
             a => a.id === assetId
         );
 
+    if (asset.status === "Transferred") {
+
+        alert(
+            "Transferred assets cannot be edited."
+        );
+
+        return;
+
+    }
+
     if (!asset) {
             return;
         }
+
+    if (asset.status === "Transferred") {
+
+        alert(
+            "Transferred assets cannot be edited."
+        );
+
+        return;
+    }
 
     const activeAssignment =
         getAssignments().find(
@@ -1738,6 +1891,29 @@ ${newAssetId}`
 
     alert(
         "Asset transferred successfully."
+    );
+
+    const transferModal =
+        document.querySelector(
+            ".modal.show"
+        );
+
+    if (transferModal) {
+        transferModal.remove();
+    }
+
+    document
+        .querySelectorAll(".modal-backdrop")
+        .forEach(
+            b => b.remove()
+        );
+
+    document.body.classList.remove(
+        "modal-open"
+    );
+
+    document.body.style.removeProperty(
+        "padding-right"
     );
 
     loadAssets();
