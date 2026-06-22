@@ -856,6 +856,9 @@ function saveEmployeeEdit() {
         ...employee
     };
 
+    const oldLocation =
+        employee.location || "";
+
     employee.firstName =
         document.getElementById(
             "editEmployeeFirstName"
@@ -886,10 +889,13 @@ function saveEmployeeEdit() {
             "editEmployeeManager"
         ).value;
 
-    employee.location =
+    const newLocation =
         document.getElementById(
             "editEmployeeLocation"
         ).value;
+
+    employee.location =
+        newLocation;
 
     employee.joiningDate =
         document.getElementById(
@@ -986,6 +992,47 @@ function saveEmployeeEdit() {
         );
 
         return;
+    }
+
+    if (
+        oldLocation &&
+        oldLocation !== newLocation
+    ) {
+
+        addEmployeeTransfer({
+
+            id: Date.now(),
+
+            employeeId:
+                employee.id,
+
+            employeeName:
+                `${employee.firstName} ${employee.lastName}`,
+
+            fromLocation:
+                oldLocation,
+
+            toLocation:
+                newLocation,
+
+            effectiveDate:
+                formatDateTime(),
+
+            remarks:
+                "Location changed via Employee Edit"
+
+        });
+
+        addActivity(
+            `Employee ${employee.name} transferred from ${oldLocation} to ${newLocation}`
+        );
+
+        addEmployeeHistory(
+            employee.id,
+            "Transferred",
+            `${oldLocation} → ${newLocation}`
+        );
+
     }
 
     saveEmployees(employees);
