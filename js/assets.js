@@ -1,10 +1,242 @@
+let assetFilter = "all";
+
+const AssetSpecifications = {
+
+    Laptop: [
+
+        { key: "manufacturer", label: "Manufacturer" },
+        { key: "model", label: "Model" },
+        { key: "processor", label: "Processor" },
+        { key: "ram", label: "Memory (RAM)" },
+        { key: "storage", label: "Storage" },
+        { key: "graphics", label: "Graphics" },
+        { key: "display", label: "Display" },
+        { key: "operatingSystem", label: "Operating System" }
+
+    ],
+
+    Desktop: [
+
+        { key: "manufacturer", label: "Manufacturer" },
+        { key: "model", label: "Model" },
+        { key: "processor", label: "Processor" },
+        { key: "ram", label: "Memory (RAM)" },
+        { key: "storage", label: "Storage" },
+        { key: "graphics", label: "Graphics" },
+        { key: "motherboard", label: "Motherboard" },
+        { key: "operatingSystem", label: "Operating System" }
+
+    ],
+
+    Monitor: [
+
+        { key: "manufacturer", label: "Manufacturer" },
+        { key: "model", label: "Model" },
+        { key: "screenSize", label: "Screen Size" },
+        { key: "resolution", label: "Resolution" },
+        { key: "refreshRate", label: "Refresh Rate" },
+        { key: "panelType", label: "Panel Type" },
+        { key: "ports", label: "Ports" }
+
+    ],
+
+    Mobile: [
+
+        { key: "manufacturer", label: "Manufacturer" },
+        { key: "model", label: "Model" },
+        { key: "processor", label: "Processor" },
+        { key: "ram", label: "Memory (RAM)" },
+        { key: "storage", label: "Storage" },
+        { key: "battery", label: "Battery" },
+        { key: "display", label: "Display" },
+        { key: "imei1", label: "IMEI 1" },
+        { key: "imei2", label: "IMEI 2" }
+
+    ],
+
+    Printer: [
+
+        { key: "manufacturer", label: "Manufacturer" },
+        { key: "model", label: "Model" },
+        { key: "technology", label: "Technology" },
+        { key: "colorMode", label: "Color / Mono" },
+        { key: "connectivity", label: "Connectivity" },
+        { key: "duplex", label: "Duplex" }
+
+    ],
+
+    Server: [
+
+        { key: "manufacturer", label: "Manufacturer" },
+        { key: "model", label: "Model" },
+        { key: "processor", label: "Processor" },
+        { key: "ram", label: "Memory" },
+        { key: "storage", label: "Storage" },
+        { key: "raid", label: "RAID" },
+        { key: "network", label: "Network Ports" }
+
+    ],
+
+    Network: [
+        { key:"manufacturer", label:"Manufacturer" },
+        { key:"model", label:"Model" },
+        { key:"deviceType", label:"Device Type" },
+        { key:"ports", label:"Ports" },
+        { key:"speed", label:"Speed" },
+        { key:"macAddress", label:"MAC Address" },
+        { key:"firmware", label:"Firmware Version" }
+    ],
+
+};
+
+function getSpecificationTemplate(category){
+
+    return AssetSpecifications[category] || [];
+
+}
+
+function buildSpecificationFields(category, values = {}, prefix = "spec") {
+
+    const specs = getSpecificationTemplate(category);
+
+    return specs.map(field => `
+
+        <div class="mb-3">
+
+            <label class="form-label">
+
+                ${field.label}
+
+            </label>
+
+            <input
+                type="text"
+                class="form-control"
+                id="${prefix}_${field.key}"
+                value="${values[field.key] || ""}"
+            >
+
+        </div>
+
+    `).join("");
+
+}
+
+function renderSpecificationFields(
+    categorySelectId,
+    containerId,
+    values = {},
+    prefix = "spec"
+){
+
+    const category =
+        document.getElementById(categorySelectId).value;
+
+    document.getElementById(containerId).innerHTML =
+        buildSpecificationFields(
+            category,
+            values,
+            prefix
+        );
+}
+
+function buildSpecificationCard(asset){
+
+    const specs =
+        asset.specifications || {};
+
+    const fields =
+        getSpecificationTemplate(asset.category);
+
+    return `
+
+        <div class="asset-info-card">
+
+            <h6>
+
+                <i class="fas fa-microchip text-primary me-2"></i>
+
+                Specifications
+
+            </h6>
+
+            <div class="info-grid">
+
+                ${fields.map(field => `
+
+                    <div>
+
+                        ${field.label}
+
+                    </div>
+
+                    <strong>
+
+                        ${specs[field.key] || "Not Specified"}
+
+                    </strong>
+
+                `).join("")}
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
 function loadAssets(){
 
     let assetList = getAssets();
+
+    const assignments = getAssignments();
+
+    const totalAssets = assetList.length;
+
+    const assignedAssets = assignments.filter(
+        a => a.status === "Assigned"
+    ).length;
+
+    const availableAssets = assetList.filter(
+        a => a.status === "Available"
+    ).length;
+
+    const expiringWarranty = getExpiringAssets(30).length;
+
     const searchText =
     document.getElementById("assetSearch")?.value || "";
 
     setActiveMenu('nav-assets');
+
+    switch(assetFilter){
+
+        case "assigned":
+
+            assetList = assetList.filter(asset =>
+                assignments.some(a =>
+                    a.assetId === asset.id &&
+                    a.status === "Assigned"
+                )
+            );
+
+            break;
+
+        case "available":
+
+            assetList = assetList.filter(asset =>
+                asset.status === "Available"
+            );
+
+            break;
+
+        case "warranty":
+
+            assetList = getExpiringAssets(30);
+
+            break;
+
+    }
 
 document.getElementById("content").innerHTML = `
 
@@ -15,6 +247,90 @@ document.getElementById("content").innerHTML = `
         <p class="text-muted">
             Manage company assets and inventory.
         </p>
+    </div>
+
+</div>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-3">
+
+        <div class="card dashboard-card h-100" onclick="setAssetFilter('all')">
+
+            <div class="card-body">
+
+                <div class="text-muted small">
+                    Total Assets
+                </div>
+
+                <h2>${totalAssets}</h2>
+
+                <i class="fas fa-laptop fa-2x text-primary"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card dashboard-card h-100" data-filter="assigned" onclick="setAssetFilter('assigned')">
+
+            <div class="card-body">
+
+                <div class="text-muted small">
+                    Assigned
+                </div>
+
+                <h2>${assignedAssets}</h2>
+
+                <i class="fas fa-user-check fa-2x text-success"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card dashboard-card h-100" data-filter="available" onclick="setAssetFilter('available')">
+
+            <div class="card-body">
+
+                <div class="text-muted small">
+                    Available
+                </div>
+
+                <h2>${availableAssets}</h2>
+
+                <i class="fas fa-box-open fa-2x text-info"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card dashboard-card h-100" data-filter="warranty" onclick="setAssetFilter('warranty')">
+
+            <div class="card-body">
+
+                <div class="text-muted small">
+                    Warranty (30 Days)
+                </div>
+
+                <h2>${expiringWarranty}</h2>
+
+                <i class="fas fa-shield-alt fa-2x text-warning"></i>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>
@@ -61,10 +377,10 @@ document.getElementById("content").innerHTML = `
 
         <thead>
             <tr>
-                <th>Asset ID</th>
-                <th>Asset Name</th>
-                <th>Category</th>
+                <th>Asset</th>
+                <th>Assigned To</th>
                 <th>Location</th>
+                <th>Warranty</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -88,71 +404,135 @@ document.getElementById("content").innerHTML = `
                         : asset.status;
 
                 return `
+                <tr>
 
-            <tr>
+                    <td>
+                        <div class="d-flex flex-column">
+                            <div class="asset-name">
 
-                <td>${asset.id}</td>
+                                ${asset.name}
 
-                <td>${asset.name}</td>
+                            </div>
 
-                <td>${asset.category}</td>
+                            <div class="asset-meta">
+                                ${asset.id}
+                            </div>
 
-                <td>${asset.location || "-"}</td>
+                            <div class="asset-meta">
+                                ${asset.category}
+                            </div>
 
-                <td>
-                    <span class="status-badge ${asset.status.toLowerCase()}">
-                        ${displayStatus}
-                    </span>
-                </td>
+                            ${
+                                asset.serialNumber
+                                    ? `<div class="asset-meta">
+                                        S/N : ${asset.serialNumber}
+                                    </div>`
+                                    : ""
+                            }
+                        </div>
+                    </td>
 
-                <td>
-                    <button
-                        class="btn btn-sm btn-outline-info"
-                        onclick="viewAsset('${asset.id}')">
-                        View
-                    </button>
-                    ${
-                        asset.status !== "Transferred"
+                    <td>
+                        ${
+                            activeAssignment
+                                ? `
+                                    <div>
+                                        <i class="fas fa-user text-primary"></i>
+                                        ${activeAssignment.employeeName}
+                                    </div>
+                                `
+                                : `
+                                    <span class="text-muted">
+                                        <i class="fas fa-box"></i>
+                                        In Inventory
+                                    </span>
+                                `
+                        }
+                    </td>
 
-                        ? `
+                    <td>
+                        ${asset.location || "-"}
+                    </td>
+
+                    <td>
+                        ${
+                            asset.warrantyExpiry
+                                ? (() => {
+
+                                    const days = Math.ceil(
+                                        (new Date(asset.warrantyExpiry) - new Date())
+                                        / (1000*60*60*24)
+                                    );
+
+                                    if(days < 0)
+                                        return `<span class="badge bg-danger">
+                                                    Expired
+                                                </span>`;
+
+                                    if(days <=30)
+                                        return `<span class="badge bg-danger">
+                                                    ${days} Days
+                                                </span>`;
+
+                                    if(days <=90)
+                                        return `<span class="badge bg-warning">
+                                                    ${days} Days
+                                                </span>`;
+
+                                    return `<span class="badge bg-success">
+                                                ${days} Days
+                                            </span>`;
+
+                                })()
+                                : "-"
+                        }
+                    </td>
+
+                    <td>
+                        <span class="status-badge ${displayStatus.toLowerCase()}">
+                            ${displayStatus}
+                        </span>
+                    </td>
+
+                    <td class="text-nowrap">
 
                         <button
-                            class="btn btn-sm btn-outline-primary"
-                            onclick="editAsset('${asset.id}')">
+                            class="btn btn-light btn-sm asset-action-btn"
+                            title="View"
+                            onclick="viewAsset('${asset.id}')">
 
-                            Edit
+                            <i class="fas fa-eye"></i>
 
                         </button>
 
-                        `
+                        ${
+                            asset.status !== "Transferred"
+                            ? `
+                            <button
+                                class="btn btn-light btn-sm asset-action-btn"
+                                title="Edit"
+                                onclick="editAsset('${asset.id}')">
 
-                        : ""
+                                <i class="fas fa-pen"></i>
 
-                    }
+                            </button>
 
-                    ${
-                        asset.status !== "Transferred"
+                            <button
+                                class="btn btn-light btn-sm asset-action-btn text-danger"
+                                title="Delete"
+                                onclick="deleteAsset('${asset.id}')">
 
-                        ? `
+                                <i class="fas fa-trash"></i>
 
-                        <button
-                            class="btn btn-sm btn-outline-danger"
-                            onclick="deleteAsset('${asset.id}')">
+                            </button>
+                            `
+                            : ""
+                        }
 
-                            Delete
+                    </td>
 
-                        </button>
-
-                        `
-
-                        : ""
-
-                    }
-                </td>
-
-            </tr>
-
-            `;
+                </tr>
+                `;
 
             }).join("")}
 
@@ -175,9 +555,36 @@ if (searchInput) {
 
 }
 
+document.querySelectorAll(".dashboard-card").forEach(card=>{
+
+        card.classList.remove("active");
+
+        if(card.dataset.filter===assetFilter){
+
+            card.classList.add("active");
+
+        }
+
+    });
+
+}
+
+function setAssetFilter(filter){
+
+    assetFilter = filter;
+
+    loadAssets();
+
 }
 
 function showAddAssetModal() {
+
+    const existingModal =
+        document.getElementById("addAssetModal");
+
+    if (existingModal) {
+        existingModal.remove();
+    }
 
     const modalHtml = `
     <div class="modal fade"
@@ -219,18 +626,49 @@ function showAddAssetModal() {
                     </div>
 
                     <div class="mb-3">
-                        <label>Category</label>
+
+                        <label class="form-label">
+
+                            Category
+
+                        </label>
 
                         <select
-                            id="assetCategory"
-                            class="form-control">
+                        id="assetCategory"
+                        class="form-select"
+                        onchange="
+                            renderSpecificationFields(
+                                'assetCategory',
+                                'technicalFieldsContainer',
+                                {},
+                                'addSpec'
+                            )
+                        ">
 
                             <option>Laptop</option>
                             <option>Desktop</option>
-                            <option>Mobile</option>
                             <option>Monitor</option>
+                            <option>Mobile</option>
+                            <option>Printer</option>
+                            <option>Server</option>
+                            <option>Network</option>
 
                         </select>
+
+                    </div>
+
+                    <hr>
+
+                    <h6 class="fw-bold mb-3">
+
+                        <i class="fas fa-microchip me-2 text-primary"></i>
+
+                        Specifications
+
+                    </h6>
+
+                    <div id="technicalFieldsContainer">
+
                     </div>
 
                     <div class="mb-3">
@@ -316,6 +754,12 @@ function showAddAssetModal() {
     );
 
     modal.show();
+    renderSpecificationFields(
+    "assetCategory",
+    "technicalFieldsContainer",
+    {},
+    "addSpec"
+);
 }
 
 function saveAsset() {
@@ -377,6 +821,17 @@ function saveAsset() {
         transferRemarks: ""
 
     };
+
+    const specifications = {};
+
+    getSpecificationTemplate(asset.category).forEach(field => {
+
+        specifications[field.key] =
+
+            document.getElementById(`addSpec_${field.key}`)?.value.trim() || "";
+    });
+
+    asset.specifications = specifications;
 
     if (!asset.id || !asset.name) {
 
@@ -454,6 +909,23 @@ function deleteAsset(assetId) {
     );
 
     loadAssets();
+}
+
+function getAssetIcon(category){
+
+    const icons = {
+        Laptop: "💻",
+        Desktop: "🖥️",
+        Monitor: "🖥",
+        Mobile: "📱",
+        Printer: "🖨️",
+        Server: "🖧",
+        Network: "🌐",
+        Tablet: "📲"
+    };
+
+    return icons[category] || "📦";
+
 }
 
 function viewAsset(assetId) {
@@ -544,20 +1016,373 @@ function viewAsset(assetId) {
             ? "Assigned"
             : asset.status;
 
+
+    const heroSection = `
+
+    <div class="asset-hero">
+
+        <div class="row align-items-center g-4">
+
+            <div class="col-auto">
+
+                <div class="asset-image">
+
+                    ${getAssetIcon(asset.category)}
+
+                </div>
+
+            </div>
+
+            <div class="col">
+
+                <h2 class="fw-bold mb-1">
+
+                    ${asset.name}
+
+                </h2>
+
+                <div class="asset-id">
+
+                    ${asset.id}
+
+                </div>
+
+                <div class="mt-2">
+
+                    <span class="status-badge ${displayStatus.toLowerCase()}">
+
+                        ${displayStatus}
+
+                    </span>
+
+                </div>
+
+                <div class="asset-subtitle mt-2">
+
+                    ${asset.category}
+                    •
+                    ${asset.location || "Unknown Location"}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `;
+
+    const statsSection = `
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="asset-stat-card">
+
+                <div class="asset-stat-icon">
+
+                    <i class="fas fa-user"></i>
+
+                </div>
+
+                <div>
+
+                    <small>Current Holder</small>
+
+                    <h6>
+
+                        ${
+                            currentAssignment
+                                ? currentAssignment.employeeName
+                                : "Inventory"
+                        }
+
+                    </h6>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="asset-stat-card">
+
+                <div class="asset-stat-icon">
+
+                    <i class="fas fa-shield-alt"></i>
+
+                </div>
+
+                <div>
+
+                    <small>Warranty</small>
+
+                    <h6>
+
+                        ${
+                            warrantyDaysRemaining
+                                ? warrantyDaysRemaining + " Days"
+                                : "-"
+
+                        }
+
+                    </h6>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="asset-stat-card">
+
+                <div class="asset-stat-icon">
+
+                    <i class="fas fa-exchange-alt"></i>
+
+                </div>
+
+                <div>
+
+                    <small>Assignments</small>
+
+                    <h6>
+
+                        ${totalAssignments}
+
+                    </h6>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="asset-stat-card">
+
+                <div class="asset-stat-icon">
+
+                    <i class="fas fa-calendar"></i>
+
+                </div>
+
+                <div>
+
+                    <small>Asset Age</small>
+
+                    <h6>
+
+                        ${
+                            assetAgeDays
+                                ? assetAgeDays + " Days"
+                                : "-"
+
+                        }
+
+                    </h6>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    `;
+
+    const infoSection = `
+    <div class="row g-4">
+
+        <div class="col-xl-4">
+
+            <div class="asset-info-card">
+
+                <h6>General Information</h6>
+
+                <div class="info-grid">
+
+                    <div>Asset ID</div>
+                    <strong>${asset.id}</strong>
+
+                    <div>Category</div>
+                    <strong>${asset.category}</strong>
+
+                    <div>Serial Number</div>
+                    <strong>${asset.serialNumber || "-"}</strong>
+
+                    <div>Location</div>
+                    <strong>${asset.location || "-"}</strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-4">
+
+            <div class="asset-info-card">
+
+                <h6>Purchase Information</h6>
+
+                <div class="info-grid">
+
+                    <div>Vendor</div>
+                    <strong>${asset.vendor || "-"}</strong>
+
+                    <div>Purchase Date</div>
+                    <strong>${asset.purchaseDate || "-"}</strong>
+
+                    <div>Warranty Expiry</div>
+                    <strong>${asset.warrantyExpiry || "-"}</strong>
+
+                    <div>Current Holder</div>
+                    <strong>
+                        ${
+                            currentAssignment
+                                ? currentAssignment.employeeName
+                                : "In Inventory"
+                        }
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-4">
+
+            ${buildSpecificationCard(asset)}
+
+        </div>
+
+    </div>
+    `;
+
+    const actionSection = `
+    <div class="d-flex justify-content-end my-4">
+
+        <button
+            class="btn btn-warning px-4"
+            onclick="
+                const modal = bootstrap.Modal.getInstance(
+                    document.getElementById('assetDetailsModal')
+                );
+
+                if(modal) modal.hide();
+
+                showAssetTransferModal('${asset.id}');
+            ">
+
+            <i class="fas fa-exchange-alt me-2"></i>
+
+            Transfer Asset
+
+        </button>
+
+    </div>
+    `;
+
+    const historySection = `
+
+    <ul class="nav nav-tabs asset-tabs mb-4">
+
+        <li class="nav-item">
+
+            <button
+                class="nav-link active"
+                data-bs-toggle="tab"
+                data-bs-target="#assignmentTab">
+
+                <i class="fas fa-user me-2"></i>
+
+                Assignment History
+
+            </button>
+
+        </li>
+
+        <li class="nav-item">
+
+            <button
+                class="nav-link"
+                data-bs-toggle="tab"
+                data-bs-target="#transferTab">
+
+                <i class="fas fa-exchange-alt me-2"></i>
+
+                Transfer History
+
+            </button>
+
+        </li>
+
+        <li class="nav-item">
+
+            <button
+                class="nav-link"
+                data-bs-toggle="tab"
+                data-bs-target="#timelineTab">
+
+                <i class="fas fa-stream me-2"></i>
+
+                Timeline
+
+            </button>
+
+        </li>
+
+    </ul>
+
+    <div class="tab-content">
+
+        <div
+            class="tab-pane fade show active"
+            id="assignmentTab">
+
+            ${buildAssignmentHistory(assignmentHistory)}
+
+        </div>
+
+        <div
+            class="tab-pane fade"
+            id="transferTab">
+
+            ${buildTransferHistory(transferHistory)}
+
+        </div>
+
+        <div
+            class="tab-pane fade"
+            id="timelineTab">
+
+            ${buildTimeline(history, asset)}
+
+        </div>
+
+    </div>
+    `;
+
     const modalHtml = `
     <div class="modal fade"
          id="assetDetailsModal"
          tabindex="-1">
 
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl asset-details-modal">
 
             <div class="modal-content">
 
                 <div class="modal-header">
 
-                    <h5 class="modal-title">
-                        Asset Details
-                    </h5>
+                ${heroSection}
 
                     <button
                         type="button"
@@ -569,426 +1394,13 @@ function viewAsset(assetId) {
 
                 <div class="modal-body">
 
-                    <div class="row">
+                    ${statsSection}
 
-                        <div class="col-md-6">
+                    ${infoSection}
 
-                            <p>
-                                <strong>Asset ID:</strong>
-                                ${asset.id}
-                            </p>
+                    ${actionSection}
 
-                            <p>
-                                <strong>Name:</strong>
-                                ${asset.name}
-                            </p>
-
-                            <p>
-                                <strong>Category:</strong>
-                                ${asset.category}
-                            </p>
-
-                            <p>
-                                <strong>Location:</strong>
-                                ${asset.location || "-"}
-                            </p>
-
-                            <p>
-                                <strong>Serial Number:</strong>
-                                ${asset.serialNumber || "-"}
-                            </p>
-
-                            <p>
-                                <strong>Vendor:</strong>
-                                ${asset.vendor || "-"}
-                            </p>
-
-                            <p>
-                                <strong>Purchase Date:</strong>
-                                ${asset.purchaseDate || "-"}
-                            </p>
-
-                            <p>
-                                <strong>Warranty Expiry:</strong>
-                                ${asset.warrantyExpiry || "-"}
-                            </p>
-                            <p>
-                                <strong>Status:</strong>
-                                ${displayStatus}
-                            </p>
-
-                        </div>
-
-                        <div class="col-md-3">
-
-                            <small class="text-muted">
-
-                                Current Holder
-
-                            </small>
-
-                            <div>
-
-                                ${
-                                    currentAssignment
-                                        ? currentAssignment.employeeName
-                                        : "Not Assigned"
-                                }
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <hr>
-                    <div class="row">
-                        <button
-                            class="btn btn-warning"
-                            onclick="
-                                const modal =
-                                    bootstrap.Modal.getInstance(
-                                        document.getElementById(
-                                            'assetDetailsModal'
-                                        )
-                                    );
-
-                                if (modal) {
-                                    modal.hide();
-                                }
-
-                                showAssetTransferModal('${asset.id}');
-                            ">
-
-                            <i class="fas fa-exchange-alt"></i>
-
-                            Transfer Asset
-
-                        </button>
-
-                    </div>
-                    <hr>
-                    <div class="card border-0 bg-light mb-4">
-
-                        <div class="card-body">
-
-                            <h6 class="fw-bold">
-
-                                Asset Statistics
-
-                            </h6>
-
-                            <div class="row mt-3">
-
-                                <div class="col-md-3">
-
-                                    <small class="text-muted">
-
-                                        Status
-
-                                    </small>
-
-                                    <div>
-
-                                        ${displayStatus}
-
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-3">
-
-                                    <small class="text-muted">
-
-                                        Assignments
-
-                                    </small>
-
-                                    <div>
-
-                                        ${totalAssignments}
-
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-3">
-
-                                    <small class="text-muted">
-
-                                        Warranty Left
-
-                                    </small>
-
-                                    <div>
-
-                                        ${
-                                            warrantyDaysRemaining
-                                                ? warrantyDaysRemaining <= 30
-
-                                                    ? `<span class="badge bg-danger">
-                                                            ${warrantyDaysRemaining} Days
-                                                    </span>`
-
-                                                    : warrantyDaysRemaining <= 90
-
-                                                    ? `<span class="badge bg-warning">
-                                                            ${warrantyDaysRemaining} Days
-                                                    </span>`
-
-                                                    : `<span class="badge bg-success">
-                                                            ${warrantyDaysRemaining} Days
-                                                    </span>`
-                                                : "-"
-                                        }
-
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-3">
-
-                                    <small class="text-muted">
-
-                                        Asset Age
-
-                                    </small>
-
-                                    <div>
-
-                                        ${
-                                            assetAgeDays
-                                                ? assetAgeDays + " Days"
-                                                : "-"
-                                        }
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                        <hr>
-
-                            <h6>
-                                Assignment History
-                            </h6>
-
-                            ${
-                                assignmentHistory.length > 0
-
-                                ? `
-
-                                <table class="table table-sm">
-
-                                    <thead>
-
-                                        <tr>
-                                            <th>Employee</th>
-                                            <th>Assigned</th>
-                                            <th>Returned</th>
-                                            <th>Status</th>
-                                        </tr>
-
-                                    </thead>
-
-                                    <tbody>
-
-                                        ${assignmentHistory.map(item => `
-
-                                            <tr>
-
-                                                <td>
-                                                    ${item.employeeName}
-                                                </td>
-
-                                                <td>
-                                                    ${item.assignedDate}
-                                                </td>
-
-                                                <td>
-                                                    ${item.returnedDate || "-"}
-                                                </td>
-
-                                                <td>
-
-                                                    <span class="badge ${
-                                                        item.status === "Assigned"
-                                                            ? "bg-success"
-                                                            : "bg-secondary"
-                                                    }">
-
-                                                        ${item.status}
-
-                                                    </span>
-
-                                                </td>
-
-                                            </tr>
-
-                                        `).join('')}
-
-                                    </tbody>
-
-                                </table>
-
-                                `
-
-                                : `
-
-                                <p class="text-muted">
-
-                                    No assignment history.
-
-                                </p>
-
-                                `
-                            }
-
-                        <hr>
-
-                            <h6>
-                                Transfer History
-                            </h6>
-
-                            ${
-                                transferHistory.length > 0
-
-                                ? `
-
-                                <table class="table table-sm">
-
-                                    <thead>
-
-                                        <tr>
-
-                                            <th>Old Asset</th>
-                                            <th>New Asset</th>
-                                            <th>From</th>
-                                            <th>To</th>
-                                            <th>Date</th>
-
-                                        </tr>
-
-                                    </thead>
-
-                                    <tbody>
-
-                                        ${transferHistory.map(t => `
-
-                                            <tr>
-
-                                                <td>
-                                                    ${t.oldAssetId}
-                                                </td>
-
-                                                <td>
-                                                    ${t.newAssetId}
-                                                </td>
-
-                                                <td>
-                                                    ${t.fromLocation}
-                                                </td>
-
-                                                <td>
-                                                    ${t.toLocation}
-                                                </td>
-
-                                                <td>
-                                                    ${t.transferDate}
-                                                </td>
-
-                                            </tr>
-
-                                        `).join("")}
-
-                                    </tbody>
-
-                                </table>
-
-                                `
-
-                                : `
-
-                                <p class="text-muted">
-
-                                    No transfer history.
-
-                                </p>
-
-                                `
-
-                            }
-
-                    <h6 class="mt-4">
-                        Asset Timeline
-                    </h6>
-
-                    <div class="timeline mt-3">
-
-                        ${history.map(item => `
-
-                            <div class="timeline-item">
-
-                                <div class="timeline-dot ${
-                                    item.action === "Assigned"
-                                        ? "bg-success"
-                                        : item.action === "Returned"
-                                            ? "bg-warning"
-                                            : item.action === "Updated"
-                                                ? "bg-info"
-                                                : item.action === "Deleted"
-                                                    ? "bg-danger"
-                                                    : "bg-primary"
-                                }"></div>
-
-                                <div class="timeline-content">
-
-                                    <strong>
-                                        ${item.action}
-                                    </strong>
-
-                                    <br>
-
-                                    ${item.details}
-
-                                    <br>
-
-                                    <small class="text-muted">
-                                        ${item.timestamp}
-                                    </small>
-
-                                </div>
-
-                            </div>
-
-                        `).join('')}
-
-                        <div class="timeline-item">
-
-                            <div class="timeline-dot bg-secondary"></div>
-
-                            <div class="timeline-content">
-
-                                <strong>
-                                    Asset Purchased
-                                </strong>
-
-                                <br>
-
-                                <small class="text-muted">
-                                    Date : ${asset.purchaseDate || "Unknown Date"}<br>
-                                    Warranty Expiry : ${asset.warrantyExpiry || "Unknown Warranty Expiry"}
-                                </small>
-
-                            </div>
-
-                        </div>
-                    </div>
+                    ${historySection}
 
                 </div>
 
@@ -1004,22 +1416,279 @@ function viewAsset(assetId) {
             "assetDetailsModal"
         );
 
-    if (existingModal) {
+        if (existingModal) {
 
-        existingModal.remove();
+            existingModal.remove();
+
+        }
+
+        document.body.insertAdjacentHTML(
+            "beforeend",
+            modalHtml
+        );
+
+        new bootstrap.Modal(
+            document.getElementById(
+                "assetDetailsModal"
+            )
+        ).show();
+}
+
+function buildAssignmentHistory(assignmentHistory){
+
+    if(assignmentHistory.length === 0){
+
+        return `
+            <p class="text-muted">
+
+                No assignment history.
+
+            </p>
+        `;
 
     }
 
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        modalHtml
-    );
+    return `
 
-    new bootstrap.Modal(
-        document.getElementById(
-            "assetDetailsModal"
-        )
-    ).show();
+    <table class="table table-sm">
+
+        <thead>
+
+            <tr>
+
+                <th>Employee</th>
+
+                <th>Assigned</th>
+
+                <th>Returned</th>
+
+                <th>Status</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            ${assignmentHistory.map(item => `
+
+                <tr>
+
+                    <td>
+
+                        ${item.employeeName}
+
+                    </td>
+
+                    <td>
+
+                        ${item.assignedDate}
+
+                    </td>
+
+                    <td>
+
+                        ${item.returnedDate || "-"}
+
+                    </td>
+
+                    <td>
+
+                        <span class="badge ${
+
+                            item.status === "Assigned"
+
+                                ? "bg-success"
+
+                                : "bg-secondary"
+
+                        }">
+
+                            ${item.status}
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            `).join("")}
+
+        </tbody>
+
+    </table>
+
+    `;
+
+}
+
+function buildTransferHistory(transferHistory){
+
+    if(transferHistory.length === 0){
+
+        return `
+            <p class="text-muted">
+
+                No transfer history.
+
+            </p>
+        `;
+
+    }
+
+    return `
+
+    <table class="table table-sm">
+
+        <thead>
+
+            <tr>
+
+                <th>Old Asset</th>
+
+                <th>New Asset</th>
+
+                <th>From</th>
+
+                <th>To</th>
+
+                <th>Date</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            ${transferHistory.map(item => `
+
+                <tr>
+
+                    <td>
+
+                        ${item.oldAssetId}
+
+                    </td>
+
+                    <td>
+
+                        ${item.newAssetId}
+
+                    </td>
+
+                    <td>
+
+                        ${item.fromLocation}
+
+                    </td>
+
+                    <td>
+
+                        ${item.toLocation}
+
+                    </td>
+
+                    <td>
+
+                        ${item.transferDate}
+
+                    </td>
+
+                </tr>
+
+            `).join("")}
+
+        </tbody>
+
+    </table>
+
+    `;
+
+}
+
+function buildTimeline(history, asset){
+
+    return `
+
+    <div class="timeline mt-3">
+
+        ${history.map(item => `
+
+            <div class="timeline-item">
+
+                <div class="timeline-dot ${
+
+                    item.action === "Assigned"
+                        ? "bg-success"
+
+                    : item.action === "Returned"
+                        ? "bg-warning"
+
+                    : item.action === "Updated"
+                        ? "bg-info"
+
+                    : item.action === "Deleted"
+                        ? "bg-danger"
+
+                    : "bg-primary"
+
+                }"></div>
+
+                <div class="timeline-content">
+
+                    <strong>
+
+                        ${item.action}
+
+                    </strong>
+
+                    <br>
+
+                    ${item.details}
+
+                    <br>
+
+                    <small class="text-muted">
+
+                        ${item.timestamp}
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        `).join("")}
+
+        <div class="timeline-item">
+
+            <div class="timeline-dot bg-secondary"></div>
+
+            <div class="timeline-content">
+
+                <strong>
+
+                    Asset Purchased
+
+                </strong>
+
+                <br>
+
+                <small class="text-muted">
+
+                    Date : ${asset.purchaseDate || "Unknown Date"}<br>
+                    Warranty Expiry : ${asset.warrantyExpiry || "Unknown Warranty Expiry"}
+
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `;
+
 }
 
 function filterAssets() {
@@ -1049,15 +1718,16 @@ function filterAssets() {
         const text =
             row.innerText.toLowerCase();
 
-        const location =
-            row.children[3]?.innerText;
+        const location = row.children[2]
+            ?.textContent
+            .trim();
 
         const matchesSearch =
             text.includes(searchText);
 
         const matchesLocation =
-            !selectedLocation ||
-            location === selectedLocation;
+            selectedLocation === "" ||
+            location.trim() === selectedLocation.trim();
 
         row.style.display =
             matchesSearch &&
@@ -1199,17 +1869,39 @@ function editAsset(assetId) {
 
                         <select
                             id="editAssetCategory"
-                            class="form-control">
+                            class="form-select"
+                            onchange="
+                            renderSpecificationFields(
+                                'editAssetCategory',
+                                'editTechnicalFieldsContainer',
+                                asset.specifications || {},
+                                'editSpec'
+                            )
+                            ">
 
-                            <option ${asset.category === "Laptop" ? "selected" : ""}>Laptop</option>
-
-                            <option ${asset.category === "Desktop" ? "selected" : ""}>Desktop</option>
-
-                            <option ${asset.category === "Mobile" ? "selected" : ""}>Mobile</option>
-
-                            <option ${asset.category === "Monitor" ? "selected" : ""}>Monitor</option>
+                            <option ${asset.category=="Laptop"?"selected":""}>Laptop</option>
+                            <option ${asset.category=="Desktop"?"selected":""}>Desktop</option>
+                            <option ${asset.category=="Monitor"?"selected":""}>Monitor</option>
+                            <option ${asset.category=="Mobile"?"selected":""}>Mobile</option>
+                            <option ${asset.category=="Printer"?"selected":""}>Printer</option>
+                            <option ${asset.category=="Server"?"selected":""}>Server</option>
+                            <option ${asset.category=="Network"?"selected":""}>Network</option>
 
                         </select>
+
+                    </div>
+
+                    <hr>
+
+                    <h6 class="fw-bold mb-3">
+
+                        <i class="fas fa-microchip me-2 text-primary"></i>
+
+                        Specifications
+
+                    </h6>
+
+                    <div id="editTechnicalFieldsContainer">
 
                     </div>
 
@@ -1377,6 +2069,12 @@ function editAsset(assetId) {
             "editAssetModal"
         )
     ).show();
+    renderSpecificationFields(
+    "editAssetCategory",
+    "editTechnicalFieldsContainer",
+    asset.specifications || {},
+    "editSpec"
+);
 }
 
 function saveAssetEdit() {
@@ -1435,6 +2133,18 @@ function saveAssetEdit() {
         document.getElementById(
             "editAssetWarrantyExpiry"
         ).value;
+
+    const specifications = {};
+
+    getSpecificationTemplate(asset.category).forEach(field=>{
+
+        specifications[field.key]=
+
+            document.getElementById(`editSpec_${field.key}`)?.value.trim() || "";
+
+    });
+
+    asset.specifications = specifications;
 
     if (asset.status === "Retired") {
 

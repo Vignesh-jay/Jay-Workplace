@@ -327,3 +327,400 @@ body{
     font-weight: 600;
     margin-bottom: 4px;
 }
+
+.dashboard-card{
+    border:none;
+    border-radius:16px;
+    transition:.25s ease;
+    cursor:default;
+}
+
+.dashboard-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.dashboard-card .card-body{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.dashboard-card h2{
+    margin:6px 0 0;
+    font-size:2rem;
+    font-weight:700;
+}
+
+.dashboard-card{
+
+    transition:.25s;
+
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 15px 35px rgba(0,0,0,.12);
+
+}
+
+.dashboard-card.active{
+
+    border-left:5px solid var(--bs-primary);
+
+    background:#f8fbff;
+
+}
+
+.table tbody tr{
+    transition: all .2s ease;
+    cursor: pointer;
+}
+
+.table tbody tr:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.08);
+    background:#f8fbff;
+}
+
+.table td{
+    vertical-align: middle;
+}
+
+.status-badge{
+
+    padding:6px 12px;
+
+    border-radius:999px;
+
+    font-weight:600;
+
+    font-size:.75rem;
+
+}
+
+.status-badge.available{
+
+    background:#e8f7ef;
+    color:#15803d;
+
+}
+
+.status-badge.assigned{
+
+    background:#e8f0ff;
+    color:#2563eb;
+
+}
+
+.status-badge.maintenance{
+
+    background:#fff7e6;
+    color:#d97706;
+
+}
+
+.status-badge.retired{
+
+    background:#fdecec;
+    color:#dc2626;
+
+}
+
+.status-badge.transferred{
+
+    background:#f3f4f6;
+    color:#4b5563;
+
+}
+
+.asset-name{
+
+    font-weight:700;
+
+    font-size:15px;
+
+}
+
+.asset-meta{
+
+    font-size:12px;
+
+    color:#6c757d;
+
+}
+
+.dashboard-card{
+
+    overflow:hidden;
+    position:relative;
+
+}
+
+.dashboard-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+    top:0;
+
+    width:4px;
+    height:100%;
+
+    background:#2563eb;
+
+    transform:scaleY(0);
+
+    transition:.2s;
+
+}
+
+.dashboard-card:hover::before,
+.dashboard-card.active::before{
+
+    transform:scaleY(1);
+
+}
+
+.asset-hero{
+
+    padding:20px 0 28px;
+
+    border-bottom:1px solid #eef2f7;
+
+}
+
+.asset-image{
+
+    width:100px;
+    height:100px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    flex-shrink:0;
+
+    background:#f8fafc;
+    border:1px solid #eef2f7;
+    border-radius:20px;
+
+    font-size:56px;      /* <-- This is the missing part */
+    line-height:1;
+}
+
+.asset-image img{
+    width:75px;
+    height:75px;
+    object-fit:contain;
+}
+
+.asset-hero-icon{
+
+    font-size:56px;
+
+    margin-bottom:10px;
+
+}
+
+.asset-hero h3{
+
+    font-weight:700;
+
+    margin-bottom:5px;
+
+}
+
+.asset-hero .status-badge{
+
+    margin-top:10px;
+
+    display:inline-block;
+
+}
+
+.asset-info-card{
+
+    background:#fff;
+
+    border:1px solid #edf2f7;
+
+    border-radius:16px;
+
+    padding:24px;
+
+    height:100%;
+
+}
+
+.asset-info-card h6{
+
+    margin-bottom:20px;
+
+    font-weight:700;
+
+}
+
+.info-grid{
+
+    display:grid;
+
+    grid-template-columns:140px 1fr;
+
+    row-gap:14px;
+
+    column-gap:18px;
+
+}
+
+.info-grid div{
+
+    color:#6b7280;
+
+}
+
+.info-grid strong{
+
+    font-weight:600;
+
+}
+
+.asset-stat-card{
+
+    display:flex;
+    align-items:center;
+    gap:16px;
+
+    padding:18px;
+
+    background:#fff;
+
+    border-radius:16px;
+
+    border:1px solid #edf2f7;
+
+    transition:.25s;
+
+}
+
+.asset-stat-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.asset-stat-icon{
+
+    width:50px;
+
+    height:50px;
+
+    border-radius:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#f5f7fb;
+
+    font-size:20px;
+
+    color:#2563eb;
+
+}
+
+.asset-tabs .nav-link.active{
+
+    color:#2563eb;
+
+    border-bottom:3px solid #2563eb;
+
+    background:none;
+
+    font-weight:600;
+
+}
+
+.asset-history-table tbody tr{
+
+    transition:.2s;
+
+}
+
+.asset-history-table tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.asset-id{
+
+    color:#6b7280;
+
+    font-size:15px;
+
+    margin-top:2px;
+
+}
+
+.asset-subtitle{
+
+    color:#6b7280;
+
+    font-size:15px;
+
+}
+
+.asset-hero h2{
+
+    margin-bottom:4px;
+
+    font-size:2.2rem;
+
+    font-weight:700;
+
+    line-height:1.2;
+
+}
+
+.modal.fade .modal-dialog{
+
+    transform:scale(.96);
+
+    transition:.2s ease;
+
+}
+
+.modal.show .modal-dialog{
+
+    transform:scale(1);
+
+}
+
+.asset-info-card{
+
+    transition:.2s;
+
+}
+
+.asset-info-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 20px rgba(0,0,0,.06);
+
+}
+
+.asset-image{
+
+    color:var(--primary);
+
+}
