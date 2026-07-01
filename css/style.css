@@ -724,3 +724,32 @@ body{
     color:var(--primary);
 
 }
+
+.status-badge.on-leave{
+
+    background:#FEF3C7;
+
+    color:#B45309;
+
+}
+
+.status-badge.inactive{
+
+    background:#F3F4F6;
+
+    color:#4B5563;
+
+}
+
+.timeline-content{
+    background:#f8fafc;
+    border:1px solid #eef2f7;
+    border-radius:14px;
+    padding:16px;
+    transition:.25s;
+}
+
+.timeline-content:hover{
+    transform:translateX(4px);
+    box-shadow:0 8px 20px rgba(0,0,0,.06);
+}

@@ -2,7 +2,19 @@ function loadWorkforce() {
 
     const employeeList = getEmployees();
 
+    const totalEmployees = employeeList.length;
+
+    const activeEmployees =
+        employeeList.filter(e => e.status === "Active").length;
+
+    const onLeaveEmployees =
+        employeeList.filter(e => e.status === "On Leave").length;
+
+    const departments =
+        [...new Set(employeeList.map(e => e.department))].length;
+
     setActiveMenu('nav-workforce');
+    
 document.getElementById("content").innerHTML = `
 
 <div class="page-header">
@@ -12,6 +24,106 @@ document.getElementById("content").innerHTML = `
         <p class="text-muted">
             Manage employees and workforce information.
         </p>
+    </div>
+
+</div>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="card dashboard-card active">
+
+            <div class="card-body">
+
+                <div>
+
+                    <small class="text-muted">
+                        Total Employees
+                    </small>
+
+                    <h2>${totalEmployees}</h2>
+
+                </div>
+
+                <i class="fas fa-users fa-2x text-primary"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="card dashboard-card">
+
+            <div class="card-body">
+
+                <div>
+
+                    <small class="text-muted">
+                        Active
+                    </small>
+
+                    <h2>${activeEmployees}</h2>
+
+                </div>
+
+                <i class="fas fa-user-check fa-2x text-success"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="card dashboard-card">
+
+            <div class="card-body">
+
+                <div>
+
+                    <small class="text-muted">
+                        On Leave
+                    </small>
+
+                    <h2>${onLeaveEmployees}</h2>
+
+                </div>
+
+                <i class="fas fa-user-clock fa-2x text-warning"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="card dashboard-card">
+
+            <div class="card-body">
+
+                <div>
+
+                    <small class="text-muted">
+                        Departments
+                    </small>
+
+                    <h2>${departments}</h2>
+
+                </div>
+
+                <i class="fas fa-building fa-2x text-info"></i>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>
@@ -61,13 +173,15 @@ document.getElementById("content").innerHTML = `
 
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
+            <th style="width:35%">Employee</th>
+
             <th>Department</th>
+
             <th>Location</th>
-            <th>Designation</th>
+
             <th>Status</th>
-            <th>Actions</th>
+
+            <th style="width:130px">Actions</th>
         </tr>
     </thead>
 
@@ -77,43 +191,82 @@ document.getElementById("content").innerHTML = `
 
             <tr>
 
-                <td>${emp.id}</td>
-
                 <td>
-                    ${emp.firstName}
-                    ${emp.lastName}
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <div class="avatar">
+
+                            ${emp.firstName.charAt(0)}${emp.lastName.charAt(0)}
+
+                        </div>
+
+                        <div>
+
+                            <div class="asset-name">
+
+                                ${emp.firstName} ${emp.lastName}
+
+                            </div>
+
+                            <div class="asset-meta">
+
+                                ${emp.id}
+
+                                •
+
+                                ${emp.designation}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </td>
 
                 <td>${emp.department}</td>
 
                 <td>${emp.location || '-'}</td>
 
-                <td>${emp.designation}</td>
+                <td>
 
-                <td>
-                    <span class="status-badge active">
+                    <span class="status-badge ${emp.status.toLowerCase().replace(/\s/g,'-')}">
+
                         ${emp.status}
+
                     </span>
+
                 </td>
-                <td>
+                <td class="text-nowrap">
+
                     <button
-                        class="btn btn-sm btn-outline-info"
+                        class="btn btn-light btn-sm asset-action-btn"
+                        title="View"
                         onclick="viewEmployee('${emp.id}')">
 
-                        View
+                        <i class="fas fa-eye"></i>
 
                     </button>
+
                     <button
-                        class="btn btn-sm btn-outline-primary"
+                        class="btn btn-light btn-sm asset-action-btn"
+                        title="Edit"
                         onclick="editEmployee('${emp.id}')">
-                        Edit
+
+                        <i class="fas fa-pen"></i>
+
                     </button>
 
                     <button
-                        class="btn btn-sm btn-outline-danger"
+                        class="btn btn-light btn-sm asset-action-btn text-danger"
+                        title="Delete"
                         onclick="deleteEmployee('${emp.id}')">
-                        Delete
+
+                        <i class="fas fa-trash"></i>
+
                     </button>
+
                 </td>
 
             </tr>
@@ -1095,112 +1248,260 @@ function viewEmployee(employeeId) {
 
             <div class="modal-content">
 
-                <div class="modal-header">
+            <div class="asset-hero d-flex align-items-center position-relative px-4 py-4">
 
-                    <h5 class="modal-title">
+                <div class="asset-image me-4">
 
-                        Employee Profile
+                    <div class="avatar"
+                        style="width:72px;height:72px;font-size:26px;">
 
-                    </h5>
+                        ${employee.firstName.charAt(0)}
+                        ${employee.lastName.charAt(0)}
 
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
+                    </div>
 
                 </div>
 
-                <div class="modal-body">
+                <div>
 
-                    <div class="row">
+                    <h2 class="mb-1">
+                        ${employee.firstName}
+                        ${employee.lastName}
+                    </h2>
 
-                        <div class="col-md-6">
+                    <div class="text-muted fw-semibold">
+                        ${employee.id}
+                        •
+                        ${employee.designation}
+                        •
+                        ${employee.department}
+                    </div>
 
-                            <p>
-                                <strong>ID:</strong>
-                                ${employee.id}
-                            </p>
+                    <span class="status-badge ${employee.status.toLowerCase().replace(/\s/g,'-')}">
+                        ${employee.status}
+                    </span>
 
-                            <p>
-                                <strong>Name:</strong>
-                                ${employee.firstName || ''}
-                                ${employee.lastName || ''}
-                            </p>
+                </div>
 
-                            <p>
-                                <strong>Department:</strong>
-                                ${employee.department}
-                            </p>
+                <button
+                    type="button"
+                    class="btn-close position-absolute"
+                    style="top:24px; right:24px;"
+                    data-bs-dismiss="modal">
+                </button>
 
-                            <p>
-                                <strong>Designation:</strong>
-                                ${employee.designation}
-                            </p>
+            </div>
+            
 
-                            <p>
-                                <strong>Status:</strong>
-                                ${employee.status}
-                            </p>
+            <div class="modal-body">
 
-                            <p>
-                                <strong>Email:</strong>
-                                ${employee.email}
-                            </p>
+                <div class="row g-4 mt-1">
 
-                            <p>
-                                <strong>Manager:</strong>
-                                ${employee.manager}
-                            </p>
+                    <div class="col-md-3">
 
-                            <p>
-                                <strong>Location:</strong>
-                                ${employee.location}
-                            </p>
+                        <div class="asset-stat-card">
 
-                            <p>
-                                <strong>Employment Type:</strong>
-                                ${employee.employmentType}
-                            </p>
+                            <div class="asset-stat-icon">
 
-                            <p>
-                                <strong>Joining Date:</strong>
-                                ${employee.joiningDate}
-                            </p>
+                                <i class="fas fa-laptop"></i>
+
+                            </div>
+
+                            <div>
+
+                                <small>Assets</small>
+
+                                <h5>${employeeAssets.length}</h5>
+
+                            </div>
 
                         </div>
 
                     </div>
 
-                        <hr>
+                    <div class="col-md-3">
 
-                        <h5>
-                            Employee Timeline
-                        </h5>
+                        <div class="asset-stat-card">
+
+                            <div class="asset-stat-icon">
+
+                                <i class="fas fa-building"></i>
+
+                            </div>
+
+                            <div>
+
+                                <small>Department</small>
+
+                                <h6>${employee.department}</h6>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <div class="asset-stat-card">
+
+                            <div class="asset-stat-icon">
+
+                                <i class="fas fa-user-tie"></i>
+
+                            </div>
+
+                            <div>
+
+                                <small>Manager</small>
+
+                                <h6>${employee.manager || "-"}</h6>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <div class="asset-stat-card">
+
+                            <div class="asset-stat-icon">
+
+                                <i class="fas fa-map-marker-alt"></i>
+
+                            </div>
+
+                            <div>
+
+                                <small>Location</small>
+
+                                <h6>${employee.location}</h6>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="asset-info-card">
+
+                            <h6>General Information</h6>
+
+                            <div class="info-grid">
+
+                                <div>Employee ID</div>
+                                <strong>${employee.id}</strong>
+
+                                <div>Email</div>
+                                <strong>${employee.email || "-"}</strong>
+
+                                <div>Phone</div>
+                                <strong>${employee.phone || "-"}</strong>
+
+                                <div>Location</div>
+                                <strong>${employee.location || "-"}</strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="asset-info-card">
+
+                            <h6>Employment Information</h6>
+
+                            <div class="info-grid">
+
+                                <div>Department</div>
+                                <strong>${employee.department}</strong>
+
+                                <div>Designation</div>
+                                <strong>${employee.designation}</strong>
+
+                                <div>Manager</div>
+                                <strong>${employee.manager || "-"}</strong>
+
+                                <div>Employment</div>
+                                <strong>${employee.employmentType}</strong>
+
+                                <div>Joined</div>
+                                <strong>${employee.joiningDate}</strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <hr class="mt-4">
+
+                    <ul class="nav nav-tabs asset-tabs mb-3" role="tablist">
+
+                        <li class="nav-item">
+
+                            <button
+                                class="nav-link active"
+                                data-bs-toggle="tab"
+                                data-bs-target="#empTimeline">
+
+                                <i class="fas fa-stream me-2"></i>
+                                Timeline
+
+                            </button>
+
+                        </li>
+
+                        <li class="nav-item">
+
+                            <button
+                                class="nav-link"
+                                data-bs-toggle="tab"
+                                data-bs-target="#empAssets">
+
+                                <i class="fas fa-laptop me-2"></i>
+                                Assigned Assets
+
+                            </button>
+
+                        </li>
+
+                    </ul>
+
+                    <div class="tab-content">
+                    <div class="tab-pane fade show active"
+                        id="empTimeline">
 
                         <div class="timeline">
 
-                        ${history.length > 0 ?
+                            ${
+                                history.length
 
-                            history.map(item => `
+                                ?
+
+                                history.map(item=>`
 
                                 <div class="timeline-item">
 
-                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-dot ${getTimelineColor(item.action)}"></div>
 
                                     <div class="timeline-content">
 
-                                        <strong>
-                                            ${item.action}
-                                        </strong>
+                                        <strong>${item.action}</strong>
 
-                                        <br>
+                                        <div class="text-muted">
 
-                                        ${item.details}
+                                            ${item.details}
 
-                                        <br>
+                                        </div>
 
-                                        <small class="text-muted">
+                                        <small>
 
                                             ${item.timestamp}
 
@@ -1210,53 +1511,123 @@ function viewEmployee(employeeId) {
 
                                 </div>
 
-                            `).join('')
+                                `).join('')
 
-                        :
+                                :
 
-                            `<p class="text-muted">
-                                No history available.
-                            </p>`
+                                `
+                                <div class="text-center py-5 text-muted">
 
-                        }
+                                    <i class="fas fa-history fa-2x mb-3"></i>
+
+                                    <p>No employee history found.</p>
+
+                                </div>
+                                `
+
+                            }
 
                         </div>
 
-                    <hr>
-                    <h6>
-                        Assigned Assets
-                    </h6>
+                    </div>
+                    <div class="tab-pane fade"
+                        id="empAssets">
 
-                    ${
-                        employeeAssets.length > 0
-                        ? `
-                        <ul>
+                        ${
+                            employeeAssets.length
 
-                            ${employeeAssets.map(asset => `
+                            ?
 
-                                <li>
-                                    ${asset.assetName}
-                                </li>
+                            `
 
-                            `).join('')}
+                            <table class="table align-middle">
 
-                        </ul>
-                        `
-                        : `
-                        <p class="text-muted">
-                            No assets assigned.
-                        </p>
-                        `
-                    }
+                                <thead>
 
-                </div>
+                                    <tr>
+
+                                        <th>Asset</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    ${employeeAssets.map(asset=>`
+
+                                    <tr>
+
+                                        <td>
+
+                                            <strong>
+
+                                                ${asset.assetName}
+
+                                            </strong>
+
+                                        </td>
+
+                                        <td>
+
+                                            ${asset.category}
+
+                                        </td>
+
+                                        <td>
+
+                                            <span class="status-badge assigned">
+
+                                                Assigned
+
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+
+                                    `).join("")}
+
+                                </tbody>
+
+                            </table>
+
+                            `
+
+                            :
+
+                            `
+
+                            <div class="text-center py-5">
+
+                                <i class="fas fa-laptop fa-2x text-muted mb-3"></i>
+
+                                <p class="text-muted">
+
+                                    No assets assigned.
+
+                                </p>
+
+                            </div>
+
+                            `
+
+                        }
+
+                    </div>
+
+                </div>    
 
             </div>
 
         </div>
 
     </div>
-    `;
+
+</div>
+`;
 
     const existingModal =
         document.getElementById(
@@ -1281,6 +1652,26 @@ function viewEmployee(employeeId) {
     addActivity(
         `Viewed employee profile: ${employee.firstName} ${employee.lastName}`
     );
+}
+
+function getTimelineColor(action){
+
+    if(action.includes("Created"))
+        return "bg-success";
+
+    if(action.includes("Assigned"))
+        return "bg-primary";
+
+    if(action.includes("Returned"))
+        return "bg-warning";
+
+    if(action.includes("Transferred"))
+        return "bg-info";
+
+    if(action.includes("Deleted"))
+        return "bg-danger";
+
+    return "bg-secondary";
 }
 
 function getEmployeeName(employee) {
