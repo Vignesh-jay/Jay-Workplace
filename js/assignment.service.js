@@ -32,14 +32,16 @@ function saveAssignment() {
 
     const assignment = {
 
+        id: crypto.randomUUID(),   // <-- Add this
+
         assetId: asset.id,
         assetName: asset.name,
 
         employeeId: employee.id,
         employeeName: `${employee.firstName} ${employee.lastName}`,
 
-        assignedDate:
-            formatDateTime(),
+        assignedDate: formatDateTime(),
+        returnedDate: "",
 
         status: "Assigned"
     };
