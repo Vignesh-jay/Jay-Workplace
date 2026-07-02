@@ -15,179 +15,549 @@ document.getElementById("content").innerHTML = `
 
 </div>
 
-<div class="row g-4">
+<div class="row g-3 mb-4">
 
-    <div class="col-md-6">
-        <div class="card-custom">
-            <h5>Department Management</h5>
+    <div class="col-lg-2 col-md-4">
+
+        <div class="dashboard-card card h-100">
+
+            <div class="card-body">
+
+                <div>
+
+                    <div class="text-muted small">
+
+                        Employees
+
+                    </div>
+
+                    <h2>${getEmployees().length}</h2>
+
+                </div>
+
+                <i class="fas fa-users fa-2x text-primary"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-2 col-md-4">
+
+        <div class="dashboard-card card h-100">
+
+            <div class="card-body">
+
+                <div>
+
+                    <div class="text-muted small">
+
+                        Departments
+
+                    </div>
+
+                    <h2>${getDepartments().length}</h2>
+
+                </div>
+
+                <i class="fas fa-building fa-2x text-success"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-2 col-md-4">
+
+        <div class="dashboard-card card h-100">
+
+            <div class="card-body">
+
+                <div>
+
+                    <div class="text-muted small">
+
+                        Locations
+
+                    </div>
+
+                    <h2>${getLocations().length}</h2>
+
+                </div>
+
+                <i class="fas fa-map-marker-alt fa-2x text-danger"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-2 col-md-4">
+
+        <div class="dashboard-card card h-100">
+
+            <div class="card-body">
+
+                <div>
+
+                    <div class="text-muted small">
+
+                        Audit Logs
+
+                    </div>
+
+                    <h2>${getAuditLogs().length}</h2>
+
+                </div>
+
+                <i class="fas fa-clipboard-list fa-2x text-warning"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-2 col-md-4">
+
+        <div class="dashboard-card card h-100">
+
+            <div class="card-body">
+
+                <div>
+
+                    <div class="text-muted small">
+
+                        Transfers
+
+                    </div>
+
+                    <h2>${getAssetTransfers().length}</h2>
+
+                </div>
+
+                <i class="fas fa-exchange-alt fa-2x text-info"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-2 col-md-4">
+
+        <div class="dashboard-card card h-100">
+
+            <div class="card-body">
+
+                <div>
+
+                    <div class="text-muted small">
+
+                        Version
+
+                    </div>
+
+                    <h2>1.1</h2>
+
+                </div>
+
+                <i class="fas fa-code-branch fa-2x text-secondary"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<h5 class="fw-bold mb-3">
+
+    Management Center
+
+</h5>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-4">
+
+        <div class="export-card">
+
+            <div class="export-icon bg-primary-subtle text-primary">
+
+                <i class="fas fa-building"></i>
+
+            </div>
+
+            <h6>
+
+                Departments
+
+            </h6>
+
             <p class="text-muted">
-                Configure departments and organizational structure.
+
+                Manage organizational departments.
+
             </p>
+
             <button
-                class="btn btn-primary mt-3"
+                class="btn btn-primary w-100"
                 onclick="loadDepartments()">
 
-                Manage Departments
+                Manage
 
             </button>
+
         </div>
+
     </div>
 
-    <div class="col-md-6">
-        <div class="card-custom">
-            <h5>Location Management</h5>
-            <p>
-                    Manage office locations.
-                </p>
+    <div class="col-md-4">
+
+        <div class="export-card">
+
+            <div class="export-icon bg-success-subtle text-success">
+
+                <i class="fas fa-map-marker-alt"></i>
+
+            </div>
+
+            <h6>
+
+                Locations
+
+            </h6>
+
+            <p class="text-muted">
+
+                Manage office locations.
+
+            </p>
+
             <button
-                class="btn btn-primary mt-3"
+                class="btn btn-success w-100"
                 onclick="loadLocations()">
 
-                Manage Locations
+                Manage
 
             </button>
+
         </div>
+
     </div>
 
-    <div class="col-md-6">
-        <div class="card-custom">
-            <h5>Roles & Permissions</h5>
-            <p class="text-muted">
-                Manage access control and user permissions.
-            </p>
-        </div>
-    </div>
+    <div class="col-md-4">
 
-    <div class="col-md-6">
-        <div class="card-custom">
-            <h5>Audit Logs</h5>
+        <div class="export-card">
+
+            <div class="export-icon bg-warning-subtle text-warning">
+
+                <i class="fas fa-clipboard-list"></i>
+
+            </div>
+
+            <h6>
+
+                Audit Logs
+
+            </h6>
 
             <p class="text-muted">
-                Review system activity and changes.
+
+                View complete activity logs.
+
             </p>
 
             <button
-                class="btn btn-primary mt-3"
+                class="btn btn-warning w-100"
                 onclick="loadAuditLogs()">
 
                 View Logs
 
             </button>
+
         </div>
+
     </div>
 
-    <div class="col-md-6">
-        <div class="card-custom">
-            <h5>System Settings</h5>
+    <div class="col-md-4">
+
+        <div class="export-card">
+
+            <div class="export-icon bg-secondary-subtle text-secondary">
+
+                <i class="fas fa-user-shield"></i>
+
+            </div>
+
+            <h6>
+
+                Roles & Permissions
+
+            </h6>
+
             <p class="text-muted">
-                Configure application preferences.
+
+                User roles and permissions.
+
             </p>
-        </div>
-    </div>
-    <div class="col-md-6">
-    <div class="card-custom">
-
-        <h5>Backup & Restore</h5>
-
-        <p class="text-muted">
-            Export and restore Jay Workplace data.
-        </p>
-
-        <div class="d-grid gap-2 mt-3">
 
             <button
-                class="btn btn-primary"
-                onclick="exportBackup()">
+                class="btn btn-secondary w-100"
+                disabled>
 
-                Export Backup
-
-            </button>
-
-            <input
-                type="file"
-                id="restoreFile"
-                class="form-control">
-
-            <button
-                class="btn btn-success"
-                onclick="restoreBackup()">
-
-                Restore Backup
-
-            </button>
-            <button
-                class="btn btn-danger"
-                onclick="resetSystem()">
-
-                Reset All Data
+                Coming Soon
 
             </button>
 
         </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="export-card">
+
+            <div class="export-icon bg-info-subtle text-info">
+
+                <i class="fas fa-cogs"></i>
+
+            </div>
+
+            <h6>
+
+                System Settings
+
+            </h6>
+
+            <p class="text-muted">
+
+                Configure application preferences.
+
+            </p>
+
+            <button
+                class="btn btn-info w-100"
+                disabled>
+
+                Coming Soon
+
+            </button>
+
         </div>
-    </div>
-    <div class="col-md-6">
-    <div class="card-custom">
-
-        <h5>System Information</h5>
-
-        <table class="table">
-
-            <tr>
-                <td>Version</td>
-                <td>1.1.0 MVP</td>
-            </tr>
-
-            <tr>
-                <td>Employees</td>
-                <td>${getEmployees().length}</td>
-            </tr>
-
-            <tr>
-                <td>Assets</td>
-                <td>
-                ${
-                    getAssets().filter(
-                        a =>
-                            a.status !== "Retired" &&
-                            a.status !== "Transferred"
-                    ).length
-                }
-                </td>
-            </tr>
-
-            <tr>
-                <td>Assignments</td>
-                <td>${getAssignments().length}</td>
-            </tr>
-
-            <tr>
-                <td>Locations</td>
-                <td>${getLocations().length}</td>
-            </tr>
-
-            <tr>
-                <td>Employee Transfers</td>
-                <td>${getEmployeeTransfers().length}</td>
-            </tr>
-
-            <tr>
-                <td>Asset Transfers</td>
-                <td>${getAssetTransfers().length}</td>
-            </tr>
-
-            <tr>
-                <td>Storage</td>
-                <td>Local Storage</td>
-            </tr>
-
-        </table>
 
     </div>
+
+    <div class="col-md-4">
+
+        <div class="export-card">
+
+            <div class="export-icon bg-danger-subtle text-danger">
+
+                <i class="fas fa-database"></i>
+
+            </div>
+
+            <h6>
+
+                Data Management
+
+            </h6>
+
+            <p class="text-muted">
+
+                Backup and restore application data.
+
+            </p>
+
+            <button
+                class="btn btn-danger w-100"
+                onclick="openDataManagement()">
+                Open
+
+            </button>
+
+        </div>
+
+    </div>
+
 </div>
 </div>
 
 `;
+
+}
+
+function openDataManagement() {
+
+    const existing =
+        document.getElementById("dataManagementModal");
+
+    if (existing) {
+        existing.remove();
+    }
+
+    const modalHtml = `
+
+    <div class="modal fade"
+         id="dataManagementModal"
+         tabindex="-1">
+
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+
+                <div class="asset-hero d-flex align-items-center position-relative px-4 py-4">
+
+                    <div class="asset-image me-4">
+
+                        <div class="asset-avatar">
+
+                            <i class="fas fa-database"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        <h2 class="mb-1">
+
+                            Data Management
+
+                        </h2>
+
+                        <div class="text-muted">
+
+                            Backup, Restore and Reset Jay Workplace
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        class="btn-close position-absolute"
+                        style="top:24px;right:24px;"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="asset-info-card mb-4">
+
+                        <h6>
+
+                            Export Backup
+
+                        </h6>
+
+                        <p class="text-muted">
+
+                            Download a complete backup of all data.
+
+                        </p>
+
+                        <button
+                            class="btn btn-primary"
+                            onclick="exportBackup()">
+
+                            <i class="fas fa-download me-2"></i>
+
+                            Export Backup
+
+                        </button>
+
+                    </div>
+                    <div class="asset-info-card mb-4">
+
+                        <h6>
+
+                            Restore Backup
+
+                        </h6>
+
+                        <p class="text-muted">
+
+                            Restore data from a previous backup.
+
+                        </p>
+
+                        <div class="row g-2">
+
+                            <div class="col-md-8">
+
+                                <input
+                                    id="restoreFile"
+                                    type="file"
+                                    class="form-control">
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <button
+                                    class="btn btn-success w-100"
+                                    onclick="restoreBackup()">
+
+                                    Restore
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="asset-info-card">
+
+                        <h6 class="text-danger">
+
+                            Reset Application
+
+                        </h6>
+
+                        <p class="text-muted">
+
+                            Permanently delete all data stored in Jay Workplace.
+
+                        </p>
+
+                        <button
+                            class="btn btn-danger"
+                            onclick="resetSystem()">
+
+                            Reset All Data
+
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `;
+
+    document.body.insertAdjacentHTML(
+        "beforeend",
+        modalHtml
+    );
+
+    new bootstrap.Modal(
+        document.getElementById(
+            "dataManagementModal"
+        )
+    ).show();
 
 }
 
@@ -212,6 +582,8 @@ function exportBackup() {
         assetTransfers: getAssetTransfers(),
 
         assetHistory: getAssetHistory(),
+
+        employeeHistory: getEmployeeHistory(),
 
         exportDate: formatDateTime(),
 
@@ -316,6 +688,10 @@ function restoreBackup() {
                 backup.assetHistory || []
             );
 
+            saveEmployeeHistory(
+                backup.employeeHistory || []
+            );
+
             alert(
                 "Backup restored successfully"
             );
@@ -354,4 +730,17 @@ function resetSystem() {
 
     location.reload();
 
+}
+
+function getEmployeeHistory() {
+    return JSON.parse(
+        localStorage.getItem("employeeHistory")
+    ) || [];
+}
+
+function saveEmployeeHistory(history) {
+    localStorage.setItem(
+        "employeeHistory",
+        JSON.stringify(history)
+    );
 }

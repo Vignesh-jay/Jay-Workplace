@@ -869,3 +869,18 @@ body{
     font-size:14px;
 
 }
+
+.asset-avatar{
+    width:72px;
+    height:72px;
+    border-radius:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#fef2f2;
+    color:#dc3545;
+
+    font-size:30px;
+}
