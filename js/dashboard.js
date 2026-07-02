@@ -587,7 +587,7 @@ function startupRestoreBackup() {
                     );
 
                 saveEmployees(
-                    backup.employees || []
+                backup.employees || []
                 );
 
                 saveAssets(
@@ -610,12 +610,24 @@ function startupRestoreBackup() {
                     backup.locations || []
                 );
 
+                saveAuditLogs(
+                    backup.auditLogs || []
+                );
+
                 saveAssetTransfers(
                     backup.assetTransfers || []
                 );
 
                 saveAssetHistory(
                     backup.assetHistory || []
+                );
+
+                saveEmployeeHistory(
+                    backup.employeeHistory || []
+                );
+
+                saveAssignmentHistory(
+                    backup.assignmentHistory || []
                 );
 
                 alert(

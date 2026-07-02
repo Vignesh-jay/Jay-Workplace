@@ -585,6 +585,8 @@ function exportBackup() {
 
         employeeHistory: getEmployeeHistory(),
 
+        assignmentHistory: getAssignmentHistory(),
+
         exportDate: formatDateTime(),
 
         version: "1.1.0"
@@ -690,6 +692,10 @@ function restoreBackup() {
 
             saveEmployeeHistory(
                 backup.employeeHistory || []
+            );
+
+            saveAssignmentHistory(
+                backup.assignmentHistory || []
             );
 
             alert(

@@ -93,7 +93,8 @@ const STORAGE_KEYS = {
     activities: "jay_activities",
     departments: "jay_departments",
     assetHistory: "jay_asset_history",
-    employeeHistory: "jay_employee_history"
+    employeeHistory: "jay_employee_history",
+    assignmentHistory: "jay_assignment_history"
 };
 
 function getDepartments() {
@@ -186,22 +187,6 @@ function addEmployeeHistory(
 
 }
 
-function getEmployeeHistory() {
-    return JSON.parse(
-        localStorage.getItem(
-            "jay_employee_history"
-        )
-    ) || [];
-}
-
-function saveEmployeeHistory(history) {
-
-    localStorage.setItem(
-        "jay_employee_history",
-        JSON.stringify(history)
-    );
-
-}
 
 function getAssignmentHistory() {
 
