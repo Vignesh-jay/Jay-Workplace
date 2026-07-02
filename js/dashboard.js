@@ -65,103 +65,192 @@ function loadDashboard() {
 
     document.getElementById("content").innerHTML = `
 
-<div class="mb-4">
-    <h2 class="fw-bold">Welcome Back, Admin 👋</h2>
-    <p class="text-muted mb-0">
-        Here's what's happening in your workplace today.
-    </p>
+<div class="page-header">
+
+    <div>
+
+        <h2 class="fw-bold mb-1">
+
+            Dashboard
+
+        </h2>
+
+        <p class="text-muted">
+
+            Overview of your workplace assets and workforce.
+
+        </p>
+
+    </div>
+
 </div>
 
 <!-- KPI Cards -->
+
 <div class="row g-4">
 
     <div class="col-md-3">
-        <div class="card-custom">
-            <p>Total Employees</p>
-            <div class="kpi-number">${totalEmployees}</div>
+
+        <div class="card-custom stat-card active">
+
+            <div class="stat-value">
+
+                <small>Total Employees</small>
+
+                <h2>${employeeList.length}</h2>
+
+            </div>
+
+            <i class="fas fa-users stat-icon text-primary"></i>
+
         </div>
+
     </div>
 
     <div class="col-md-3">
-        <div class="card-custom">
-            <p>Total Assets</p>
-            <div class="kpi-number">${totalAssets}</div>
+
+        <div class="card-custom stat-card">
+
+            <div class="stat-value">
+
+                <small>Total Assets</small>
+
+                <h2>${assetList.length}</h2>
+
+            </div>
+
+            <i class="fas fa-laptop stat-icon text-primary"></i>
+
         </div>
+
     </div>
 
     <div class="col-md-3">
-        <div class="card-custom">
-            <p>Assigned Assets</p>
-            <div class="kpi-number">${assignedAssets}</div>
+
+        <div class="card-custom stat-card">
+
+            <div class="stat-value">
+
+                <small>Assigned</small>
+
+                <h2>${assignedAssets}</h2>
+
+            </div>
+
+            <i class="fas fa-user-check stat-icon text-success"></i>
+
         </div>
+
     </div>
 
     <div class="col-md-3">
-        <div class="card-custom">
-            <p>Available Assets</p>
-            <div class="kpi-number">${availableAssets}</div>
+
+        <div class="card-custom stat-card">
+
+            <div class="stat-value">
+
+                <small>Available</small>
+
+                <h2>${availableAssets}</h2>
+
+            </div>
+
+            <i class="fas fa-box-open stat-icon text-info"></i>
+
         </div>
+
     </div>
 
 </div>
 
 <!-- Charts -->
 
-<div class="row mt-4">
+<div class="row g-4 mt-1">
 
-    <div class="col-md-6">
-        <div class="card-custom">
-            <h5>Department Distribution</h5>
+    <div class="col-lg-6">
+
+        <div class="card-custom chart-card">
+
+            <h5 class="mb-4">
+                Department Distribution
+            </h5>
+
             <div class="chart-wrapper">
+
                 <canvas id="deptChart"></canvas>
+
             </div>
+
         </div>
+
     </div>
 
-    <div class="col-md-6">
-        <div class="card-custom">
-            <h5>Asset Categories</h5>
+    <div class="col-lg-6">
+
+        <div class="card-custom chart-card">
+
+            <h5 class="mb-4">
+                Asset Categories
+            </h5>
+
             <div class="chart-wrapper">
+
                 <canvas id="assetChart"></canvas>
+
             </div>
         </div>
+
     </div>
+
 </div>
 
 <!-- Recent Activities + Quick Actions -->
 
-<div class="row mt-4">
+<div class="row g-4 mt-1">
 
     <div class="col-lg-8">
         <div class="card-custom">
             <h5>Recent Activities</h5>
 
-            <ul class="activity-list mt-3">
+            <div class="timeline">
                 ${getActivities()
+
                     .slice(0,5)
+
                     .map(item => `
 
-                        <li>
+                    <div class="timeline-item">
+
+                        <div class="timeline-dot"></div>
+
+                        <div class="timeline-content">
 
                             <strong>
-                                ${item.timestamp}
+
+                                ${item.message}
+
                             </strong>
 
                             <br>
 
-                            ${item.message}
+                            <small class="text-muted">
 
-                        </li>
+                                ${item.timestamp}
 
-                    `).join('')
-                }
-            </ul>
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                    `).join('')}
+            </div>
 
         </div>
     </div>
     <div class="col-lg-4">
 
-        <div class="card-custom">
+        <div class="card-custom chart-card">
 
             <h5>
                 ⚠ Warranty Expiring Soon
@@ -215,36 +304,7 @@ function loadDashboard() {
 
             }
 
-        </div>
-            <br>
-        <div class="card-custom">
-            <h5>Quick Actions</h5>
-
-            <button
-                class="btn btn-primary w-100 mt-3"
-                onclick="loadWorkforce()">
-
-                Add Employee
-
-            </button>
-
-            <button
-                class="btn btn-outline-primary w-100 mt-2"
-                onclick="loadAssets()">
-
-                Add Asset
-
-            </button>
-
-            <button
-                class="btn btn-outline-primary w-100 mt-2"
-                onclick="loadAssignments()">
-
-                Assign Asset
-
-            </button>
-
-        </div>
+        </div>       
     </div>
 </div>
 
@@ -256,7 +316,7 @@ function loadWelcomeDashboard() {
 
     document.getElementById("content").innerHTML = `
 
-    <div class="card-custom text-center p-5">
+    <div class="card-custom chart-card text-center p-5">
 
         <h1 class="mb-3">
             Welcome to Jay Workplace 👋
@@ -335,7 +395,7 @@ function loadFirstRunScreen() {
 
     document.getElementById("content").innerHTML = `
 
-    <div class="card-custom text-center p-5">
+    <div class="card-custom chart-card text-center p-5">
 
         <h1>
             Welcome to Jay Workplace 👋
@@ -479,7 +539,7 @@ new Chart(deptCtx, {
 
             legend: {
 
-                position: 'bottom'
+                position: "bottom"
 
             }
 
@@ -545,7 +605,17 @@ new Chart(assetCtx, {
 
         responsive: true,
 
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            legend: {
+
+                position: "bottom"
+
+            }
+
+        }
 
     }
 

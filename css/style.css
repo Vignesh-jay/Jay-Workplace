@@ -172,6 +172,8 @@ body{
 .chart-wrapper{
     height: 200px;
     position: relative;
+    flex:1;
+    min-height:0;
 }
 
 .chart-wrapper canvas{
@@ -792,7 +794,11 @@ body{
 
 .chart-card{
 
-    height:360px;
+    height:380px;
+
+    display:flex;
+
+    flex-direction:column;
 
 }
 
@@ -883,4 +889,86 @@ body{
     color:#dc3545;
 
     font-size:30px;
+}
+
+.timeline{
+
+    max-height:320px;
+
+    overflow-y:auto;
+
+    padding-right:8px;
+
+}
+
+.stat-card{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    height:90px;
+
+    padding:18px 22px;
+
+    border-radius:16px;
+
+    background:#fff;
+
+    border:1px solid #eef1f5;
+
+    transition:.25s ease;
+
+}
+
+.stat-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 24px rgba(0,0,0,.06);
+
+}
+
+.stat-icon{
+
+    font-size:30px;
+
+}
+
+.stat-card.active{
+
+    border-left:4px solid #2563eb;
+
+}
+
+.stat-card small{
+
+    display:block;
+
+    color:#666;
+
+    font-size:13px;
+
+    margin-bottom:6px;
+
+}
+
+.stat-card h2{
+
+    margin:0;
+
+    font-size:38px;
+
+    font-weight:700;
+
+    line-height:1;
+
+}
+
+.stat-card .stat-value{
+
+    display:flex;
+
+    flex-direction:column;
+
 }
