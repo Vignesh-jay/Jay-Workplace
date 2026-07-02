@@ -1572,7 +1572,7 @@ function viewEmployee(employeeId) {
 
                                         <td>
 
-                                            ${asset.category}
+                                            ${asset.assettype}
 
                                         </td>
 
