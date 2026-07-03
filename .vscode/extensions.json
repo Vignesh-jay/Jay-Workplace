@@ -1,13 +1,11 @@
 {
   "recommendations": [
-    "esbenp.prettier-vscode",
-    "eamodio.gitlens",
     "continue.continue",
     "rooveterinaryinc.roo-cline",
-    "usernamehw.errorlens",
-    "christian-kohler.path-intellisense",
-    "formulahendry.auto-rename-tag",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "eamodio.gitlens",
     "gruntfuggly.todo-tree",
-    "alefragnani.project-manager"
+    "usernamehw.errorlens"
   ]
 }

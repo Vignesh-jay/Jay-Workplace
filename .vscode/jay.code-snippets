@@ -1,0 +1,58 @@
+{
+  "JAY Module": {
+    "prefix": "jaymodule",
+    "body": ["/**", " * ${1:Module}", " */", "function ${2:loadModule}() {", "  ${3:// TODO}", "}"],
+    "description": "Create a JAY module",
+  },
+
+  "JAY Service": {
+    "prefix": "service",
+    "body": [
+      "function get${1:Items}() {",
+      "  return JSON.parse(localStorage.getItem(STORAGE_KEYS.${2:ITEMS})) || [];",
+      "}",
+      "",
+      "function save${1:Items}(data) {",
+      "  localStorage.setItem(",
+      "    STORAGE_KEYS.${2:ITEMS},",
+      "    JSON.stringify(data)",
+      "  );",
+      "}",
+    ],
+    "description": "Create a localStorage service",
+  },
+
+  "Bootstrap Modal": {
+    "prefix": "modal",
+    "body": [
+      "<div class=\"modal fade\" id=\"${1:modalId}\" tabindex=\"-1\">",
+      "  <div class=\"modal-dialog\">",
+      "    <div class=\"modal-content\">",
+      "      <div class=\"modal-header\">",
+      "        <h5 class=\"modal-title\">${2:Title}</h5>",
+      "      </div>",
+      "      <div class=\"modal-body\">",
+      "      </div>",
+      "    </div>",
+      "  </div>",
+      "</div>",
+    ],
+    "description": "Bootstrap Modal",
+  },
+
+  "Bootstrap Card": {
+    "prefix": "card",
+    "body": [
+      "<div class=\"card shadow-sm\">",
+      "  <div class=\"card-body\">",
+      "    ${1}",
+      "  </div>",
+      "</div>",
+    ],
+  },
+
+  "Console Log": {
+    "prefix": "jlog",
+    "body": ["console.log('${1}', ${2});"],
+  },
+}

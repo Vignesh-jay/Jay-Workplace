@@ -2,15 +2,33 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Open Live Server",
+      "label": "🚀 JAY: Start Live Server",
       "type": "shell",
-      "command": "echo Start Live Server using the VS Code Live Server extension.",
+      "command": "open http://127.0.0.1:5500",
       "problemMatcher": []
     },
     {
-      "label": "Format Project",
+      "label": "🧹 JAY: Format Project",
       "type": "shell",
-      "command": "npx prettier . --write",
+      "command": "npx prettier --write .",
+      "problemMatcher": []
+    },
+    {
+      "label": "✅ JAY: Run ESLint",
+      "type": "shell",
+      "command": "npx eslint .",
+      "problemMatcher": []
+    },
+    {
+      "label": "📦 JAY: Install Dependencies",
+      "type": "shell",
+      "command": "npm install",
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 JAY: Project Info",
+      "type": "shell",
+      "command": "echo 'Project: JAY Workplace' && echo 'Node:' && node --version && echo 'NPM:' && npm --version",
       "problemMatcher": []
     }
   ]
