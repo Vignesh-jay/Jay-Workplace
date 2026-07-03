@@ -1,18 +1,11 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
+  initializeStore();
 
-    initializeStore();
-
-    loadDashboard();
-
+  loadDashboard();
 });
 
-function setActiveMenu(menuId){
+function setActiveMenu(menuId) {
+  document.querySelectorAll('.nav-menu li').forEach((item) => item.classList.remove('active'));
 
-document.querySelectorAll('.nav-menu li')
-    .forEach(item => item.classList.remove('active'));
-
-document
-    .getElementById(menuId)
-    .classList.add('active');
-
+  document.getElementById(menuId).classList.add('active');
 }

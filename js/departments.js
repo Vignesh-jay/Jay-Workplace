@@ -1,15 +1,9 @@
 function loadDepartments() {
+  const departments = getDepartments();
 
-    const departments =
-        getDepartments();
+  setActiveMenu('nav-administration');
 
-    setActiveMenu(
-        'nav-administration'
-    );
-
-    document.getElementById(
-        "content"
-    ).innerHTML = `
+  document.getElementById('content').innerHTML = `
 
 <div class="page-header">
 
@@ -61,7 +55,9 @@ function loadDepartments() {
 
         <tbody>
 
-            ${departments.map(dep => `
+            ${departments
+              .map(
+                (dep) => `
 
             <tr>
 
@@ -81,7 +77,9 @@ function loadDepartments() {
 
             </tr>
 
-            `).join('')}
+            `
+              )
+              .join('')}
 
         </tbody>
 
@@ -90,12 +88,10 @@ function loadDepartments() {
 </div>
 
 `;
-
 }
 
 function showAddDepartmentModal() {
-
-    const modalHtml = `
+  const modalHtml = `
 
     <div class="modal fade"
          id="addDepartmentModal">
@@ -148,101 +144,59 @@ function showAddDepartmentModal() {
     </div>
     `;
 
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        modalHtml
-    );
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    new bootstrap.Modal(
-        document.getElementById(
-            "addDepartmentModal"
-        )
-    ).show();
-
+  new bootstrap.Modal(document.getElementById('addDepartmentModal')).show();
 }
 
 function saveDepartment() {
+  const departmentName = document.getElementById('departmentName').value.trim();
 
-    const departmentName =
-        document.getElementById(
-            "departmentName"
-        ).value.trim();
+  if (!departmentName) {
+    alert('Department name required');
 
-    if (!departmentName) {
+    return;
+  }
 
-        alert(
-            "Department name required"
-        );
+  const departments = getDepartments();
 
-        return;
-    }
+  if (departments.includes(departmentName)) {
+    alert('Department already exists');
 
-    const departments =
-        getDepartments();
+    return;
+  }
 
-    if (
-        departments.includes(
-            departmentName
-        )
-    ) {
+  departments.push(departmentName);
 
-        alert(
-            "Department already exists"
-        );
+  saveDepartments(departments);
 
-        return;
-    }
+  addActivity(`Department ${departmentName} created`);
 
-    departments.push(
-        departmentName
-    );
-
-    saveDepartments(
-        departments
-    );
-
-    addActivity(
-        `Department ${departmentName} created`
-    );
-
-    loadDepartments();
-
+  loadDepartments();
 }
 
 function deleteDepartment(name) {
+  const employees = getEmployees();
 
-    const employees = getEmployees();
+  const inUse = employees.some((emp) => emp.department === name);
 
-    const inUse = employees.some(
-        emp => emp.department === name
-    );
+  if (inUse) {
+    alert('Department is assigned to employees and cannot be deleted.');
 
-    if (inUse) {
+    return;
+  }
 
-        alert(
-            "Department is assigned to employees and cannot be deleted."
-        );
+  if (!confirm('Delete department?')) {
+    return;
+  }
 
-        return;
-    }
+  const departments = getDepartments();
 
-    if (!confirm("Delete department?")) {
-        return;
-    }
+  const updated = departments.filter((dep) => dep !== name);
 
-    const departments = getDepartments();
+  saveDepartments(updated);
 
-    const updated =
-        departments.filter(
-            dep => dep !== name
-        );
+  addActivity(`Department ${name} deleted`);
 
-    saveDepartments(updated);
-
-    addActivity(
-        `Department ${name} deleted`
-    );
-
-    loadDepartments();
-
+  loadDepartments();
 }

@@ -1,8 +1,7 @@
-function loadAdministration(){
+function loadAdministration() {
+  setActiveMenu('nav-administration');
 
-setActiveMenu('nav-administration');
-
-document.getElementById("content").innerHTML = `
+  document.getElementById('content').innerHTML = `
 
 <div class="page-header">
 
@@ -390,19 +389,16 @@ document.getElementById("content").innerHTML = `
 </div>
 
 `;
-
 }
 
 function openDataManagement() {
+  const existing = document.getElementById('dataManagementModal');
 
-    const existing =
-        document.getElementById("dataManagementModal");
+  if (existing) {
+    existing.remove();
+  }
 
-    if (existing) {
-        existing.remove();
-    }
-
-    const modalHtml = `
+  const modalHtml = `
 
     <div class="modal fade"
          id="dataManagementModal"
@@ -548,205 +544,125 @@ function openDataManagement() {
 
     `;
 
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        modalHtml
-    );
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    new bootstrap.Modal(
-        document.getElementById(
-            "dataManagementModal"
-        )
-    ).show();
-
+  new bootstrap.Modal(document.getElementById('dataManagementModal')).show();
 }
 
 function exportBackup() {
+  const backup = {
+    employees: getEmployees(),
 
-    const backup = {
+    assets: getAssets(),
 
-        employees: getEmployees(),
+    assignments: getAssignments(),
 
-        assets: getAssets(),
+    activities: getActivities(),
 
-        assignments: getAssignments(),
+    departments: getDepartments(),
 
-        activities: getActivities(),
+    locations: getLocations(),
 
-        departments: getDepartments(),
+    auditLogs: getAuditLogs(),
 
-        locations: getLocations(),
+    assetTransfers: getAssetTransfers(),
 
-        auditLogs: getAuditLogs(),
+    assetHistory: getAssetHistory(),
 
-        assetTransfers: getAssetTransfers(),
+    employeeHistory: getEmployeeHistory(),
 
-        assetHistory: getAssetHistory(),
+    assignmentHistory: getAssignmentHistory(),
 
-        employeeHistory: getEmployeeHistory(),
+    exportDate: formatDateTime(),
 
-        assignmentHistory: getAssignmentHistory(),
+    version: '1.1.0',
+  };
 
-        exportDate: formatDateTime(),
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {
+    type: 'application/json',
+  });
 
-        version: "1.1.0"
+  const url = URL.createObjectURL(blob);
 
-    };
+  const a = document.createElement('a');
 
-    const blob = new Blob(
-        [
-            JSON.stringify(
-                backup,
-                null,
-                2
-            )
-        ],
-        {
-            type: "application/json"
-        }
-    );
+  a.href = url;
 
-    const url =
-        URL.createObjectURL(blob);
+  a.download = 'jay-workplace-backup.json';
 
-    const a =
-        document.createElement("a");
+  a.click();
 
-    a.href = url;
+  URL.revokeObjectURL(url);
 
-    a.download =
-        "jay-workplace-backup.json";
-
-    a.click();
-
-    URL.revokeObjectURL(url);
-
-    addActivity(
-        "Backup exported"
-    );
+  addActivity('Backup exported');
 }
 
 function restoreBackup() {
+  const file = document.getElementById('restoreFile').files[0];
 
-    const file =
-        document.getElementById(
-            "restoreFile"
-        ).files[0];
+  if (!file) {
+    alert('Select a backup file');
 
-    if (!file) {
+    return;
+  }
 
-        alert(
-            "Select a backup file"
-        );
+  const reader = new FileReader();
 
-        return;
+  reader.onload = function (e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+
+      saveEmployees(backup.employees || []);
+
+      saveAssets(backup.assets || []);
+
+      saveAssignments(backup.assignments || []);
+
+      saveActivities(backup.activities || []);
+
+      saveDepartments(backup.departments || []);
+
+      saveLocations(backup.locations || []);
+
+      saveAuditLogs(backup.auditLogs || []);
+
+      saveAssetTransfers(backup.assetTransfers || []);
+
+      saveAssetHistory(backup.assetHistory || []);
+
+      saveEmployeeHistory(backup.employeeHistory || []);
+
+      saveAssignmentHistory(backup.assignmentHistory || []);
+
+      alert('Backup restored successfully');
+
+      location.reload();
+    } catch (error) {
+      console.error(error);
+
+      alert('Restore failed: ' + error.message);
     }
+  };
 
-    const reader =
-        new FileReader();
-
-    reader.onload = function(e) {
-
-        try {
-
-            const backup =
-                JSON.parse(
-                    e.target.result
-                );
-
-            saveEmployees(
-                backup.employees || []
-            );
-
-            saveAssets(
-                backup.assets || []
-            );
-
-            saveAssignments(
-                backup.assignments || []
-            );
-
-            saveActivities(
-                backup.activities || []
-            );
-
-            saveDepartments(
-                backup.departments || []
-            );
-
-            saveLocations(
-                backup.locations || []
-            );
-
-            saveAuditLogs(
-                backup.auditLogs || []
-            );
-
-            saveAssetTransfers(
-                backup.assetTransfers || []
-            );
-
-            saveAssetHistory(
-                backup.assetHistory || []
-            );
-
-            saveEmployeeHistory(
-                backup.employeeHistory || []
-            );
-
-            saveAssignmentHistory(
-                backup.assignmentHistory || []
-            );
-
-            alert(
-                "Backup restored successfully"
-            );
-
-            location.reload();
-
-        } catch(error) {
-
-            console.error(error);
-
-            alert(
-                "Restore failed: " +
-                error.message
-            );
-
-        }
-
-    };
-
-    reader.readAsText(file);
+  reader.readAsText(file);
 }
 
 function resetSystem() {
+  if (!confirm('Delete all application data?')) {
+    return;
+  }
 
-    if (!confirm(
-        "Delete all application data?"
-    )) {
-        return;
-    }
+  localStorage.clear();
 
-    localStorage.clear();
+  alert('All data has been reset.');
 
-    alert(
-        "All data has been reset."
-    );
-
-    location.reload();
-
+  location.reload();
 }
 
 function getEmployeeHistory() {
-    return JSON.parse(
-        localStorage.getItem("employeeHistory")
-    ) || [];
+  return JSON.parse(localStorage.getItem('employeeHistory')) || [];
 }
 
 function saveEmployeeHistory(history) {
-    localStorage.setItem(
-        "employeeHistory",
-        JSON.stringify(history)
-    );
+  localStorage.setItem('employeeHistory', JSON.stringify(history));
 }

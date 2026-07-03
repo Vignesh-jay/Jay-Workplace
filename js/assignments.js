@@ -1,21 +1,17 @@
-function loadAssignments(){
+function loadAssignments() {
+  const assignmentList = getAssignments();
 
-    const assignmentList = getAssignments();
+  const totalAssignments = assignmentList.length;
 
-    const totalAssignments = assignmentList.length;
+  const activeAssignments = assignmentList.filter((a) => a.status === 'Assigned').length;
 
-    const activeAssignments =
-        assignmentList.filter(a => a.status === "Assigned").length;
+  const returnedAssignments = assignmentList.filter((a) => a.status === 'Returned').length;
 
-    const returnedAssignments =
-        assignmentList.filter(a => a.status === "Returned").length;
+  const availableAssets = getAssets().filter((a) => a.status === 'Available').length;
 
-    const availableAssets =
-        getAssets().filter(a => a.status === "Available").length;
+  setActiveMenu('nav-assignments');
 
-    setActiveMenu('nav-assignments');
-
-document.getElementById("content").innerHTML = `
+  document.getElementById('content').innerHTML = `
 
 <div class="page-header">
 
@@ -182,7 +178,9 @@ document.getElementById("content").innerHTML = `
 
         <tbody>
 
-            ${assignmentList.map(item => `
+            ${assignmentList
+              .map(
+                (item) => `
 
                 <tr>
 
@@ -226,20 +224,14 @@ document.getElementById("content").innerHTML = `
 
                     <td>
 
-                        ${item.returnedDate || "-"}
+                        ${item.returnedDate || '-'}
 
                     </td>
 
                     <td>
 
                         <span class="status-badge ${
-
-                            item.status === "Assigned"
-
-                            ? "assigned"
-
-                            : "available"
-
+                          item.status === 'Assigned' ? 'assigned' : 'available'
                         }">
 
                             ${item.status}
@@ -251,11 +243,8 @@ document.getElementById("content").innerHTML = `
                     <td class="text-nowrap">
 
                         ${
-                            item.status === "Assigned"
-
-                            ?
-
-                            `
+                          item.status === 'Assigned'
+                            ? `
 
                             <button
                                 class="btn btn-light btn-sm asset-action-btn"
@@ -279,10 +268,7 @@ document.getElementById("content").innerHTML = `
                             </button>
 
                             `
-
-                            :
-
-                            `
+                            : `
 
                             <button
                                 class="btn btn-light btn-sm asset-action-btn"
@@ -294,14 +280,15 @@ document.getElementById("content").innerHTML = `
                             </button>
 
                             `
-
                         }
 
                     </td>
 
                 </tr>
 
-            `).join("")}
+            `
+              )
+              .join('')}
 
         </tbody>
 
@@ -310,18 +297,14 @@ document.getElementById("content").innerHTML = `
 </div>
 
 `;
-
 }
 
 function showAssignAssetModal() {
+  const employees = getEmployees();
 
-    const employees = getEmployees();
+  const assets = getAssets().filter((asset) => asset.status === 'Available');
 
-    const assets = getAssets().filter(
-        asset => asset.status === "Available"
-    );
-
-    const modalHtml = `
+  const modalHtml = `
     <div class="modal fade"
          id="assignAssetModal"
          tabindex="-1">
@@ -356,7 +339,9 @@ function showAssignAssetModal() {
                             id="employeeSelect"
                             class="form-select">
 
-                            ${employees.map(emp=>`
+                            ${employees
+                              .map(
+                                (emp) => `
 
                                 <option value="${emp.id}">
 
@@ -366,7 +351,9 @@ function showAssignAssetModal() {
 
                                 </option>
 
-                            `).join("")}
+                            `
+                              )
+                              .join('')}
 
                         </select>
 
@@ -391,7 +378,9 @@ function showAssignAssetModal() {
 
                             </option>
 
-                            ${assets.map(asset=>`
+                            ${assets
+                              .map(
+                                (asset) => `
 
                                 <option value="${asset.id}">
 
@@ -401,7 +390,9 @@ function showAssignAssetModal() {
 
                                 </option>
 
-                            `).join("")}
+                            `
+                              )
+                              .join('')}
 
                         </select>
 
@@ -437,41 +428,26 @@ function showAssignAssetModal() {
     </div>
     `;
 
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        modalHtml
-    );
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    new bootstrap.Modal(
-        document.getElementById("assignAssetModal")
-    ).show();
-    previewAssignmentAsset();
+  new bootstrap.Modal(document.getElementById('assignAssetModal')).show();
+  previewAssignmentAsset();
 }
 
-function previewAssignmentAsset(){
+function previewAssignmentAsset() {
+  const assetId = document.getElementById('assetSelect').value;
 
-    const assetId =
-        document.getElementById("assetSelect").value;
+  const asset = getAssets().find((a) => a.id === assetId);
 
-    const asset =
-        getAssets().find(
-            a => a.id === assetId
-        );
+  const preview = document.getElementById('assignmentAssetPreview');
 
-    const preview =
-        document.getElementById(
-            "assignmentAssetPreview"
-        );
+  if (!asset) {
+    preview.innerHTML = '';
 
-    if(!asset){
+    return;
+  }
 
-        preview.innerHTML="";
-
-        return;
-
-    }
-
-    preview.innerHTML = `
+  preview.innerHTML = `
 
     <div class="asset-info-card">
 
@@ -496,123 +472,83 @@ function previewAssignmentAsset(){
             <strong>${asset.status}</strong>
 
             <div>Serial</div>
-            <strong>${asset.serialNumber || "-"}</strong>
+            <strong>${asset.serialNumber || '-'}</strong>
 
         </div>
 
     </div>
 
     `;
-
 }
 
 function returnAsset(assetId) {
+  if (!confirm('Return this asset?')) {
+    return;
+  }
 
-    if (!confirm("Return this asset?")) {
-        return;
-    }
+  const assets = getAssets();
 
-    const assets = getAssets();
+  const assignments = getAssignments();
 
-    const assignments = getAssignments();
+  const asset = assets.find((a) => a.id === assetId);
 
-    const asset =
-        assets.find(a => a.id === assetId);
+  const assignment = assignments.find((a) => a.assetId === assetId && a.status === 'Assigned');
 
-    const assignment =
-        assignments.find(
-            a =>
-                a.assetId === assetId &&
-                a.status === "Assigned"
-        );
+  if (!asset || !assignment) {
+    return;
+  }
 
-    if (!asset || !assignment) {
-        return;
-    }
+  asset.status = 'Available';
 
-    asset.status = "Available";
+  assignment.status = 'Returned';
 
-    assignment.status = "Returned";
+  assignment.returnedDate = formatDateTime();
 
-    assignment.returnedDate =
-        formatDateTime();
+  addAssetHistory(asset.id, 'Returned', `Returned by ${assignment.employeeName}`);
 
-    addAssetHistory(
-        asset.id,
-        "Returned",
-        `Returned by ${assignment.employeeName}`
-    );
+  addAssignmentHistory(
+    asset.id,
+    'Returned',
+    `${asset.name} returned by ${assignment.employeeName}`
+  );
 
-    addAssignmentHistory(
-        asset.id,
-        "Returned",
-        `${asset.name} returned by ${assignment.employeeName}`
-    );
+  saveAssets(assets);
 
-    saveAssets(assets);
+  saveAssignments(assignments);
 
-    saveAssignments(assignments);
+  addEmployeeHistory(assignment.employeeId, 'Asset Returned', asset.name);
 
-    addEmployeeHistory(
-    assignment.employeeId,
-    "Asset Returned",
-    asset.name
-);
+  addActivity(`${asset.name} returned by ${assignment.employeeName}`);
 
-    addActivity(
-        `${asset.name} returned by ${assignment.employeeName}`
-    );
-
-    loadAssignments();
+  loadAssignments();
 }
 
 function filterAssignments() {
+  const searchText = document.getElementById('assignmentSearch').value.toLowerCase();
 
-    const searchText =
-        document
-            .getElementById("assignmentSearch")
-            .value
-            .toLowerCase();
+  const rows = document.querySelectorAll('tbody tr');
 
-    const rows =
-        document.querySelectorAll("tbody tr");
-
-    rows.forEach(row => {
-
-        row.style.display =
-            row.innerText
-                .toLowerCase()
-                .includes(searchText)
-            ? ""
-            : "none";
-
-    });
-
+  rows.forEach((row) => {
+    row.style.display = row.innerText.toLowerCase().includes(searchText) ? '' : 'none';
+  });
 }
 
-function viewAssignment(assignmentId){
+function viewAssignment(assignmentId) {
+  const assignments = getAssignments();
+  const assets = getAssets();
+  const employees = getEmployees();
 
-    const assignments = getAssignments();
-    const assets = getAssets();
-    const employees = getEmployees();
+  const assignment = assignments.find((a) => a.id === assignmentId);
 
-    const assignment = assignments.find(
-        a => a.id === assignmentId
-    );
+  if (!assignment) return;
 
-    if(!assignment) return;
+  const asset = assets.find((a) => a.id === assignment.assetId);
 
-    const asset = assets.find(
-        a => a.id === assignment.assetId
-    );
+  const employee = employees.find((e) => e.id === assignment.employeeId);
 
-    const employee = employees.find(
-        e => e.id === assignment.employeeId
-    );
+  if (!asset || !employee) return;
 
-    if(!asset || !employee) return;
-
-    const modalHtml = `
+  const modalHtml = `
 
     <div class="modal fade"
          id="viewAssignmentModal"
@@ -651,11 +587,7 @@ function viewAssignment(assignmentId){
 
         </div>
 
-        <span class="status-badge ${
-            assignment.status === "Assigned"
-                ? "assigned"
-                : "available"
-        }">
+        <span class="status-badge ${assignment.status === 'Assigned' ? 'assigned' : 'available'}">
 
             ${assignment.status}
 
@@ -759,7 +691,7 @@ function viewAssignment(assignmentId){
 
                 <small>Returned</small>
 
-                <h6>${assignment.returnedDate || "-"}</h6>
+                <h6>${assignment.returnedDate || '-'}</h6>
 
             </div>
 
@@ -784,7 +716,7 @@ function viewAssignment(assignmentId){
         <strong>${assignment.assignedDate}</strong>
 
         <div>Returned On</div>
-        <strong>${assignment.returnedDate || "-"}</strong>
+        <strong>${assignment.returnedDate || '-'}</strong>
 
     </div>
 
@@ -799,23 +731,13 @@ function viewAssignment(assignmentId){
 </div>
 `;
 
-const existingModal =
-    document.getElementById(
-        "viewAssignmentModal"
-    );
+  const existingModal = document.getElementById('viewAssignmentModal');
 
-if (existingModal) {
+  if (existingModal) {
     existingModal.remove();
-}
+  }
 
-document.body.insertAdjacentHTML(
-    "beforeend",
-    modalHtml
-);
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-new bootstrap.Modal(
-    document.getElementById(
-        "viewAssignmentModal"
-    )
-).show();
+  new bootstrap.Modal(document.getElementById('viewAssignmentModal')).show();
 }

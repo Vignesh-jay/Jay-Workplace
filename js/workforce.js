@@ -1,21 +1,17 @@
 function loadWorkforce() {
+  const employeeList = getEmployees();
 
-    const employeeList = getEmployees();
+  const totalEmployees = employeeList.length;
 
-    const totalEmployees = employeeList.length;
+  const activeEmployees = employeeList.filter((e) => e.status === 'Active').length;
 
-    const activeEmployees =
-        employeeList.filter(e => e.status === "Active").length;
+  const onLeaveEmployees = employeeList.filter((e) => e.status === 'On Leave').length;
 
-    const onLeaveEmployees =
-        employeeList.filter(e => e.status === "On Leave").length;
+  const departments = [...new Set(employeeList.map((e) => e.department))].length;
 
-    const departments =
-        [...new Set(employeeList.map(e => e.department))].length;
+  setActiveMenu('nav-workforce');
 
-    setActiveMenu('nav-workforce');
-    
-document.getElementById("content").innerHTML = `
+  document.getElementById('content').innerHTML = `
 
 <div class="page-header">
 
@@ -149,11 +145,15 @@ document.getElementById("content").innerHTML = `
                 All Locations
             </option>
 
-            ${getLocations().map(location => `
+            ${getLocations()
+              .map(
+                (location) => `
                 <option value="${location.name}">
                     ${location.name}
                 </option>
-            `).join("")}
+            `
+              )
+              .join('')}
 
         </select>
 
@@ -187,7 +187,9 @@ document.getElementById("content").innerHTML = `
 
         <tbody>
 
-            ${employeeList.map(emp => `
+            ${employeeList
+              .map(
+                (emp) => `
 
             <tr>
 
@@ -231,7 +233,7 @@ document.getElementById("content").innerHTML = `
 
                 <td>
 
-                    <span class="status-badge ${emp.status.toLowerCase().replace(/\s/g,'-')}">
+                    <span class="status-badge ${emp.status.toLowerCase().replace(/\s/g, '-')}">
 
                         ${emp.status}
 
@@ -271,7 +273,9 @@ document.getElementById("content").innerHTML = `
 
             </tr>
 
-            `).join("")}
+            `
+              )
+              .join('')}
 
         </tbody>
 
@@ -280,14 +284,12 @@ document.getElementById("content").innerHTML = `
 </div>
 
 `;
-
 }
 
 function showAddEmployeeModal() {
+  const locations = getLocations();
 
-    const locations = getLocations();
-
-    const modalHtml = `
+  const modalHtml = `
     <div class="modal fade"
          id="addEmployeeModal"
          tabindex="-1">
@@ -381,9 +383,13 @@ function showAddEmployeeModal() {
                     id="employeeDepartment"
                     class="form-select">
 
-                    ${getDepartments().map(dep => `
+                    ${getDepartments()
+                      .map(
+                        (dep) => `
                         <option>${dep}</option>
-                    `).join('')}
+                    `
+                      )
+                      .join('')}
 
                 </select>
 
@@ -429,11 +435,15 @@ function showAddEmployeeModal() {
                         Select Location
                     </option>
 
-                    ${locations.map(location => `
+                    ${locations
+                      .map(
+                        (location) => `
                         <option value="${location.name}">
                             ${location.name}
                         </option>
-                    `).join("")}
+                    `
+                      )
+                      .join('')}
 
                 </select>
 
@@ -532,240 +542,141 @@ function showAddEmployeeModal() {
     </div>
     `;
 
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        modalHtml
-    );
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    new bootstrap.Modal(
-        document.getElementById("addEmployeeModal")
-    ).show();
+  new bootstrap.Modal(document.getElementById('addEmployeeModal')).show();
 }
 
 function saveEmployee() {
+  const employee = {
+    id: document.getElementById('employeeId').value,
 
-    const employee = {
+    firstName: document.getElementById('employeeFirstName').value,
 
-        id:
-            document.getElementById(
-                "employeeId"
-            ).value,
+    lastName: document.getElementById('employeeLastName').value,
 
-        firstName:
-            document.getElementById(
-                "employeeFirstName"
-            ).value,
+    email: document.getElementById('employeeEmail').value,
 
-        lastName:
-            document.getElementById(
-                "employeeLastName"
-            ).value,
+    department: document.getElementById('employeeDepartment').value,
 
-        email:
-            document.getElementById(
-                "employeeEmail"
-            ).value,
+    designation: document.getElementById('employeeDesignation').value,
 
-        department:
-            document.getElementById(
-                "employeeDepartment"
-            ).value,
+    manager: document.getElementById('employeeManager').value,
 
-        designation:
-            document.getElementById(
-                "employeeDesignation"
-            ).value,
+    joiningDate: document.getElementById('employeeJoiningDate').value,
 
-        manager:
-            document.getElementById(
-                "employeeManager"
-            ).value,
+    leavingDate: document.getElementById('employeeLeavingDate').value,
 
-        joiningDate:
-            document.getElementById(
-                "employeeJoiningDate"
-            ).value,
+    location: document.getElementById('employeeLocation').value,
 
-        leavingDate:
-            document.getElementById(
-                "employeeLeavingDate"
-            ).value,
+    employmentType: document.getElementById('employeeType').value,
 
-        location:
-            document.getElementById(
-                "employeeLocation"
-            ).value,
+    status: document.getElementById('employeeStatus').value,
+  };
 
-        employmentType:
-            document.getElementById(
-                "employeeType"
-            ).value,
+  if (
+    !employee.id ||
+    !employee.department ||
+    !employee.designation ||
+    !employee.status ||
+    !employee.email ||
+    !employee.joiningDate ||
+    !employee.employmentType ||
+    !employee.location ||
+    !employee.firstName ||
+    !employee.lastName
+  ) {
+    alert('Please fill all Required fields');
 
-        status:
-            document.getElementById(
-                "employeeStatus"
-            ).value
+    return;
+  }
 
-    };
+  employee.name = `${employee.firstName} ${employee.lastName}`;
+  const existingEmployees = getEmployees();
 
-    if (
-        !employee.id ||
-        !employee.department ||
-        !employee.designation ||
-        !employee.status ||
-        !employee.email ||  
-        !employee.joiningDate ||
-        !employee.employmentType ||
-        !employee.location ||
-        !employee.firstName ||
-        !employee.lastName
-    ) {
+  const employeeExists = existingEmployees.some((emp) => emp.id === employee.id);
 
-        alert("Please fill all Required fields");
+  if (employeeExists) {
+    alert(`Employee ID ${employee.id} already exists`);
 
-        return;
-    }
+    return;
+  }
 
-    employee.name =
-    `${employee.firstName} ${employee.lastName}`;
-    const existingEmployees = getEmployees();
+  addEmployee(employee);
 
-    const employeeExists = existingEmployees.some(
-        emp => emp.id === employee.id
-    );
+  addEmployeeHistory(employee.id, 'Created', 'Employee onboarded');
 
-    if (employeeExists) {
+  alert(`Employee ${employee.firstName} ${employee.lastName} added successfully`);
 
-        alert(
-            `Employee ID ${employee.id} already exists`
-        );
+  loadWorkforce();
 
-        return;
-    }
-
-    addEmployee(employee);
-
-    addEmployeeHistory(
-        employee.id,
-        "Created",
-        "Employee onboarded"
-    );
-
-    alert(
-        `Employee ${employee.firstName} ${employee.lastName} added successfully`
-    );
-
-    loadWorkforce();
-
-    bootstrap.Modal.getInstance(
-        document.getElementById("addEmployeeModal")
-    ).hide();
+  bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal')).hide();
 }
 
 function deleteEmployee(employeeId) {
+  const assignedAssets = getAssignments().filter(
+    (a) => a.employeeId === employeeId && a.status === 'Assigned'
+  );
 
-    const assignedAssets =
-        getAssignments().filter(
-            a =>
-                a.employeeId === employeeId &&
-                a.status === "Assigned"
-        );
-
-    if (assignedAssets.length > 0) {
-
-        alert(
-            `Cannot delete employee.\n\nOutstanding Assets:\n\n${
-                assignedAssets
-                    .map(a => a.assetName)
-                    .join("\n")
-            }`
-        );
-
-        return;
-    }
-
-    if (!confirm("Delete this employee?")) {
-        return;
-    }
-
-    deleteEmployeeById(employeeId);
-
-    addEmployeeHistory(
-        employeeId,
-        "Deleted",
-        "Employee removed"
+  if (assignedAssets.length > 0) {
+    alert(
+      `Cannot delete employee.\n\nOutstanding Assets:\n\n${assignedAssets
+        .map((a) => a.assetName)
+        .join('\n')}`
     );
 
-    addActivity(
-        `Employee with ID ${employeeId} deleted`
-    );
+    return;
+  }
 
-    loadWorkforce();
+  if (!confirm('Delete this employee?')) {
+    return;
+  }
+
+  deleteEmployeeById(employeeId);
+
+  addEmployeeHistory(employeeId, 'Deleted', 'Employee removed');
+
+  addActivity(`Employee with ID ${employeeId} deleted`);
+
+  loadWorkforce();
 }
 
 function filterEmployees() {
+  const searchText = document.getElementById('employeeSearch').value.toLowerCase();
 
-    const searchText =
-        document
-            .getElementById("employeeSearch")
-            .value
-            .toLowerCase();
+  const selectedLocation = document.getElementById('locationFilter').value;
 
-    const selectedLocation =
-        document
-            .getElementById("locationFilter")
-            .value;
+  const rows = document.querySelectorAll('tbody tr');
 
-    const rows =
-        document.querySelectorAll("tbody tr");
+  rows.forEach((row) => {
+    const rowText = row.innerText.toLowerCase();
 
-    rows.forEach(row => {
+    const locationCell = row.children[3]?.innerText || '';
 
-        const rowText =
-            row.innerText.toLowerCase();
+    const matchesSearch = rowText.includes(searchText);
 
-        const locationCell =
-            row.children[3]?.innerText || "";
+    const matchesLocation = !selectedLocation || locationCell === selectedLocation;
 
-        const matchesSearch =
-            rowText.includes(searchText);
-
-        const matchesLocation =
-            !selectedLocation ||
-            locationCell === selectedLocation;
-
-        row.style.display =
-            matchesSearch && matchesLocation
-                ? ""
-                : "none";
-
-    });
-
+    row.style.display = matchesSearch && matchesLocation ? '' : 'none';
+  });
 }
 
 function editEmployee(employeeId) {
+  const existingModal = document.getElementById('editEmployeeModal');
 
-    const existingModal =
-        document.getElementById(
-            "editEmployeeModal"
-        );
+  if (existingModal) {
+    existingModal.remove();
+  }
+  const employees = getEmployees();
 
-    if (existingModal) {
-        existingModal.remove();
-    }
-    const employees = getEmployees();
+  const employee = employees.find((e) => e.id === employeeId);
 
-    const employee =
-        employees.find(
-            e => e.id === employeeId
-        );
+  if (!employee) {
+    return;
+  }
 
-    if (!employee) {
-        return;
-    }
-
-    const locations = getLocations();
-    const modalHtml = `
+  const locations = getLocations();
+  const modalHtml = `
 
     <div class="modal fade"
          id="editEmployeeModal"
@@ -828,13 +739,17 @@ function editEmployee(employeeId) {
                                 id="editEmployeeDepartment"
                                 class="form-select">
 
-                                ${getDepartments().map(dep => `
+                                ${getDepartments()
+                                  .map(
+                                    (dep) => `
                                     <option
                                         value="${dep}"
                                         ${employee.department === dep ? 'selected' : ''}>
                                         ${dep}
                                     </option>
-                                `).join('')}
+                                `
+                                  )
+                                  .join('')}
 
                             </select>
                         </div>
@@ -861,13 +776,17 @@ function editEmployee(employeeId) {
                                 id="editEmployeeLocation"
                                 class="form-select">
 
-                                ${locations.map(location => `
+                                ${locations
+                                  .map(
+                                    (location) => `
                                     <option
                                         value="${location.name}"
                                         ${employee.location === location.name ? 'selected' : ''}>
                                         ${location.name}
                                     </option>
-                                `).join('')}
+                                `
+                                  )
+                                  .join('')}
 
                             </select>
                         </div>
@@ -974,271 +893,155 @@ function editEmployee(employeeId) {
     </div>
     `;
 
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        modalHtml
-    );
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    new bootstrap.Modal(
-        document.getElementById(
-            "editEmployeeModal"
-        )
-    ).show();
+  new bootstrap.Modal(document.getElementById('editEmployeeModal')).show();
 }
 
 function saveEmployeeEdit() {
+  const employeeId = document.getElementById('editEmployeeId').value;
 
-    const employeeId =
-        document.getElementById(
-            "editEmployeeId"
-        ).value;
+  const employees = getEmployees();
 
-    const employees =
-        getEmployees();
+  const employee = employees.find((e) => e.id === employeeId);
 
-    const employee =
-        employees.find(
-            e => e.id === employeeId
-        );
+  if (!employee) {
+    return;
+  }
 
-    if (!employee) {
-        return;
-    }
+  const oldEmployee = {
+    ...employee,
+  };
 
-    const oldEmployee = {
-        ...employee
-    };
+  const oldLocation = employee.location || '';
 
-    const oldLocation =
-        employee.location || "";
+  employee.firstName = document.getElementById('editEmployeeFirstName').value;
 
-    employee.firstName =
-        document.getElementById(
-            "editEmployeeFirstName"
-        ).value;
+  employee.lastName = document.getElementById('editEmployeeLastName').value;
 
-    employee.lastName =
-        document.getElementById(
-            "editEmployeeLastName"
-        ).value;
+  employee.department = document.getElementById('editEmployeeDepartment').value;
 
-    employee.department =
-        document.getElementById(
-            "editEmployeeDepartment"
-        ).value;
+  employee.designation = document.getElementById('editEmployeeDesignation').value;
 
-    employee.designation =
-        document.getElementById(
-            "editEmployeeDesignation"
-        ).value;
+  employee.email = document.getElementById('editEmployeeEmail').value;
 
-    employee.email =
-    document.getElementById(
-        "editEmployeeEmail"
-    ).value;
+  employee.manager = document.getElementById('editEmployeeManager').value;
 
-    employee.manager =
-        document.getElementById(
-            "editEmployeeManager"
-        ).value;
+  const newLocation = document.getElementById('editEmployeeLocation').value;
 
-    const newLocation =
-        document.getElementById(
-            "editEmployeeLocation"
-        ).value;
+  employee.location = newLocation;
 
-    employee.location =
-        newLocation;
+  employee.joiningDate = document.getElementById('editEmployeeJoiningDate').value;
 
-    employee.joiningDate =
-        document.getElementById(
-            "editEmployeeJoiningDate"
-        ).value;
+  employee.leavingDate = document.getElementById('editEmployeeLeavingDate').value;
 
-    employee.leavingDate =
-        document.getElementById(
-            "editEmployeeLeavingDate"
-        ).value;
+  employee.employmentType = document.getElementById('editEmployeeType').value;
 
-    employee.employmentType =
-        document.getElementById(
-            "editEmployeeType"
-        ).value;
+  employee.status = document.getElementById('editEmployeeStatus').value;
 
-    employee.status =
-        document.getElementById(
-            "editEmployeeStatus"
-        ).value;
+  employee.name = `${employee.firstName} ${employee.lastName}`;
 
-    employee.name =
-    `${employee.firstName} ${employee.lastName}`;
+  addActivity(`Employee ${employee.firstName} ${employee.lastName} updated`);
 
-    addActivity(
-        `Employee ${employee.firstName} ${employee.lastName} updated`
+  const changes = [];
+
+  if (oldEmployee.firstName !== employee.firstName)
+    changes.push(`First Name: ${oldEmployee.firstName} → ${employee.firstName}`);
+
+  if (oldEmployee.lastName !== employee.lastName)
+    changes.push(`Last Name: ${oldEmployee.lastName} → ${employee.lastName}`);
+
+  if (oldEmployee.email !== employee.email)
+    changes.push(`Email: ${oldEmployee.email} → ${employee.email}`);
+
+  if (oldEmployee.department !== employee.department)
+    changes.push(`Department: ${oldEmployee.department} → ${employee.department}`);
+
+  if (oldEmployee.designation !== employee.designation)
+    changes.push(`Designation: ${oldEmployee.designation} → ${employee.designation}`);
+
+  if (oldEmployee.manager !== employee.manager)
+    changes.push(`Manager: ${oldEmployee.manager} → ${employee.manager}`);
+
+  if (oldEmployee.location !== employee.location)
+    changes.push(`Location: ${oldEmployee.location} → ${employee.location}`);
+
+  if (oldEmployee.status !== employee.status)
+    changes.push(`Status: ${oldEmployee.status} → ${employee.status}`);
+
+  if (oldEmployee.employmentType !== employee.employmentType)
+    changes.push(`Employment Type: ${oldEmployee.employmentType} → ${employee.employmentType}`);
+
+  const assignedAssets = getAssignments().filter(
+    (a) => a.employeeId === employee.id && a.status === 'Assigned'
+  );
+
+  if (
+    (employee.status === 'Resigned' || employee.status === 'Inactive') &&
+    assignedAssets.length > 0
+  ) {
+    alert(
+      `Cannot mark employee as Resigned / Inactive.\n\nOutstanding Assets:\n\n${assignedAssets
+        .map((a) => a.assetName)
+        .join('\n')}`
     );
 
-    const changes = [];
+    return;
+  }
 
-    if (oldEmployee.firstName !== employee.firstName)
-        changes.push(
-            `First Name: ${oldEmployee.firstName} → ${employee.firstName}`
-        );
+  if (oldLocation && oldLocation !== newLocation) {
+    addEmployeeTransfer({
+      id: Date.now(),
 
-    if (oldEmployee.lastName !== employee.lastName)
-        changes.push(
-            `Last Name: ${oldEmployee.lastName} → ${employee.lastName}`
-        );
+      employeeId: employee.id,
 
-    if (oldEmployee.email !== employee.email)
-        changes.push(
-            `Email: ${oldEmployee.email} → ${employee.email}`
-        );
+      employeeName: `${employee.firstName} ${employee.lastName}`,
 
-    if (oldEmployee.department !== employee.department)
-        changes.push(
-            `Department: ${oldEmployee.department} → ${employee.department}`
-        );
+      fromLocation: oldLocation,
 
-    if (oldEmployee.designation !== employee.designation)
-        changes.push(
-            `Designation: ${oldEmployee.designation} → ${employee.designation}`
-        );
+      toLocation: newLocation,
 
-    if (oldEmployee.manager !== employee.manager)
-        changes.push(
-            `Manager: ${oldEmployee.manager} → ${employee.manager}`
-        );
+      effectiveDate: formatDateTime(),
 
-    if (oldEmployee.location !== employee.location)
-        changes.push(
-            `Location: ${oldEmployee.location} → ${employee.location}`
-        );
+      remarks: 'Location changed via Employee Edit',
+    });
 
-    if (oldEmployee.status !== employee.status)
-        changes.push(
-            `Status: ${oldEmployee.status} → ${employee.status}`
-        );
+    addActivity(`Employee ${employee.name} transferred from ${oldLocation} to ${newLocation}`);
 
-    if (oldEmployee.employmentType !== employee.employmentType)
-        changes.push(
-            `Employment Type: ${oldEmployee.employmentType} → ${employee.employmentType}`
-        );
+    addEmployeeHistory(employee.id, 'Transferred', `${oldLocation} → ${newLocation}`);
+  }
 
-    const assignedAssets =
-    getAssignments().filter(
-        a =>
-            a.employeeId === employee.id &&
-            a.status === "Assigned"
-    );
+  saveEmployees(employees);
 
-    if (
-        (employee.status === "Resigned" || employee.status === "Inactive" )&&
-        assignedAssets.length > 0
-    ) {
+  addEmployeeHistory(
+    employee.id,
+    'Updated',
+    changes.length > 0 ? changes.join('<br>') : 'No changes detected'
+  );
 
-        alert(
-            `Cannot mark employee as Resigned / Inactive.\n\nOutstanding Assets:\n\n${
-                assignedAssets
-                    .map(a => a.assetName)
-                    .join("\n")
-            }`
-        );
+  bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal')).hide();
 
-        return;
-    }
-
-    if (
-        oldLocation &&
-        oldLocation !== newLocation
-    ) {
-
-        addEmployeeTransfer({
-
-            id: Date.now(),
-
-            employeeId:
-                employee.id,
-
-            employeeName:
-                `${employee.firstName} ${employee.lastName}`,
-
-            fromLocation:
-                oldLocation,
-
-            toLocation:
-                newLocation,
-
-            effectiveDate:
-                formatDateTime(),
-
-            remarks:
-                "Location changed via Employee Edit"
-
-        });
-
-        addActivity(
-            `Employee ${employee.name} transferred from ${oldLocation} to ${newLocation}`
-        );
-
-        addEmployeeHistory(
-            employee.id,
-            "Transferred",
-            `${oldLocation} → ${newLocation}`
-        );
-
-    }
-
-    saveEmployees(employees);
-
-    addEmployeeHistory(
-        employee.id,
-        "Updated",
-        changes.length > 0
-            ? changes.join("<br>")
-            : "No changes detected"
-    );
-
-    bootstrap.Modal.getInstance(
-        document.getElementById(
-            "editEmployeeModal"
-        )
-    ).hide();
-
-    loadWorkforce();
+  loadWorkforce();
 }
 
 function viewEmployee(employeeId) {
+  const employees = getEmployees();
 
-    const employees =
-        getEmployees();
+  const assignments = getAssignments();
 
-    const assignments =
-        getAssignments();
+  const employee = employees.find((e) => e.id === employeeId);
 
-    const employee =
-        employees.find(
-            e => e.id === employeeId
-        );
+  if (!employee) {
+    return;
+  }
 
-    if (!employee) {
-        return;
-    }
+  const employeeAssets = assignments.filter(
+    (item) => item.employeeId === employeeId && item.status === 'Assigned'
+  );
 
-    const employeeAssets =
-        assignments.filter(
-            item =>
-                item.employeeId === employeeId &&
-                item.status === "Assigned"
-        );
+  const history = (getEmployeeHistory() || []).filter((item) => item.employeeId === employeeId);
 
-    const history =
-    (getEmployeeHistory() || [])
-        .filter(
-            item =>
-                item.employeeId === employeeId
-        );
-
-    const modalHtml = `
+  const modalHtml = `
 
     <div class="modal fade"
          id="employeeProfileModal"
@@ -1277,7 +1080,7 @@ function viewEmployee(employeeId) {
                         ${employee.department}
                     </div>
 
-                    <span class="status-badge ${employee.status.toLowerCase().replace(/\s/g,'-')}">
+                    <span class="status-badge ${employee.status.toLowerCase().replace(/\s/g, '-')}">
                         ${employee.status}
                     </span>
 
@@ -1355,7 +1158,7 @@ function viewEmployee(employeeId) {
 
                                 <small>Manager</small>
 
-                                <h6>${employee.manager || "-"}</h6>
+                                <h6>${employee.manager || '-'}</h6>
 
                             </div>
 
@@ -1397,13 +1200,13 @@ function viewEmployee(employeeId) {
                                 <strong>${employee.id}</strong>
 
                                 <div>Email</div>
-                                <strong>${employee.email || "-"}</strong>
+                                <strong>${employee.email || '-'}</strong>
 
                                 <div>Phone</div>
-                                <strong>${employee.phone || "-"}</strong>
+                                <strong>${employee.phone || '-'}</strong>
 
                                 <div>Location</div>
-                                <strong>${employee.location || "-"}</strong>
+                                <strong>${employee.location || '-'}</strong>
 
                             </div>
 
@@ -1426,7 +1229,7 @@ function viewEmployee(employeeId) {
                                 <strong>${employee.designation}</strong>
 
                                 <div>Manager</div>
-                                <strong>${employee.manager || "-"}</strong>
+                                <strong>${employee.manager || '-'}</strong>
 
                                 <div>Employment</div>
                                 <strong>${employee.employmentType}</strong>
@@ -1481,11 +1284,10 @@ function viewEmployee(employeeId) {
                         <div class="timeline">
 
                             ${
-                                history.length
-
-                                ?
-
-                                history.map(item=>`
+                              history.length
+                                ? history
+                                    .map(
+                                      (item) => `
 
                                 <div class="timeline-item">
 
@@ -1511,11 +1313,10 @@ function viewEmployee(employeeId) {
 
                                 </div>
 
-                                `).join('')
-
-                                :
-
                                 `
+                                    )
+                                    .join('')
+                                : `
                                 <div class="text-center py-5 text-muted">
 
                                     <i class="fas fa-history fa-2x mb-3"></i>
@@ -1524,7 +1325,6 @@ function viewEmployee(employeeId) {
 
                                 </div>
                                 `
-
                             }
 
                         </div>
@@ -1534,11 +1334,8 @@ function viewEmployee(employeeId) {
                         id="empAssets">
 
                         ${
-                            employeeAssets.length
-
-                            ?
-
-                            `
+                          employeeAssets.length
+                            ? `
 
                             <table class="table align-middle">
 
@@ -1556,7 +1353,9 @@ function viewEmployee(employeeId) {
 
                                 <tbody>
 
-                                    ${employeeAssets.map(asset=>`
+                                    ${employeeAssets
+                                      .map(
+                                        (asset) => `
 
                                     <tr>
 
@@ -1588,17 +1387,16 @@ function viewEmployee(employeeId) {
 
                                     </tr>
 
-                                    `).join("")}
+                                    `
+                                      )
+                                      .join('')}
 
                                 </tbody>
 
                             </table>
 
                             `
-
-                            :
-
-                            `
+                            : `
 
                             <div class="text-center py-5">
 
@@ -1613,7 +1411,6 @@ function viewEmployee(employeeId) {
                             </div>
 
                             `
-
                         }
 
                     </div>
@@ -1629,56 +1426,33 @@ function viewEmployee(employeeId) {
 </div>
 `;
 
-    const existingModal =
-        document.getElementById(
-            "employeeProfileModal"
-        );
+  const existingModal = document.getElementById('employeeProfileModal');
 
-    if (existingModal) {
-        existingModal.remove();
-    }
+  if (existingModal) {
+    existingModal.remove();
+  }
 
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        modalHtml
-    );
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    new bootstrap.Modal(
-        document.getElementById(
-            "employeeProfileModal"
-        )
-    ).show();
-    
-    addActivity(
-        `Viewed employee profile: ${employee.firstName} ${employee.lastName}`
-    );
+  new bootstrap.Modal(document.getElementById('employeeProfileModal')).show();
+
+  addActivity(`Viewed employee profile: ${employee.firstName} ${employee.lastName}`);
 }
 
-function getTimelineColor(action){
+function getTimelineColor(action) {
+  if (action.includes('Created')) return 'bg-success';
 
-    if(action.includes("Created"))
-        return "bg-success";
+  if (action.includes('Assigned')) return 'bg-primary';
 
-    if(action.includes("Assigned"))
-        return "bg-primary";
+  if (action.includes('Returned')) return 'bg-warning';
 
-    if(action.includes("Returned"))
-        return "bg-warning";
+  if (action.includes('Transferred')) return 'bg-info';
 
-    if(action.includes("Transferred"))
-        return "bg-info";
+  if (action.includes('Deleted')) return 'bg-danger';
 
-    if(action.includes("Deleted"))
-        return "bg-danger";
-
-    return "bg-secondary";
+  return 'bg-secondary';
 }
 
 function getEmployeeName(employee) {
-
-    return [
-        employee.firstName,
-        employee.lastName
-    ].join(" ");
-
+  return [employee.firstName, employee.lastName].join(' ');
 }

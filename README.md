@@ -15,31 +15,37 @@ Jay Workplace is a modern web-based workplace management platform designed to ma
 ## Features
 
 ### Dashboard
+
 - KPI Metrics
 - Department Distribution
 - Asset Distribution
 - Recent Activities
 
 ### Workforce
+
 - Employee Directory
 - Search Employees
 - Employee Status Tracking
 
 ### Assets
+
 - Asset Inventory
 - Asset Categories
 - Asset Status Tracking
 
 ### Assignments
+
 - Asset Allocation Tracking
 - Assignment History
 
 ### Reports
+
 - Workforce Reports
 - Asset Reports
 - Assignment Reports
 
 ### Administration
+
 - Departments
 - Roles & Permissions
 - Audit Logs

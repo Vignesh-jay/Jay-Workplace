@@ -1,48 +1,33 @@
 function addEmployee(employee) {
+  const employees = getEmployees();
 
-    const employees = getEmployees();
+  employees.push(employee);
 
-    employees.push(employee);
+  saveEmployees(employees);
 
-    saveEmployees(employees);
+  addActivity(`${employee.name} added to workforce`);
 
-    addActivity(
-        `${employee.name} added to workforce`
-    );
-
-    return employee;
+  return employee;
 }
 
 function deleteEmployeeById(employeeId) {
+  const employees = getEmployees();
 
-    const employees = getEmployees();
+  const updatedEmployees = employees.filter((employee) => employee.id !== employeeId);
 
-    const updatedEmployees = employees.filter(
-        employee => employee.id !== employeeId
-    );
-
-    saveEmployees(updatedEmployees);
+  saveEmployees(updatedEmployees);
 }
 
-function addAssignmentHistory(
+function addAssignmentHistory(assignmentId, action, details) {
+  const history = getAssignmentHistory();
+
+  history.push({
     assignmentId,
     action,
-    details
-) {
+    details,
 
-    const history =
-        getAssignmentHistory();
+    timestamp: formatDateTime(),
+  });
 
-    history.push({
-
-        assignmentId,
-        action,
-        details,
-
-        timestamp: formatDateTime()
-
-    });
-
-    saveAssignmentHistory(history);
-
+  saveAssignmentHistory(history);
 }

@@ -1,69 +1,46 @@
 function loadDashboard() {
+  const employees = getEmployees();
+  const assets = getAssets();
 
-    const employees = getEmployees();
-    const assets = getAssets();
+  if (
+    getEmployees().length === 0 &&
+    getAssets().length === 0 &&
+    getDepartments().length === 0 &&
+    getLocations().length === 0
+  ) {
+    loadFirstRunScreen();
 
-    if (
-        getEmployees().length === 0 &&
-        getAssets().length === 0 &&
-        getDepartments().length === 0 &&
-        getLocations().length === 0
-    ) {
+    return;
+  }
 
-        loadFirstRunScreen();
+  const expiringAssets = getExpiringAssets();
 
-        return;
-    }
+  const employeeList = getEmployees();
+  const assetList = getAssets();
 
-    const expiringAssets =
-    getExpiringAssets();
+  const totalEmployees = employeeList.length;
 
-    const employeeList = getEmployees();
-    const assetList = getAssets();
+  const totalAssets = getAssets().filter(
+    (asset) => asset.status !== 'Retired' && asset.status !== 'Transferred'
+  ).length;
 
-    const totalEmployees = employeeList.length;
+  const assignedAssets = getAssignments().filter((a) => a.status === 'Assigned').length;
 
-    const totalAssets =
-        getAssets().filter(
-            asset =>
-                asset.status !== "Retired" &&
-                asset.status !== "Transferred"
-        ).length;
+  const activeAssignedAssetIds = getAssignments()
+    .filter((a) => a.status === 'Assigned')
+    .map((a) => a.assetId);
 
-    const assignedAssets =
-        getAssignments().filter(
-            a => a.status === "Assigned"
-        ).length;
+  const availableAssets = getAssets().filter(
+    (asset) => asset.status === 'Available' && !activeAssignedAssetIds.includes(asset.id)
+  ).length;
 
-    const activeAssignedAssetIds =
-        getAssignments()
-            .filter(
-                a => a.status === "Assigned"
-            )
-            .map(
-                a => a.assetId
-            );
+  const retiredAssets = getAssets().filter((a) => a.status === 'Retired').length;
 
-    const availableAssets =
-        getAssets().filter(
-            asset =>
-                asset.status === "Available" &&
-                !activeAssignedAssetIds.includes(asset.id)
-        ).length;
+  const transferredAssets = getAssets().filter((a) => a.status === 'Transferred').length;
 
-    const retiredAssets =
-        getAssets().filter(
-            a => a.status === "Retired"
-        ).length;
+  setActiveMenu('nav-dashboard');
 
-    const transferredAssets =
-        getAssets().filter(
-            a => a.status === "Transferred"
-        ).length;
-
-    setActiveMenu('nav-dashboard');
-
-    document.getElementById("content").innerHTML = `
+  document.getElementById('content').innerHTML = `
 
 <div class="page-header">
 
@@ -214,10 +191,10 @@ function loadDashboard() {
 
             <div class="timeline">
                 ${getActivities()
+                  .slice(0, 5)
 
-                    .slice(0,5)
-
-                    .map(item => `
+                  .map(
+                    (item) => `
 
                     <div class="timeline-item">
 
@@ -243,7 +220,9 @@ function loadDashboard() {
 
                     </div>
 
-                    `).join('')}
+                    `
+                  )
+                  .join('')}
             </div>
 
         </div>
@@ -256,26 +235,17 @@ function loadDashboard() {
                 ⚠ Warranty Expiring Soon
             </h5>
 
-            ${expiringAssets.map(asset => {
+            ${
+              expiringAssets
+                .map((asset) => {
+                  const daysLeft = Math.ceil(
+                    (new Date(asset.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24)
+                  );
 
-                const daysLeft =
-                    Math.ceil(
-                        (
-                            new Date(asset.warrantyExpiry)
-                            -
-                            new Date()
-                        ) /
-                        (1000 * 60 * 60 * 24)
-                    );
+                  const badgeClass =
+                    daysLeft <= 30 ? 'bg-danger' : daysLeft <= 60 ? 'bg-warning' : 'bg-success';
 
-                const badgeClass =
-                    daysLeft <= 30
-                        ? "bg-danger"
-                        : daysLeft <= 60
-                            ? "bg-warning"
-                            : "bg-success";
-
-                return `
+                  return `
 
                     <div class="mb-3">
 
@@ -295,13 +265,11 @@ function loadDashboard() {
                     </div>
 
                 `;
-
-            }).join('') ||
-
-                `<p class="text-muted">
+                })
+                .join('') ||
+              `<p class="text-muted">
                     No upcoming expiries.
                 </p>`
-
             }
 
         </div>       
@@ -309,12 +277,11 @@ function loadDashboard() {
 </div>
 
 `;
-renderCharts();
+  renderCharts();
 }
 
 function loadWelcomeDashboard() {
-
-    document.getElementById("content").innerHTML = `
+  document.getElementById('content').innerHTML = `
 
     <div class="card-custom chart-card text-center p-5">
 
@@ -392,8 +359,7 @@ function loadWelcomeDashboard() {
 }
 
 function loadFirstRunScreen() {
-
-    document.getElementById("content").innerHTML = `
+  document.getElementById('content').innerHTML = `
 
     <div class="card-custom chart-card text-center p-5">
 
@@ -479,242 +445,133 @@ function loadFirstRunScreen() {
 }
 
 function renderCharts() {
+  const employees = getEmployees();
 
-const employees =
-    getEmployees();
+  const departmentCounts = {};
 
-const departmentCounts = {};
+  employees.forEach((emp) => {
+    departmentCounts[emp.department] = (departmentCounts[emp.department] || 0) + 1;
+  });
 
-employees.forEach(emp => {
+  const deptLabels = Object.keys(departmentCounts);
 
-    departmentCounts[
-        emp.department
-    ] =
-        (
-            departmentCounts[
-                emp.department
-            ] || 0
-        ) + 1;
+  const deptData = Object.values(departmentCounts);
 
-});
+  const deptCtx = document.getElementById('deptChart');
 
-const deptLabels =
-    Object.keys(
-        departmentCounts
-    );
-
-const deptData =
-    Object.values(
-        departmentCounts
-    );
-
-const deptCtx =
-    document.getElementById(
-        'deptChart'
-    );
-
-new Chart(deptCtx, {
-
+  new Chart(deptCtx, {
     type: 'doughnut',
 
     data: {
+      labels: deptLabels,
 
-        labels: deptLabels,
-
-        datasets: [{
-
-            data: deptData
-
-        }]
-
+      datasets: [
+        {
+          data: deptData,
+        },
+      ],
     },
 
     options: {
+      responsive: true,
 
-        responsive: true,
+      maintainAspectRatio: false,
 
-        maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+      },
+    },
+  });
 
-        plugins: {
+  const assetCtx = document.getElementById('assetChart');
 
-            legend: {
+  const assets = getAssets();
 
-                position: "bottom"
+  const laptops = assets.filter((a) => a.category === 'Laptop').length;
 
-            }
+  const desktops = assets.filter((a) => a.category === 'Desktop').length;
 
-        }
+  const mobiles = assets.filter((a) => a.category === 'Mobile').length;
 
-    }
+  const monitors = assets.filter((a) => a.category === 'Monitor').length;
 
-});
-
-const assetCtx = document.getElementById('assetChart');
-
-const assets = getAssets();
-
-const laptops =
-    assets.filter(
-        a => a.category === "Laptop"
-    ).length;
-
-const desktops =
-    assets.filter(
-        a => a.category === "Desktop"
-    ).length;
-
-const mobiles =
-    assets.filter(
-        a => a.category === "Mobile"
-    ).length;
-
-const monitors =
-    assets.filter(
-        a => a.category === "Monitor"
-    ).length;
-
-new Chart(assetCtx, {
-
+  new Chart(assetCtx, {
     type: 'bar',
 
     data: {
+      labels: ['Laptop', 'Desktop', 'Mobile', 'Monitor'],
 
-        labels: [
-            'Laptop',
-            'Desktop',
-            'Mobile',
-            'Monitor'
-        ],
+      datasets: [
+        {
+          label: 'Assets',
 
-        datasets: [{
-
-            label: 'Assets',
-
-            data: [
-                laptops,
-                desktops,
-                mobiles,
-                monitors
-            ]
-
-        }]
-
+          data: [laptops, desktops, mobiles, monitors],
+        },
+      ],
     },
 
     options: {
+      responsive: true,
 
-        responsive: true,
+      maintainAspectRatio: false,
 
-        maintainAspectRatio: false,
-
-        plugins: {
-
-            legend: {
-
-                position: "bottom"
-
-            }
-
-        }
-
-    }
-
-});
-
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+      },
+    },
+  });
 }
 
 function startupRestoreBackup() {
+  document.getElementById('restoreFile')?.remove();
 
-    document.getElementById(
-        "restoreFile"
-    )?.remove();
+  const file = document.getElementById('startupRestoreFile').files[0];
 
-    const file =
-        document.getElementById(
-            "startupRestoreFile"
-        ).files[0];
+  if (!file) {
+    alert('Select a backup file');
 
-    if (!file) {
+    return;
+  }
 
-        alert(
-            "Select a backup file"
-        );
+  const reader = new FileReader();
 
-        return;
+  reader.onload = function (e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+
+      saveEmployees(backup.employees || []);
+
+      saveAssets(backup.assets || []);
+
+      saveAssignments(backup.assignments || []);
+
+      saveActivities(backup.activities || []);
+
+      saveDepartments(backup.departments || []);
+
+      saveLocations(backup.locations || []);
+
+      saveAuditLogs(backup.auditLogs || []);
+
+      saveAssetTransfers(backup.assetTransfers || []);
+
+      saveAssetHistory(backup.assetHistory || []);
+
+      saveEmployeeHistory(backup.employeeHistory || []);
+
+      saveAssignmentHistory(backup.assignmentHistory || []);
+
+      alert('Backup restored successfully');
+
+      location.reload();
+    } catch (error) {
+      alert('Invalid backup file');
     }
+  };
 
-    const reader =
-        new FileReader();
-
-    reader.onload =
-        function(e) {
-
-            try {
-
-                const backup =
-                    JSON.parse(
-                        e.target.result
-                    );
-
-                saveEmployees(
-                backup.employees || []
-                );
-
-                saveAssets(
-                    backup.assets || []
-                );
-
-                saveAssignments(
-                    backup.assignments || []
-                );
-
-                saveActivities(
-                    backup.activities || []
-                );
-
-                saveDepartments(
-                    backup.departments || []
-                );
-
-                saveLocations(
-                    backup.locations || []
-                );
-
-                saveAuditLogs(
-                    backup.auditLogs || []
-                );
-
-                saveAssetTransfers(
-                    backup.assetTransfers || []
-                );
-
-                saveAssetHistory(
-                    backup.assetHistory || []
-                );
-
-                saveEmployeeHistory(
-                    backup.employeeHistory || []
-                );
-
-                saveAssignmentHistory(
-                    backup.assignmentHistory || []
-                );
-
-                alert(
-                    "Backup restored successfully"
-                );
-
-                location.reload();
-
-            } catch(error) {
-
-                alert(
-                    "Invalid backup file"
-                );
-
-            }
-
-        };
-
-    reader.readAsText(file);
+  reader.readAsText(file);
 }

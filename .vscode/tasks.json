@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Open Live Server",
+      "type": "shell",
+      "command": "echo Start Live Server using the VS Code Live Server extension.",
+      "problemMatcher": []
+    },
+    {
+      "label": "Format Project",
+      "type": "shell",
+      "command": "npx prettier . --write",
+      "problemMatcher": []
+    }
+  ]
+}

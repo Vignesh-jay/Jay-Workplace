@@ -1,79 +1,39 @@
-const EMPLOYEE_TRANSFERS_KEY =
-    "jayworkplace_employee_transfers";
+const EMPLOYEE_TRANSFERS_KEY = 'jayworkplace_employee_transfers';
 
-const ASSET_TRANSFERS_KEY =
-    "jayworkplace_asset_transfers";
+const ASSET_TRANSFERS_KEY = 'jayworkplace_asset_transfers';
 
 /* Employee Transfers */
 
 function getEmployeeTransfers() {
-
-    return JSON.parse(
-        localStorage.getItem(
-            EMPLOYEE_TRANSFERS_KEY
-        )
-    ) || [];
-
+  return JSON.parse(localStorage.getItem(EMPLOYEE_TRANSFERS_KEY)) || [];
 }
 
 function saveEmployeeTransfers(transfers) {
-
-    localStorage.setItem(
-        EMPLOYEE_TRANSFERS_KEY,
-        JSON.stringify(transfers)
-    );
-
+  localStorage.setItem(EMPLOYEE_TRANSFERS_KEY, JSON.stringify(transfers));
 }
 
-function addEmployeeTransfer(
-    transfer
-) {
+function addEmployeeTransfer(transfer) {
+  const transfers = getEmployeeTransfers();
 
-    const transfers =
-        getEmployeeTransfers();
+  transfers.push(transfer);
 
-    transfers.push(transfer);
-
-    saveEmployeeTransfers(
-        transfers
-    );
-
+  saveEmployeeTransfers(transfers);
 }
 
 /* Asset Transfers */
 
 function getAssetTransfers() {
-
-    return JSON.parse(
-        localStorage.getItem(
-            ASSET_TRANSFERS_KEY
-        )
-    ) || [];
-
+  return JSON.parse(localStorage.getItem(ASSET_TRANSFERS_KEY)) || [];
 }
 
-function saveAssetTransfers(
-    transfers
-) {
-
-    localStorage.setItem(
-        ASSET_TRANSFERS_KEY,
-        JSON.stringify(transfers)
-    );
-
+function saveAssetTransfers(transfers) {
+  localStorage.setItem(ASSET_TRANSFERS_KEY, JSON.stringify(transfers));
 }
 
-function addAssetTransfer(
-    transfer
-) {
+function addAssetTransfer(transfer) {
+  const transfers = getAssetTransfers();
 
-    const transfers =
-        getAssetTransfers();
+  transfers.push(transfer);
 
-    transfers.push(transfer);
-
-    saveAssetTransfers(
-        transfers
-    );
-
+  saveAssetTransfers(transfers);
 }

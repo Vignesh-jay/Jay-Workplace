@@ -1,105 +1,90 @@
-let assetFilter = "all";
+let assetFilter = 'all';
 
 const AssetSpecifications = {
+  Laptop: [
+    { key: 'manufacturer', label: 'Manufacturer' },
+    { key: 'model', label: 'Model' },
+    { key: 'processor', label: 'Processor' },
+    { key: 'ram', label: 'Memory (RAM)' },
+    { key: 'storage', label: 'Storage' },
+    { key: 'graphics', label: 'Graphics' },
+    { key: 'display', label: 'Display' },
+    { key: 'operatingSystem', label: 'Operating System' },
+  ],
 
-    Laptop: [
+  Desktop: [
+    { key: 'manufacturer', label: 'Manufacturer' },
+    { key: 'model', label: 'Model' },
+    { key: 'processor', label: 'Processor' },
+    { key: 'ram', label: 'Memory (RAM)' },
+    { key: 'storage', label: 'Storage' },
+    { key: 'graphics', label: 'Graphics' },
+    { key: 'motherboard', label: 'Motherboard' },
+    { key: 'operatingSystem', label: 'Operating System' },
+  ],
 
-        { key: "manufacturer", label: "Manufacturer" },
-        { key: "model", label: "Model" },
-        { key: "processor", label: "Processor" },
-        { key: "ram", label: "Memory (RAM)" },
-        { key: "storage", label: "Storage" },
-        { key: "graphics", label: "Graphics" },
-        { key: "display", label: "Display" },
-        { key: "operatingSystem", label: "Operating System" }
+  Monitor: [
+    { key: 'manufacturer', label: 'Manufacturer' },
+    { key: 'model', label: 'Model' },
+    { key: 'screenSize', label: 'Screen Size' },
+    { key: 'resolution', label: 'Resolution' },
+    { key: 'refreshRate', label: 'Refresh Rate' },
+    { key: 'panelType', label: 'Panel Type' },
+    { key: 'ports', label: 'Ports' },
+  ],
 
-    ],
+  Mobile: [
+    { key: 'manufacturer', label: 'Manufacturer' },
+    { key: 'model', label: 'Model' },
+    { key: 'processor', label: 'Processor' },
+    { key: 'ram', label: 'Memory (RAM)' },
+    { key: 'storage', label: 'Storage' },
+    { key: 'battery', label: 'Battery' },
+    { key: 'display', label: 'Display' },
+    { key: 'imei1', label: 'IMEI 1' },
+    { key: 'imei2', label: 'IMEI 2' },
+  ],
 
-    Desktop: [
+  Printer: [
+    { key: 'manufacturer', label: 'Manufacturer' },
+    { key: 'model', label: 'Model' },
+    { key: 'technology', label: 'Technology' },
+    { key: 'colorMode', label: 'Color / Mono' },
+    { key: 'connectivity', label: 'Connectivity' },
+    { key: 'duplex', label: 'Duplex' },
+  ],
 
-        { key: "manufacturer", label: "Manufacturer" },
-        { key: "model", label: "Model" },
-        { key: "processor", label: "Processor" },
-        { key: "ram", label: "Memory (RAM)" },
-        { key: "storage", label: "Storage" },
-        { key: "graphics", label: "Graphics" },
-        { key: "motherboard", label: "Motherboard" },
-        { key: "operatingSystem", label: "Operating System" }
+  Server: [
+    { key: 'manufacturer', label: 'Manufacturer' },
+    { key: 'model', label: 'Model' },
+    { key: 'processor', label: 'Processor' },
+    { key: 'ram', label: 'Memory' },
+    { key: 'storage', label: 'Storage' },
+    { key: 'raid', label: 'RAID' },
+    { key: 'network', label: 'Network Ports' },
+  ],
 
-    ],
-
-    Monitor: [
-
-        { key: "manufacturer", label: "Manufacturer" },
-        { key: "model", label: "Model" },
-        { key: "screenSize", label: "Screen Size" },
-        { key: "resolution", label: "Resolution" },
-        { key: "refreshRate", label: "Refresh Rate" },
-        { key: "panelType", label: "Panel Type" },
-        { key: "ports", label: "Ports" }
-
-    ],
-
-    Mobile: [
-
-        { key: "manufacturer", label: "Manufacturer" },
-        { key: "model", label: "Model" },
-        { key: "processor", label: "Processor" },
-        { key: "ram", label: "Memory (RAM)" },
-        { key: "storage", label: "Storage" },
-        { key: "battery", label: "Battery" },
-        { key: "display", label: "Display" },
-        { key: "imei1", label: "IMEI 1" },
-        { key: "imei2", label: "IMEI 2" }
-
-    ],
-
-    Printer: [
-
-        { key: "manufacturer", label: "Manufacturer" },
-        { key: "model", label: "Model" },
-        { key: "technology", label: "Technology" },
-        { key: "colorMode", label: "Color / Mono" },
-        { key: "connectivity", label: "Connectivity" },
-        { key: "duplex", label: "Duplex" }
-
-    ],
-
-    Server: [
-
-        { key: "manufacturer", label: "Manufacturer" },
-        { key: "model", label: "Model" },
-        { key: "processor", label: "Processor" },
-        { key: "ram", label: "Memory" },
-        { key: "storage", label: "Storage" },
-        { key: "raid", label: "RAID" },
-        { key: "network", label: "Network Ports" }
-
-    ],
-
-    Network: [
-        { key:"manufacturer", label:"Manufacturer" },
-        { key:"model", label:"Model" },
-        { key:"deviceType", label:"Device Type" },
-        { key:"ports", label:"Ports" },
-        { key:"speed", label:"Speed" },
-        { key:"macAddress", label:"MAC Address" },
-        { key:"firmware", label:"Firmware Version" }
-    ],
-
+  Network: [
+    { key: 'manufacturer', label: 'Manufacturer' },
+    { key: 'model', label: 'Model' },
+    { key: 'deviceType', label: 'Device Type' },
+    { key: 'ports', label: 'Ports' },
+    { key: 'speed', label: 'Speed' },
+    { key: 'macAddress', label: 'MAC Address' },
+    { key: 'firmware', label: 'Firmware Version' },
+  ],
 };
 
-function getSpecificationTemplate(category){
-
-    return AssetSpecifications[category] || [];
-
+function getSpecificationTemplate(category) {
+  return AssetSpecifications[category] || [];
 }
 
-function buildSpecificationFields(category, values = {}, prefix = "spec") {
+function buildSpecificationFields(category, values = {}, prefix = 'spec') {
+  const specs = getSpecificationTemplate(category);
 
-    const specs = getSpecificationTemplate(category);
-
-    return specs.map(field => `
+  return specs
+    .map(
+      (field) => `
 
         <div class="mb-3">
 
@@ -113,42 +98,32 @@ function buildSpecificationFields(category, values = {}, prefix = "spec") {
                 type="text"
                 class="form-control"
                 id="${prefix}_${field.key}"
-                value="${values[field.key] || ""}"
+                value="${values[field.key] || ''}"
             >
 
         </div>
 
-    `).join("");
-
+    `
+    )
+    .join('');
 }
 
-function renderSpecificationFields(
-    categorySelectId,
-    containerId,
-    values = {},
-    prefix = "spec"
-){
+function renderSpecificationFields(categorySelectId, containerId, values = {}, prefix = 'spec') {
+  const category = document.getElementById(categorySelectId).value;
 
-    const category =
-        document.getElementById(categorySelectId).value;
-
-    document.getElementById(containerId).innerHTML =
-        buildSpecificationFields(
-            category,
-            values,
-            prefix
-        );
+  document.getElementById(containerId).innerHTML = buildSpecificationFields(
+    category,
+    values,
+    prefix
+  );
 }
 
-function buildSpecificationCard(asset){
+function buildSpecificationCard(asset) {
+  const specs = asset.specifications || {};
 
-    const specs =
-        asset.specifications || {};
+  const fields = getSpecificationTemplate(asset.category);
 
-    const fields =
-        getSpecificationTemplate(asset.category);
-
-    return `
+  return `
 
         <div class="asset-info-card">
 
@@ -162,7 +137,9 @@ function buildSpecificationCard(asset){
 
             <div class="info-grid">
 
-                ${fields.map(field => `
+                ${fields
+                  .map(
+                    (field) => `
 
                     <div>
 
@@ -172,73 +149,58 @@ function buildSpecificationCard(asset){
 
                     <strong>
 
-                        ${specs[field.key] || "Not Specified"}
+                        ${specs[field.key] || 'Not Specified'}
 
                     </strong>
 
-                `).join("")}
+                `
+                  )
+                  .join('')}
 
             </div>
 
         </div>
 
     `;
-
 }
 
-function loadAssets(){
+function loadAssets() {
+  let assetList = getAssets();
 
-    let assetList = getAssets();
+  const assignments = getAssignments();
 
-    const assignments = getAssignments();
+  const totalAssets = assetList.length;
 
-    const totalAssets = assetList.length;
+  const assignedAssets = assignments.filter((a) => a.status === 'Assigned').length;
 
-    const assignedAssets = assignments.filter(
-        a => a.status === "Assigned"
-    ).length;
+  const availableAssets = assetList.filter((a) => a.status === 'Available').length;
 
-    const availableAssets = assetList.filter(
-        a => a.status === "Available"
-    ).length;
+  const expiringWarranty = getExpiringAssets(30).length;
 
-    const expiringWarranty = getExpiringAssets(30).length;
+  const searchText = document.getElementById('assetSearch')?.value || '';
 
-    const searchText =
-    document.getElementById("assetSearch")?.value || "";
+  setActiveMenu('nav-assets');
 
-    setActiveMenu('nav-assets');
+  switch (assetFilter) {
+    case 'assigned':
+      assetList = assetList.filter((asset) =>
+        assignments.some((a) => a.assetId === asset.id && a.status === 'Assigned')
+      );
 
-    switch(assetFilter){
+      break;
 
-        case "assigned":
+    case 'available':
+      assetList = assetList.filter((asset) => asset.status === 'Available');
 
-            assetList = assetList.filter(asset =>
-                assignments.some(a =>
-                    a.assetId === asset.id &&
-                    a.status === "Assigned"
-                )
-            );
+      break;
 
-            break;
+    case 'warranty':
+      assetList = getExpiringAssets(30);
 
-        case "available":
+      break;
+  }
 
-            assetList = assetList.filter(asset =>
-                asset.status === "Available"
-            );
-
-            break;
-
-        case "warranty":
-
-            assetList = getExpiringAssets(30);
-
-            break;
-
-    }
-
-document.getElementById("content").innerHTML = `
+  document.getElementById('content').innerHTML = `
 
 <div class="page-header">
 
@@ -355,11 +317,15 @@ document.getElementById("content").innerHTML = `
                 All Locations
             </option>
 
-            ${getLocations().map(location => `
+            ${getLocations()
+              .map(
+                (location) => `
                 <option value="${location.name}">
                     ${location.name}
                 </option>
-            `).join("")}
+            `
+              )
+              .join('')}
 
         </select>
 
@@ -389,19 +355,13 @@ document.getElementById("content").innerHTML = `
 
         <tbody>
 
-            ${assetList.map(asset => {
+            ${assetList
+              .map((asset) => {
+                const activeAssignment = getAssignments().find(
+                  (a) => a.assetId === asset.id && a.status === 'Assigned'
+                );
 
-                const activeAssignment =
-                    getAssignments().find(
-                        a =>
-                            a.assetId === asset.id &&
-                            a.status === "Assigned"
-                    );
-
-                const displayStatus =
-                    activeAssignment
-                        ? "Assigned"
-                        : asset.status;
+                const displayStatus = activeAssignment ? 'Assigned' : asset.status;
 
                 return `
                 <tr>
@@ -423,25 +383,25 @@ document.getElementById("content").innerHTML = `
                             </div>
 
                             ${
-                                asset.serialNumber
-                                    ? `<div class="asset-meta">
+                              asset.serialNumber
+                                ? `<div class="asset-meta">
                                         S/N : ${asset.serialNumber}
                                     </div>`
-                                    : ""
+                                : ''
                             }
                         </div>
                     </td>
 
                     <td>
                         ${
-                            activeAssignment
-                                ? `
+                          activeAssignment
+                            ? `
                                     <div>
                                         <i class="fas fa-user text-primary"></i>
                                         ${activeAssignment.employeeName}
                                     </div>
                                 `
-                                : `
+                            : `
                                     <span class="text-muted">
                                         <i class="fas fa-box"></i>
                                         In Inventory
@@ -451,40 +411,38 @@ document.getElementById("content").innerHTML = `
                     </td>
 
                     <td>
-                        ${asset.location || "-"}
+                        ${asset.location || '-'}
                     </td>
 
                     <td>
                         ${
-                            asset.warrantyExpiry
-                                ? (() => {
+                          asset.warrantyExpiry
+                            ? (() => {
+                                const days = Math.ceil(
+                                  (new Date(asset.warrantyExpiry) - new Date()) /
+                                    (1000 * 60 * 60 * 24)
+                                );
 
-                                    const days = Math.ceil(
-                                        (new Date(asset.warrantyExpiry) - new Date())
-                                        / (1000*60*60*24)
-                                    );
-
-                                    if(days < 0)
-                                        return `<span class="badge bg-danger">
+                                if (days < 0)
+                                  return `<span class="badge bg-danger">
                                                     Expired
                                                 </span>`;
 
-                                    if(days <=30)
-                                        return `<span class="badge bg-danger">
+                                if (days <= 30)
+                                  return `<span class="badge bg-danger">
                                                     ${days} Days
                                                 </span>`;
 
-                                    if(days <=90)
-                                        return `<span class="badge bg-warning">
+                                if (days <= 90)
+                                  return `<span class="badge bg-warning">
                                                     ${days} Days
                                                 </span>`;
 
-                                    return `<span class="badge bg-success">
+                                return `<span class="badge bg-success">
                                                 ${days} Days
                                             </span>`;
-
-                                })()
-                                : "-"
+                              })()
+                            : '-'
                         }
                     </td>
 
@@ -506,7 +464,7 @@ document.getElementById("content").innerHTML = `
                         </button>
 
                         ${
-                            asset.status !== "Transferred"
+                          asset.status !== 'Transferred'
                             ? `
                             <button
                                 class="btn btn-light btn-sm asset-action-btn"
@@ -526,15 +484,15 @@ document.getElementById("content").innerHTML = `
 
                             </button>
                             `
-                            : ""
+                            : ''
                         }
 
                     </td>
 
                 </tr>
                 `;
-
-            }).join("")}
+              })
+              .join('')}
 
         </tbody>
 
@@ -543,50 +501,35 @@ document.getElementById("content").innerHTML = `
 </div>
 
 `;
-const searchInput =
-    document.getElementById("assetSearch");
+  const searchInput = document.getElementById('assetSearch');
 
-if (searchInput) {
+  if (searchInput) {
+    searchInput.addEventListener('input', filterAssets);
+  }
 
-    searchInput.addEventListener(
-        "input",
-        filterAssets
-    );
+  document.querySelectorAll('.dashboard-card').forEach((card) => {
+    card.classList.remove('active');
 
+    if (card.dataset.filter === assetFilter) {
+      card.classList.add('active');
+    }
+  });
 }
 
-document.querySelectorAll(".dashboard-card").forEach(card=>{
+function setAssetFilter(filter) {
+  assetFilter = filter;
 
-        card.classList.remove("active");
-
-        if(card.dataset.filter===assetFilter){
-
-            card.classList.add("active");
-
-        }
-
-    });
-
-}
-
-function setAssetFilter(filter){
-
-    assetFilter = filter;
-
-    loadAssets();
-
+  loadAssets();
 }
 
 function showAddAssetModal() {
+  const existingModal = document.getElementById('addAssetModal');
 
-    const existingModal =
-        document.getElementById("addAssetModal");
+  if (existingModal) {
+    existingModal.remove();
+  }
 
-    if (existingModal) {
-        existingModal.remove();
-    }
-
-    const modalHtml = `
+  const modalHtml = `
     <div class="modal fade"
          id="addAssetModal"
          tabindex="-1">
@@ -679,11 +622,15 @@ function showAddAssetModal() {
                             id="assetLocation"
                             class="form-control">
 
-                            ${getLocations().map(location => `
+                            ${getLocations()
+                              .map(
+                                (location) => `
                                 <option value="${location.name}">
                                     ${location.name}
                                 </option>
-                            `).join("")}
+                            `
+                              )
+                              .join('')}
 
                         </select>
 
@@ -744,280 +691,155 @@ function showAddAssetModal() {
     </div>
     `;
 
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        modalHtml
-    );
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    const modal = new bootstrap.Modal(
-        document.getElementById("addAssetModal")
-    );
+  const modal = new bootstrap.Modal(document.getElementById('addAssetModal'));
 
-    modal.show();
-    renderSpecificationFields(
-    "assetCategory",
-    "technicalFieldsContainer",
-    {},
-    "addSpec"
-);
+  modal.show();
+  renderSpecificationFields('assetCategory', 'technicalFieldsContainer', {}, 'addSpec');
 }
 
 function saveAsset() {
+  const asset = {
+    id: document.getElementById('assetId').value.trim(),
 
-    const asset = {
+    name: document.getElementById('assetName').value.trim(),
 
-        id:
-            document.getElementById(
-                "assetId"
-            ).value.trim(),
+    category: document.getElementById('assetCategory').value,
 
-        name:
-            document.getElementById(
-                "assetName"
-            ).value.trim(),
+    location: document.getElementById('assetLocation').value,
 
-        category:
-            document.getElementById(
-                "assetCategory"
-            ).value,
+    serialNumber: document.getElementById('assetSerial').value.trim(),
 
-        location:
-            document.getElementById(
-                "assetLocation"
-            ).value,
+    vendor: document.getElementById('assetVendor').value.trim(),
 
-        serialNumber:
-            document.getElementById(
-                "assetSerial"
-            ).value.trim(),
+    purchaseDate: document.getElementById('purchaseDate').value,
 
-        vendor:
-            document.getElementById(
-                "assetVendor"
-            ).value.trim(),
+    warrantyExpiry: document.getElementById('warrantyExpiry').value,
 
-        purchaseDate:
-            document.getElementById(
-                "purchaseDate"
-            ).value,
+    status: 'Available',
 
-        warrantyExpiry:
-            document.getElementById(
-                "warrantyExpiry"
-            ).value,
+    retiredDate: '',
 
-        status: "Available",
+    retirementReason: '',
 
-        retiredDate: "",
+    transferredTo: '',
 
-        retirementReason: "",
+    previousAssetId: '',
 
-        transferredTo: "",
+    transferDate: '',
 
-        previousAssetId: "",
+    transferRemarks: '',
+  };
 
-        transferDate: "",
+  const specifications = {};
 
-        transferRemarks: ""
+  getSpecificationTemplate(asset.category).forEach((field) => {
+    specifications[field.key] = document.getElementById(`addSpec_${field.key}`)?.value.trim() || '';
+  });
 
-    };
+  asset.specifications = specifications;
 
-    const specifications = {};
+  if (!asset.id || !asset.name) {
+    alert('Asset ID and Asset Name are required.');
 
-    getSpecificationTemplate(asset.category).forEach(field => {
+    return;
+  }
 
-        specifications[field.key] =
+  addAsset(asset);
 
-            document.getElementById(`addSpec_${field.key}`)?.value.trim() || "";
-    });
+  addAssetHistory(asset.id, 'Added to Inventory', `${asset.name} added to inventory`);
 
-    asset.specifications = specifications;
+  bootstrap.Modal.getInstance(document.getElementById('addAssetModal')).hide();
 
-    if (!asset.id || !asset.name) {
-
-        alert(
-            "Asset ID and Asset Name are required."
-        );
-
-        return;
-
-    }
-
-    addAsset(asset);
-
-    addAssetHistory(
-        asset.id,
-        "Added to Inventory",
-        `${asset.name} added to inventory`
-    );
-
-    bootstrap.Modal.getInstance(
-        document.getElementById(
-            "addAssetModal"
-        )
-    ).hide();
-
-    loadAssets();
-
+  loadAssets();
 }
 
 function deleteAsset(assetId) {
+  const asset = getAssets().find((a) => a.id === assetId);
 
-    const asset =
-        getAssets().find(
-            a => a.id === assetId
-        );
+  if (asset.status === 'Transferred') {
+    alert('Transferred assets cannot be deleted.');
 
-    if (
-        asset.status === "Transferred"
-    ) {
+    return;
+  }
 
-        alert(
-            "Transferred assets cannot be deleted."
-        );
+  const activeAssignment = getAssignments().find(
+    (a) => a.assetId === assetId && a.status === 'Assigned'
+  );
 
-        return;
+  if (activeAssignment) {
+    alert('Assigned assets cannot be deleted.');
 
-    }
+    return;
+  }
 
-    const activeAssignment =
-        getAssignments().find(
-            a =>
-                a.assetId === assetId &&
-                a.status === "Assigned"
-        );
+  if (!confirm('Delete this asset?')) {
+    return;
+  }
 
-    if (activeAssignment) {
+  deleteAssetById(assetId);
 
-        alert(
-            "Assigned assets cannot be deleted."
-        );
+  addAssetHistory(asset.id, 'Deleted', `${asset.name} removed from inventory`);
 
-        return;
-    }
-
-    if (!confirm("Delete this asset?")) {
-        return;
-    }
-
-    deleteAssetById(assetId);
-
-    addAssetHistory(
-        asset.id,
-        "Deleted",
-        `${asset.name} removed from inventory`
-    );
-
-    loadAssets();
+  loadAssets();
 }
 
-function getAssetIcon(category){
+function getAssetIcon(category) {
+  const icons = {
+    Laptop: '💻',
+    Desktop: '🖥️',
+    Monitor: '🖥',
+    Mobile: '📱',
+    Printer: '🖨️',
+    Server: '🖧',
+    Network: '🌐',
+    Tablet: '📲',
+  };
 
-    const icons = {
-        Laptop: "💻",
-        Desktop: "🖥️",
-        Monitor: "🖥",
-        Mobile: "📱",
-        Printer: "🖨️",
-        Server: "🖧",
-        Network: "🌐",
-        Tablet: "📲"
-    };
-
-    return icons[category] || "📦";
-
+  return icons[category] || '📦';
 }
 
 function viewAsset(assetId) {
+  const assets = getAssets();
 
-    const assets = getAssets();
+  const assignments = getAssignments();
 
-    const assignments = getAssignments();
+  const asset = assets.find((a) => a.id === assetId);
 
-    const asset =
-        assets.find(a => a.id === assetId);
+  if (!asset) {
+    return;
+  }
 
-    if (!asset) {
-        return;
-    }
+  const history = getAssetHistory()
+    .filter((h) => h.assetId === assetId)
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-    const history = getAssetHistory()
-        .filter(h => h.assetId === assetId)
-        .sort(
-            (a, b) =>
-                new Date(b.timestamp) -
-                new Date(a.timestamp)
-        );
+  const totalAssignments = history.filter((h) => h.action === 'Assigned').length;
 
-    const totalAssignments =
-        history.filter(
-            h => h.action === "Assigned"
-        ).length;
+  const warrantyDaysRemaining = asset.warrantyExpiry
+    ? Math.ceil((new Date(asset.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24))
+    : null;
 
-    const warrantyDaysRemaining =
-        asset.warrantyExpiry
-            ? Math.ceil(
-                (
-                    new Date(
-                        asset.warrantyExpiry
-                    ) -
-                    new Date()
-                ) /
-                (1000 * 60 * 60 * 24)
-            )
-            : null;
+  const assetAgeDays = asset.purchaseDate
+    ? Math.ceil((new Date() - new Date(asset.purchaseDate)) / (1000 * 60 * 60 * 24))
+    : null;
 
-    const assetAgeDays =
-        asset.purchaseDate
-            ? Math.ceil(
-                (
-                    new Date() -
-                    new Date(
-                        asset.purchaseDate
-                    )
-                ) /
-                (1000 * 60 * 60 * 24)
-            )
-            : null;
+  const currentAssignment = getAssignments().find(
+    (a) => a.assetId === assetId && a.status === 'Assigned'
+  );
 
-    const currentAssignment =
-        getAssignments().find(
-            a =>
-                a.assetId === assetId &&
-                a.status === "Assigned"
-        );
+  const assignmentHistory = getAssignments()
+    .filter((a) => a.assetId === assetId)
+    .sort((a, b) => new Date(b.assignedDate) - new Date(a.assignedDate));
 
-    const assignmentHistory =
-        getAssignments()
-            .filter(
-                a => a.assetId === assetId
-            )
-            .sort(
-                (a, b) =>
-                    new Date(b.assignedDate) -
-                    new Date(a.assignedDate)
-            );
+  const transferHistory = getAssetTransfers()
+    .filter((t) => t.oldAssetId === asset.id || t.newAssetId === asset.id)
+    .sort((a, b) => new Date(b.transferDate) - new Date(a.transferDate));
 
-    const transferHistory =
-        getAssetTransfers()
-            .filter(
-                t =>
-                    t.oldAssetId === asset.id ||
-                    t.newAssetId === asset.id
-            )
-            .sort(
-                (a, b) =>
-                    new Date(b.transferDate) -
-                    new Date(a.transferDate)
-            );
+  const displayStatus = currentAssignment ? 'Assigned' : asset.status;
 
-    const displayStatus =
-        currentAssignment
-            ? "Assigned"
-            : asset.status;
-
-
-    const heroSection = `
+  const heroSection = `
 
     <div class="asset-hero">
 
@@ -1061,7 +883,7 @@ function viewAsset(assetId) {
 
                     ${asset.category}
                     •
-                    ${asset.location || "Unknown Location"}
+                    ${asset.location || 'Unknown Location'}
 
                 </div>
 
@@ -1073,7 +895,7 @@ function viewAsset(assetId) {
 
     `;
 
-    const statsSection = `
+  const statsSection = `
     <div class="row g-3 mb-4">
 
         <div class="col-md-3">
@@ -1092,11 +914,7 @@ function viewAsset(assetId) {
 
                     <h6>
 
-                        ${
-                            currentAssignment
-                                ? currentAssignment.employeeName
-                                : "Inventory"
-                        }
+                        ${currentAssignment ? currentAssignment.employeeName : 'Inventory'}
 
                     </h6>
 
@@ -1122,12 +940,7 @@ function viewAsset(assetId) {
 
                     <h6>
 
-                        ${
-                            warrantyDaysRemaining
-                                ? warrantyDaysRemaining + " Days"
-                                : "-"
-
-                        }
+                        ${warrantyDaysRemaining ? warrantyDaysRemaining + ' Days' : '-'}
 
                     </h6>
 
@@ -1179,12 +992,7 @@ function viewAsset(assetId) {
 
                     <h6>
 
-                        ${
-                            assetAgeDays
-                                ? assetAgeDays + " Days"
-                                : "-"
-
-                        }
+                        ${assetAgeDays ? assetAgeDays + ' Days' : '-'}
 
                     </h6>
 
@@ -1197,7 +1005,7 @@ function viewAsset(assetId) {
     </div>
     `;
 
-    const infoSection = `
+  const infoSection = `
     <div class="row g-4">
 
         <div class="col-xl-4">
@@ -1215,10 +1023,10 @@ function viewAsset(assetId) {
                     <strong>${asset.category}</strong>
 
                     <div>Serial Number</div>
-                    <strong>${asset.serialNumber || "-"}</strong>
+                    <strong>${asset.serialNumber || '-'}</strong>
 
                     <div>Location</div>
-                    <strong>${asset.location || "-"}</strong>
+                    <strong>${asset.location || '-'}</strong>
 
                 </div>
 
@@ -1235,21 +1043,17 @@ function viewAsset(assetId) {
                 <div class="info-grid">
 
                     <div>Vendor</div>
-                    <strong>${asset.vendor || "-"}</strong>
+                    <strong>${asset.vendor || '-'}</strong>
 
                     <div>Purchase Date</div>
-                    <strong>${asset.purchaseDate || "-"}</strong>
+                    <strong>${asset.purchaseDate || '-'}</strong>
 
                     <div>Warranty Expiry</div>
-                    <strong>${asset.warrantyExpiry || "-"}</strong>
+                    <strong>${asset.warrantyExpiry || '-'}</strong>
 
                     <div>Current Holder</div>
                     <strong>
-                        ${
-                            currentAssignment
-                                ? currentAssignment.employeeName
-                                : "In Inventory"
-                        }
+                        ${currentAssignment ? currentAssignment.employeeName : 'In Inventory'}
                     </strong>
 
                 </div>
@@ -1267,7 +1071,7 @@ function viewAsset(assetId) {
     </div>
     `;
 
-    const actionSection = `
+  const actionSection = `
     <div class="d-flex justify-content-end my-4">
 
         <button
@@ -1291,7 +1095,7 @@ function viewAsset(assetId) {
     </div>
     `;
 
-    const historySection = `
+  const historySection = `
 
     <ul class="nav nav-tabs asset-tabs mb-4">
 
@@ -1371,7 +1175,7 @@ function viewAsset(assetId) {
     </div>
     `;
 
-    const modalHtml = `
+  const modalHtml = `
     <div class="modal fade"
          id="assetDetailsModal"
          tabindex="-1">
@@ -1411,44 +1215,29 @@ function viewAsset(assetId) {
     </div>
     `;
 
-    const existingModal =
-        document.getElementById(
-            "assetDetailsModal"
-        );
+  const existingModal = document.getElementById('assetDetailsModal');
 
-        if (existingModal) {
+  if (existingModal) {
+    existingModal.remove();
+  }
 
-            existingModal.remove();
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-        }
-
-        document.body.insertAdjacentHTML(
-            "beforeend",
-            modalHtml
-        );
-
-        new bootstrap.Modal(
-            document.getElementById(
-                "assetDetailsModal"
-            )
-        ).show();
+  new bootstrap.Modal(document.getElementById('assetDetailsModal')).show();
 }
 
-function buildAssignmentHistory(assignmentHistory){
-
-    if(assignmentHistory.length === 0){
-
-        return `
+function buildAssignmentHistory(assignmentHistory) {
+  if (assignmentHistory.length === 0) {
+    return `
             <p class="text-muted">
 
                 No assignment history.
 
             </p>
         `;
+  }
 
-    }
-
-    return `
+  return `
 
     <table class="table table-sm">
 
@@ -1470,7 +1259,9 @@ function buildAssignmentHistory(assignmentHistory){
 
         <tbody>
 
-            ${assignmentHistory.map(item => `
+            ${assignmentHistory
+              .map(
+                (item) => `
 
                 <tr>
 
@@ -1488,20 +1279,14 @@ function buildAssignmentHistory(assignmentHistory){
 
                     <td>
 
-                        ${item.returnedDate || "-"}
+                        ${item.returnedDate || '-'}
 
                     </td>
 
                     <td>
 
                         <span class="badge ${
-
-                            item.status === "Assigned"
-
-                                ? "bg-success"
-
-                                : "bg-secondary"
-
+                          item.status === 'Assigned' ? 'bg-success' : 'bg-secondary'
                         }">
 
                             ${item.status}
@@ -1512,31 +1297,29 @@ function buildAssignmentHistory(assignmentHistory){
 
                 </tr>
 
-            `).join("")}
+            `
+              )
+              .join('')}
 
         </tbody>
 
     </table>
 
     `;
-
 }
 
-function buildTransferHistory(transferHistory){
-
-    if(transferHistory.length === 0){
-
-        return `
+function buildTransferHistory(transferHistory) {
+  if (transferHistory.length === 0) {
+    return `
             <p class="text-muted">
 
                 No transfer history.
 
             </p>
         `;
+  }
 
-    }
-
-    return `
+  return `
 
     <table class="table table-sm">
 
@@ -1560,7 +1343,9 @@ function buildTransferHistory(transferHistory){
 
         <tbody>
 
-            ${transferHistory.map(item => `
+            ${transferHistory
+              .map(
+                (item) => `
 
                 <tr>
 
@@ -1596,42 +1381,38 @@ function buildTransferHistory(transferHistory){
 
                 </tr>
 
-            `).join("")}
+            `
+              )
+              .join('')}
 
         </tbody>
 
     </table>
 
     `;
-
 }
 
-function buildTimeline(history, asset){
-
-    return `
+function buildTimeline(history, asset) {
+  return `
 
     <div class="timeline mt-3">
 
-        ${history.map(item => `
+        ${history
+          .map(
+            (item) => `
 
             <div class="timeline-item">
 
                 <div class="timeline-dot ${
-
-                    item.action === "Assigned"
-                        ? "bg-success"
-
-                    : item.action === "Returned"
-                        ? "bg-warning"
-
-                    : item.action === "Updated"
-                        ? "bg-info"
-
-                    : item.action === "Deleted"
-                        ? "bg-danger"
-
-                    : "bg-primary"
-
+                  item.action === 'Assigned'
+                    ? 'bg-success'
+                    : item.action === 'Returned'
+                      ? 'bg-warning'
+                      : item.action === 'Updated'
+                        ? 'bg-info'
+                        : item.action === 'Deleted'
+                          ? 'bg-danger'
+                          : 'bg-primary'
                 }"></div>
 
                 <div class="timeline-content">
@@ -1658,7 +1439,9 @@ function buildTimeline(history, asset){
 
             </div>
 
-        `).join("")}
+        `
+          )
+          .join('')}
 
         <div class="timeline-item">
 
@@ -1676,8 +1459,8 @@ function buildTimeline(history, asset){
 
                 <small class="text-muted">
 
-                    Date : ${asset.purchaseDate || "Unknown Date"}<br>
-                    Warranty Expiry : ${asset.warrantyExpiry || "Unknown Warranty Expiry"}
+                    Date : ${asset.purchaseDate || 'Unknown Date'}<br>
+                    Warranty Expiry : ${asset.warrantyExpiry || 'Unknown Warranty Expiry'}
 
                 </small>
 
@@ -1688,111 +1471,66 @@ function buildTimeline(history, asset){
     </div>
 
     `;
-
 }
 
 function filterAssets() {
+  const searchText = document.getElementById('assetSearch').value.toLowerCase();
 
-    const searchText =
-        document
-            .getElementById(
-                "assetSearch"
-            )
-            .value
-            .toLowerCase();
+  const selectedLocation = document.getElementById('assetLocationFilter').value;
 
-    const selectedLocation =
-        document
-            .getElementById(
-                "assetLocationFilter"
-            )
-            .value;
+  const rows = document.querySelectorAll('tbody tr');
 
-    const rows =
-        document.querySelectorAll(
-            "tbody tr"
-        );
+  rows.forEach((row) => {
+    const text = row.innerText.toLowerCase();
 
-    rows.forEach(row => {
+    const location = row.children[2]?.textContent.trim();
 
-        const text =
-            row.innerText.toLowerCase();
+    const matchesSearch = text.includes(searchText);
 
-        const location = row.children[2]
-            ?.textContent
-            .trim();
+    const matchesLocation = selectedLocation === '' || location.trim() === selectedLocation.trim();
 
-        const matchesSearch =
-            text.includes(searchText);
-
-        const matchesLocation =
-            selectedLocation === "" ||
-            location.trim() === selectedLocation.trim();
-
-        row.style.display =
-            matchesSearch &&
-            matchesLocation
-                ? ""
-                : "none";
-
-    });
-
+    row.style.display = matchesSearch && matchesLocation ? '' : 'none';
+  });
 }
 
 function editAsset(assetId) {
+  const existingModal = document.getElementById('editAssetModal');
 
-    const existingModal =
-        document.getElementById(
-            "editAssetModal"
-        );
+  if (existingModal) {
+    existingModal.remove();
+  }
 
-    if (existingModal) {
-        existingModal.remove();
-    }
+  const assets = getAssets();
 
-    const assets = getAssets();
+  const asset = assets.find((a) => a.id === assetId);
 
-    const asset =
-        assets.find(
-            a => a.id === assetId
-        );
+  if (asset.status === 'Transferred') {
+    alert('Transferred assets cannot be edited.');
 
-    if (asset.status === "Transferred") {
+    return;
+  }
 
-        alert(
-            "Transferred assets cannot be edited."
-        );
+  if (!asset) {
+    return;
+  }
 
-        return;
+  if (asset.status === 'Transferred') {
+    alert('Transferred assets cannot be edited.');
 
-    }
+    return;
+  }
 
-    if (!asset) {
-            return;
-        }
+  const activeAssignment = getAssignments().find(
+    (a) => a.assetId === asset.id && a.status === 'Assigned'
+  );
 
-    if (asset.status === "Transferred") {
+  const isAssigned = !!activeAssignment;
 
-        alert(
-            "Transferred assets cannot be edited."
-        );
+  const modalHtml = `
 
-        return;
-    }
-
-    const activeAssignment =
-        getAssignments().find(
-            a =>
-                a.assetId === asset.id &&
-                a.status === "Assigned"
-        );
-
-    const isAssigned =
-        !!activeAssignment; 
-
-    const modalHtml = `
-
-    ${isAssigned ? `
+    ${
+      isAssigned
+        ? `
 
     <div class="modal-body">
 
@@ -1805,7 +1543,9 @@ function editAsset(assetId) {
 
     </div>
 
-    ` : ""}
+    `
+        : ''
+    }
 
     <input
         type="hidden"
@@ -1879,13 +1619,13 @@ function editAsset(assetId) {
                             )
                             ">
 
-                            <option ${asset.category=="Laptop"?"selected":""}>Laptop</option>
-                            <option ${asset.category=="Desktop"?"selected":""}>Desktop</option>
-                            <option ${asset.category=="Monitor"?"selected":""}>Monitor</option>
-                            <option ${asset.category=="Mobile"?"selected":""}>Mobile</option>
-                            <option ${asset.category=="Printer"?"selected":""}>Printer</option>
-                            <option ${asset.category=="Server"?"selected":""}>Server</option>
-                            <option ${asset.category=="Network"?"selected":""}>Network</option>
+                            <option ${asset.category == 'Laptop' ? 'selected' : ''}>Laptop</option>
+                            <option ${asset.category == 'Desktop' ? 'selected' : ''}>Desktop</option>
+                            <option ${asset.category == 'Monitor' ? 'selected' : ''}>Monitor</option>
+                            <option ${asset.category == 'Mobile' ? 'selected' : ''}>Mobile</option>
+                            <option ${asset.category == 'Printer' ? 'selected' : ''}>Printer</option>
+                            <option ${asset.category == 'Server' ? 'selected' : ''}>Server</option>
+                            <option ${asset.category == 'Network' ? 'selected' : ''}>Network</option>
 
                         </select>
 
@@ -1957,18 +1697,18 @@ function editAsset(assetId) {
                         <select
                             id="editAssetStatus"
                             class="form-control"
-                            ${isAssigned ? "disabled" : ""}
+                            ${isAssigned ? 'disabled' : ''}
                             onchange="toggleRetirementReason()">
 
-                            <option ${asset.status === "Available" ? "selected" : ""}>
+                            <option ${asset.status === 'Available' ? 'selected' : ''}>
                                 Available
                             </option>
 
-                            <option ${asset.status === "Maintenance" ? "selected" : ""}>
+                            <option ${asset.status === 'Maintenance' ? 'selected' : ''}>
                                 Maintenance
                             </option>
 
-                            <option ${asset.status === "Retired" ? "selected" : ""}>
+                            <option ${asset.status === 'Retired' ? 'selected' : ''}>
                                 Retired
                             </option>
 
@@ -1981,10 +1721,7 @@ function editAsset(assetId) {
                         id="retirementReasonContainer"
                         style="
                             display:
-                            ${asset.status === 'Retired'
-                                ? 'block'
-                                : 'none'
-                            };
+                            ${asset.status === 'Retired' ? 'block' : 'none'};
                         "
                     >
 
@@ -1997,31 +1734,31 @@ function editAsset(assetId) {
                             class="form-control">
 
                             <option
-                                ${asset.retirementReason === "End of Life" ? "selected" : ""}
+                                ${asset.retirementReason === 'End of Life' ? 'selected' : ''}
                             >
                                 End of Life
                             </option>
 
                             <option
-                                ${asset.retirementReason === "Hardware Failure" ? "selected" : ""}
+                                ${asset.retirementReason === 'Hardware Failure' ? 'selected' : ''}
                             >
                                 Hardware Failure
                             </option>
 
                             <option
-                                ${asset.retirementReason === "Lost" ? "selected" : ""}
+                                ${asset.retirementReason === 'Lost' ? 'selected' : ''}
                             >
                                 Lost
                             </option>
 
                             <option
-                                ${asset.retirementReason === "Stolen" ? "selected" : ""}
+                                ${asset.retirementReason === 'Stolen' ? 'selected' : ''}
                             >
                                 Stolen
                             </option>
 
                             <option
-                                ${asset.retirementReason === "Disposed" ? "selected" : ""}
+                                ${asset.retirementReason === 'Disposed' ? 'selected' : ''}
                             >
                                 Disposed
                             </option>
@@ -2059,296 +1796,172 @@ function editAsset(assetId) {
     </div>
     `;
 
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        modalHtml
-    );
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    new bootstrap.Modal(
-        document.getElementById(
-            "editAssetModal"
-        )
-    ).show();
-    renderSpecificationFields(
-    "editAssetCategory",
-    "editTechnicalFieldsContainer",
+  new bootstrap.Modal(document.getElementById('editAssetModal')).show();
+  renderSpecificationFields(
+    'editAssetCategory',
+    'editTechnicalFieldsContainer',
     asset.specifications || {},
-    "editSpec"
-);
+    'editSpec'
+  );
 }
 
 function saveAssetEdit() {
+  const assetId = document.getElementById('editAssetId').value;
 
-    const assetId =
-        document.getElementById(
-            "editAssetId"
-        ).value;
+  const assets = getAssets();
 
-    const assets =
-        getAssets();
+  const asset = assets.find((a) => a.id === assetId);
 
-    const asset =
-        assets.find(
-            a => a.id === assetId
-        );
+  if (!asset) {
+    return;
+  }
 
-    if (!asset) {
-        return;
+  const oldAsset = {
+    ...asset,
+  };
+
+  asset.name = document.getElementById('editAssetName').value;
+
+  asset.category = document.getElementById('editAssetCategory').value;
+
+  asset.status = document.getElementById('editAssetStatus').value;
+  asset.serialNumber = document.getElementById('editAssetSerial').value;
+
+  asset.vendor = document.getElementById('editAssetVendor').value;
+
+  asset.purchaseDate = document.getElementById('editAssetPurchaseDate').value;
+
+  asset.warrantyExpiry = document.getElementById('editAssetWarrantyExpiry').value;
+
+  const specifications = {};
+
+  getSpecificationTemplate(asset.category).forEach((field) => {
+    specifications[field.key] =
+      document.getElementById(`editSpec_${field.key}`)?.value.trim() || '';
+  });
+
+  asset.specifications = specifications;
+
+  if (asset.status === 'Retired') {
+    asset.retirementReason = document.getElementById('retirementReason').value;
+
+    if (!asset.retiredDate) {
+      asset.retiredDate = formatDateTime();
     }
+  }
 
-    const oldAsset = {
-        ...asset
-    };
+  addActivity(`Asset ${asset.name} updated`);
 
-    asset.name =
-        document.getElementById(
-            "editAssetName"
-        ).value;
-
-    asset.category =
-        document.getElementById(
-            "editAssetCategory"
-        ).value;
-
-    asset.status =
-        document.getElementById(
-            "editAssetStatus"
-        ).value;
-    asset.serialNumber =
-        document.getElementById(
-            "editAssetSerial"
-        ).value;
-
-    asset.vendor =
-        document.getElementById(
-            "editAssetVendor"
-        ).value;
-
-    asset.purchaseDate =
-        document.getElementById(
-            "editAssetPurchaseDate"
-        ).value;
-
-    asset.warrantyExpiry =
-        document.getElementById(
-            "editAssetWarrantyExpiry"
-        ).value;
-
-    const specifications = {};
-
-    getSpecificationTemplate(asset.category).forEach(field=>{
-
-        specifications[field.key]=
-
-            document.getElementById(`editSpec_${field.key}`)?.value.trim() || "";
-
-    });
-
-    asset.specifications = specifications;
-
-    if (asset.status === "Retired") {
-
-        asset.retirementReason =
-            document.getElementById(
-                "retirementReason"
-            ).value;
-
-        if (!asset.retiredDate) {
-
-            asset.retiredDate =
-                formatDateTime();
-
-        }
-
-    }
-
-    addActivity(
-        `Asset ${asset.name} updated`
+  if (asset.status === 'Retired') {
+    const activeAssignment = getAssignments().find(
+      (a) => a.assetId === asset.id && a.status === 'Assigned'
     );
 
-    if (asset.status === "Retired") {
+    if (activeAssignment) {
+      alert('Asset is currently assigned and cannot be retired.');
 
-        const activeAssignment =
-            getAssignments().find(
-                a =>
-                    a.assetId === asset.id &&
-                    a.status === "Assigned"
-            );
-
-        if (activeAssignment) {
-
-            alert(
-                "Asset is currently assigned and cannot be retired."
-            );
-
-            return;
-        }
+      return;
     }
+  }
 
-    if (
-        oldAsset.status !== "Retired" &&
-        asset.status === "Retired"
-    ) {
+  if (oldAsset.status !== 'Retired' && asset.status === 'Retired') {
+    addAssetHistory(asset.id, 'Retired', `Reason: ${asset.retirementReason}`);
+  }
 
-        addAssetHistory(
-            asset.id,
-            "Retired",
-            `Reason: ${asset.retirementReason}`
-        );
+  saveAssets(assets);
 
-    }
+  const changes = [];
 
-    saveAssets(assets);
+  if (oldAsset.name !== asset.name) changes.push(`Asset Name: ${oldAsset.name} → ${asset.name}`);
 
-    const changes = [];
+  if (oldAsset.category !== asset.category)
+    changes.push(`Category: ${oldAsset.category} → ${asset.category}`);
 
-    if (oldAsset.name !== asset.name)
-        changes.push(
-            `Asset Name: ${oldAsset.name} → ${asset.name}`
-        );
+  if (oldAsset.serialNumber !== asset.serialNumber)
+    changes.push(`Serial Number: ${oldAsset.serialNumber || '-'} → ${asset.serialNumber || '-'}`);
 
-    if (oldAsset.category !== asset.category)
-        changes.push(
-            `Category: ${oldAsset.category} → ${asset.category}`
-        );
+  if (oldAsset.vendor !== asset.vendor)
+    changes.push(`Vendor: ${oldAsset.vendor || '-'} → ${asset.vendor || '-'}`);
 
-    if (oldAsset.serialNumber !== asset.serialNumber)
-        changes.push(
-            `Serial Number: ${oldAsset.serialNumber || "-"} → ${asset.serialNumber || "-"}`
-        );
+  if (oldAsset.purchaseDate !== asset.purchaseDate)
+    changes.push(`Purchase Date: ${oldAsset.purchaseDate || '-'} → ${asset.purchaseDate || '-'}`);
 
-    if (oldAsset.vendor !== asset.vendor)
-        changes.push(
-            `Vendor: ${oldAsset.vendor || "-"} → ${asset.vendor || "-"}`
-        );
-
-    if (oldAsset.purchaseDate !== asset.purchaseDate)
-        changes.push(
-            `Purchase Date: ${oldAsset.purchaseDate || "-"} → ${asset.purchaseDate || "-"}`
-        );
-
-    if (oldAsset.warrantyExpiry !== asset.warrantyExpiry)
-        changes.push(
-            `Warranty Expiry: ${oldAsset.warrantyExpiry || "-"} → ${asset.warrantyExpiry || "-"}`
-        );
-
-    if (oldAsset.status !== asset.status)
-        changes.push(
-            `Status: ${oldAsset.status} → ${asset.status}`
-        );
-
-    addAssetHistory(
-        asset.id,
-        "Updated",
-        changes.length > 0
-            ? changes.join("<br>")
-            : "No changes detected"
+  if (oldAsset.warrantyExpiry !== asset.warrantyExpiry)
+    changes.push(
+      `Warranty Expiry: ${oldAsset.warrantyExpiry || '-'} → ${asset.warrantyExpiry || '-'}`
     );
 
-    bootstrap.Modal.getInstance(
-        document.getElementById(
-            "editAssetModal"
-        )
-    ).hide();
+  if (oldAsset.status !== asset.status)
+    changes.push(`Status: ${oldAsset.status} → ${asset.status}`);
 
-    loadAssets();
+  addAssetHistory(
+    asset.id,
+    'Updated',
+    changes.length > 0 ? changes.join('<br>') : 'No changes detected'
+  );
+
+  bootstrap.Modal.getInstance(document.getElementById('editAssetModal')).hide();
+
+  loadAssets();
 }
 
 function toggleRetirementReason() {
+  const status = document.getElementById('editAssetStatus').value;
 
-    const status =
-        document.getElementById(
-            "editAssetStatus"
-        ).value;
-
-    document.getElementById(
-        "retirementReasonContainer"
-    ).style.display =
-        status === "Retired"
-            ? "block"
-            : "none";
-
+  document.getElementById('retirementReasonContainer').style.display =
+    status === 'Retired' ? 'block' : 'none';
 }
 
-function showAssetTransferModal(
-    assetId
-) {
+function showAssetTransferModal(assetId) {
+  const assets = getAssets();
 
-    const assets =
-        getAssets();
+  const asset = assets.find((a) => a.id === assetId);
 
-    const asset =
-        assets.find(
-            a => a.id === assetId
-        );
+  if (!asset) {
+    return;
+  }
 
-    if (!asset) {
-        return;
-    }
+  const activeAssignment = getAssignments().find(
+    (a) => a.assetId === asset.id && a.status === 'Assigned'
+  );
 
-    const activeAssignment =
-        getAssignments().find(
-            a =>
-                a.assetId === asset.id &&
-                a.status === "Assigned"
-        );
-
-    if (activeAssignment) {
-
-        alert(
-            `Asset is currently assigned to ${activeAssignment.employeeName}.
+  if (activeAssignment) {
+    alert(
+      `Asset is currently assigned to ${activeAssignment.employeeName}.
             
 Please return the asset before transferring.`
-        );
-
-        return;
-    }
-
-    if (
-        asset.status === "Retired"
-    ) {
-
-        alert(
-            "Retired assets cannot be transferred."
-        );
-
-        return;
-    }
-
-    if (
-        asset.status === "Transferred"
-    ) {
-
-        alert(
-            "Asset already transferred."
-        );
-
-        return;
-    }
-
-    showTransferAssetForm(
-        asset
     );
 
+    return;
+  }
+
+  if (asset.status === 'Retired') {
+    alert('Retired assets cannot be transferred.');
+
+    return;
+  }
+
+  if (asset.status === 'Transferred') {
+    alert('Asset already transferred.');
+
+    return;
+  }
+
+  showTransferAssetForm(asset);
 }
 
-function showTransferAssetForm(
-    asset
-) {
+function showTransferAssetForm(asset) {
+  const locations = getLocations();
 
-    const locations =
-        getLocations();
+  const modal = document.createElement('div');
 
-    const modal =
-        document.createElement("div");
+  modal.className = 'modal fade show';
 
-    modal.className =
-        "modal fade show";
+  modal.style.display = 'block';
 
-    modal.style.display =
-        "block";
-
-    modal.innerHTML = `
+  modal.innerHTML = `
 
 <div class="modal-dialog">
 
@@ -2418,17 +2031,15 @@ Transfer To
     class="form-select">
 
 ${locations
-.filter(
-    l =>
-        l.name !== asset.location
-)
-.map(
-    l => `
+  .filter((l) => l.name !== asset.location)
+  .map(
+    (l) => `
 <option>
 ${l.name}
 </option>
 `
-).join("")}
+  )
+  .join('')}
 
 </select>
 
@@ -2475,162 +2086,100 @@ Transfer
 
 `;
 
-    document.body.appendChild(
-        modal
-    );
-
+  document.body.appendChild(modal);
 }
 
-function saveAssetTransfer(
-    oldAssetId
-) {
+function saveAssetTransfer(oldAssetId) {
+  const assets = getAssets();
 
-    const assets =
-        getAssets();
+  const oldAsset = assets.find((a) => a.id === oldAssetId);
 
-    const oldAsset =
-        assets.find(
-            a =>
-                a.id === oldAssetId
-        );
+  const newAssetId = document.getElementById('transferAssetId').value.trim();
 
-    const newAssetId =
-        document.getElementById(
-            "transferAssetId"
-        ).value.trim();
+  const newLocation = document.getElementById('transferLocation').value;
 
-    const newLocation =
-        document.getElementById(
-            "transferLocation"
-        ).value;
+  const remarks = document.getElementById('transferRemarks').value;
 
-    const remarks =
-        document.getElementById(
-            "transferRemarks"
-        ).value;
+  if (!newAssetId) {
+    alert('Enter new Asset ID');
 
-    if (!newAssetId) {
+    return;
+  }
 
-        alert(
-            "Enter new Asset ID"
-        );
+  const existingAsset = assets.find((a) => a.id === newAssetId);
 
-        return;
-    }
+  if (existingAsset) {
+    alert('Asset ID already exists.');
 
-    const existingAsset =
-        assets.find(
-            a => a.id === newAssetId
-        );
+    return;
+  }
 
-    if (existingAsset) {
+  const newAsset = {
+    ...oldAsset,
 
-        alert(
-            "Asset ID already exists."
-        );
+    transferredTo: '',
 
-        return;
-    }
+    transferDate: '',
 
-    const newAsset = {
+    transferRemarks: '',
 
-        ...oldAsset,
+    id: newAssetId,
 
-        transferredTo: "",
+    location: newLocation,
 
-        transferDate: "",
+    previousAssetId: oldAsset.id,
 
-        transferRemarks: "",
+    status: 'Available',
+  };
 
-        id:
-            newAssetId,
+  oldAsset.status = 'Transferred';
 
-        location:
-            newLocation,
+  oldAsset.transferredTo = newAssetId;
 
-        previousAssetId:
-            oldAsset.id,
+  oldAsset.transferDate = formatDateTime();
 
-        status:
-            "Available"
-    };
+  oldAsset.transferRemarks = remarks;
 
-    oldAsset.status =
-        "Transferred";
+  assets.push(newAsset);
 
-    oldAsset.transferredTo =
-        newAssetId;
+  saveAssets(assets);
 
-    oldAsset.transferDate =
-        formatDateTime();
+  addAssetTransfer({
+    id: Date.now(),
 
-    oldAsset.transferRemarks =
-        remarks;
+    oldAssetId: oldAsset.id,
 
-    assets.push(
-        newAsset
-    );
+    newAssetId,
 
-    saveAssets(
-        assets
-    );
+    fromLocation: oldAsset.location,
 
-    addAssetTransfer({
+    toLocation: newLocation,
 
-        id: Date.now(),
+    remarks,
 
-        oldAssetId:
-            oldAsset.id,
+    transferDate: formatDateTime(),
+  });
 
-        newAssetId,
-
-        fromLocation:
-            oldAsset.location,
-
-        toLocation:
-            newLocation,
-
-        remarks,
-
-        transferDate:
-            formatDateTime()
-
-    });
-
-    addActivity(
-        `Asset transferred:
+  addActivity(
+    `Asset transferred:
 ${oldAsset.id}
 →
 ${newAssetId}`
-    );
+  );
 
-    alert(
-        "Asset transferred successfully."
-    );
+  alert('Asset transferred successfully.');
 
-    const transferModal =
-        document.querySelector(
-            ".modal.show"
-        );
+  const transferModal = document.querySelector('.modal.show');
 
-    if (transferModal) {
-        transferModal.remove();
-    }
+  if (transferModal) {
+    transferModal.remove();
+  }
 
-    document
-        .querySelectorAll(".modal-backdrop")
-        .forEach(
-            b => b.remove()
-        );
+  document.querySelectorAll('.modal-backdrop').forEach((b) => b.remove());
 
-    document.body.classList.remove(
-        "modal-open"
-    );
+  document.body.classList.remove('modal-open');
 
-    document.body.style.removeProperty(
-        "padding-right"
-    );
+  document.body.style.removeProperty('padding-right');
 
-    loadAssets();
-
+  loadAssets();
 }

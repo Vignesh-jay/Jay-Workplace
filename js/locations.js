@@ -1,10 +1,9 @@
 function loadLocations() {
+  const content = document.getElementById('content');
 
-    const content = document.getElementById("content");
+  const locations = getLocations();
 
-    const locations = getLocations();
-
-    content.innerHTML = `
+  content.innerHTML = `
         <div class="page-header">
             <h2>Locations</h2>
 
@@ -29,7 +28,9 @@ function loadLocations() {
                     </thead>
 
                     <tbody>
-                        ${locations.map(location => `
+                        ${locations
+                          .map(
+                            (location) => `
                             <tr>
                                 <td>${location.code}</td>
                                 <td>${location.name}</td>
@@ -53,7 +54,9 @@ function loadLocations() {
                                     </button>
                                 </td>
                             </tr>
-                        `).join("")}
+                        `
+                          )
+                          .join('')}
                     </tbody>
                 </table>
             </div>
@@ -62,28 +65,21 @@ function loadLocations() {
 }
 
 function removeLocation(id) {
+  if (!confirm('Delete this location?')) {
+    return;
+  }
 
-    if (!confirm("Delete this location?")) {
-        return;
-    }
+  deleteLocation(id);
 
-    deleteLocation(id);
-
-    loadLocations();
+  loadLocations();
 }
 
 function showLocationModal(locationId = null) {
+  const locations = getLocations();
 
-    const locations = getLocations();
+  const location = locationId ? locations.find((l) => l.id === locationId) : null;
 
-    const location =
-        locationId
-            ? locations.find(
-                l => l.id === locationId
-            )
-            : null;
-
-    const modalHtml = `
+  const modalHtml = `
 
     <div class="modal fade"
          id="locationModal"
@@ -97,11 +93,7 @@ function showLocationModal(locationId = null) {
 
                     <h5 class="modal-title">
 
-                        ${
-                            location
-                                ? "Edit Location"
-                                : "Add Location"
-                        }
+                        ${location ? 'Edit Location' : 'Add Location'}
 
                     </h5>
 
@@ -125,9 +117,7 @@ function showLocationModal(locationId = null) {
                             type="text"
                             class="form-control"
                             id="locationCode"
-                            value="${
-                                location?.code || ""
-                            }">
+                            value="${location?.code || ''}">
 
                     </div>
 
@@ -141,9 +131,7 @@ function showLocationModal(locationId = null) {
                             type="text"
                             class="form-control"
                             id="locationName"
-                            value="${
-                                location?.name || ""
-                            }">
+                            value="${location?.name || ''}">
 
                     </div>
 
@@ -157,9 +145,7 @@ function showLocationModal(locationId = null) {
                             type="text"
                             class="form-control"
                             id="locationState"
-                            value="${
-                                location?.state || ""
-                            }">
+                            value="${location?.state || ''}">
 
                     </div>
 
@@ -175,21 +161,13 @@ function showLocationModal(locationId = null) {
 
                             <option
                                 value="Active"
-                                ${
-                                    location?.status === "Active"
-                                    ? "selected"
-                                    : ""
-                                }>
+                                ${location?.status === 'Active' ? 'selected' : ''}>
                                 Active
                             </option>
 
                             <option
                                 value="Inactive"
-                                ${
-                                    location?.status === "Inactive"
-                                    ? "selected"
-                                    : ""
-                                }>
+                                ${location?.status === 'Inactive' ? 'selected' : ''}>
                                 Inactive
                             </option>
 
@@ -213,11 +191,7 @@ function showLocationModal(locationId = null) {
                     <button
                         type="button"
                         class="btn btn-primary"
-                        onclick="${
-                            location
-                                ? `saveLocation('${location.id}')`
-                                : 'saveLocation()'
-                        }">
+                        onclick="${location ? `saveLocation('${location.id}')` : 'saveLocation()'}">
 
                         Save
 
@@ -232,109 +206,59 @@ function showLocationModal(locationId = null) {
     </div>
     `;
 
-    const existingModal =
-        document.getElementById(
-            "locationModal"
-        );
+  const existingModal = document.getElementById('locationModal');
 
-    if (existingModal) {
-        existingModal.remove();
-    }
+  if (existingModal) {
+    existingModal.remove();
+  }
 
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        modalHtml
-    );
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    const modal =
-        new bootstrap.Modal(
-            document.getElementById(
-                "locationModal"
-            )
-        );
+  const modal = new bootstrap.Modal(document.getElementById('locationModal'));
 
-    modal.show();
+  modal.show();
 }
 
 function saveLocation(locationId = null) {
+  const code = document.getElementById('locationCode').value.trim();
 
-    const code =
-        document
-            .getElementById(
-                "locationCode"
-            )
-            .value
-            .trim();
+  const name = document.getElementById('locationName').value.trim();
 
-    const name =
-        document
-            .getElementById(
-                "locationName"
-            )
-            .value
-            .trim();
+  const state = document.getElementById('locationState').value.trim();
 
-    const state =
-        document
-            .getElementById(
-                "locationState"
-            )
-            .value
-            .trim();
+  const status = document.getElementById('locationStatus').value;
 
-    const status =
-        document
-            .getElementById(
-                "locationStatus"
-            )
-            .value;
+  if (!code || !name || !state) {
+    alert('Please complete all fields.');
 
-    if (!code || !name || !state) {
+    return;
+  }
 
-        alert(
-            "Please complete all fields."
-        );
+  if (locationId) {
+    updateLocation({
+      id: locationId,
+      code,
+      name,
+      state,
+      status,
+    });
+  } else {
+    addLocation({
+      id: 'LOC' + Date.now(),
+      code,
+      name,
+      state,
+      status,
+    });
+  }
 
-        return;
-    }
+  const modalElement = document.getElementById('locationModal');
 
-    if (locationId) {
+  const modal = bootstrap.Modal.getInstance(modalElement);
 
-        updateLocation({
-            id: locationId,
-            code,
-            name,
-            state,
-            status
-        });
+  modal.hide();
 
-    } else {
+  modalElement.remove();
 
-        addLocation({
-            id:
-                "LOC" +
-                Date.now(),
-            code,
-            name,
-            state,
-            status
-        });
-
-    }
-
-    const modalElement =
-        document.getElementById(
-            "locationModal"
-        );
-
-    const modal =
-        bootstrap.Modal.getInstance(
-            modalElement
-        );
-
-    modal.hide();
-
-    modalElement.remove();
-
-    loadLocations();
+  loadLocations();
 }

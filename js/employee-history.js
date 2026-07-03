@@ -1,26 +1,15 @@
-function addEmployeeHistory(
+function addEmployeeHistory(employeeId, action, details) {
+  const history = getEmployeeHistory();
+
+  history.unshift({
     employeeId,
+
     action,
-    details
-) {
 
-    const history =
-        getEmployeeHistory();
+    details,
 
-    history.unshift({
+    timestamp: formatDateTime(),
+  });
 
-        employeeId,
-
-        action,
-
-        details,
-
-        timestamp: formatDateTime()
-
-    });
-
-    saveEmployeeHistory(
-        history
-    );
-
+  saveEmployeeHistory(history);
 }

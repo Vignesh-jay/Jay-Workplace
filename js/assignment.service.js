@@ -1,72 +1,53 @@
 function addAssignment(assignment) {
+  const assignments = getAssignments();
 
-    const assignments = getAssignments();
+  assignments.push(assignment);
 
-    assignments.push(assignment);
+  saveAssignments(assignments);
 
-    saveAssignments(assignments);
+  addActivity(`${assignment.assetName} assigned to ${assignment.employeeName}`);
 
-    addActivity(
-        `${assignment.assetName} assigned to ${assignment.employeeName}`
-    );
-
-    return assignment;
+  return assignment;
 }
 
 function saveAssignment() {
+  const employeeId = document.getElementById('employeeSelect').value;
 
-    const employeeId =
-        document.getElementById("employeeSelect").value;
+  const assetId = document.getElementById('assetSelect').value;
 
-    const assetId =
-        document.getElementById("assetSelect").value;
+  const employees = getEmployees();
+  const assets = getAssets();
 
-    const employees = getEmployees();
-    const assets = getAssets();
+  const employee = employees.find((emp) => emp.id === employeeId);
 
-    const employee =
-        employees.find(emp => emp.id === employeeId);
+  const asset = assets.find((ast) => ast.id === assetId);
 
-    const asset =
-        assets.find(ast => ast.id === assetId);
+  const assignment = {
+    id: crypto.randomUUID(), // <-- Add this
 
-    const assignment = {
+    assetId: asset.id,
+    assetName: asset.name,
 
-        id: crypto.randomUUID(),   // <-- Add this
+    employeeId: employee.id,
+    employeeName: `${employee.firstName} ${employee.lastName}`,
 
-        assetId: asset.id,
-        assetName: asset.name,
+    assignedDate: formatDateTime(),
+    returnedDate: '',
 
-        employeeId: employee.id,
-        employeeName: `${employee.firstName} ${employee.lastName}`,
+    status: 'Assigned',
+  };
 
-        assignedDate: formatDateTime(),
-        returnedDate: "",
+  asset.status = 'Assigned';
 
-        status: "Assigned"
-    };
+  saveAssets(assets);
 
-    asset.status = "Assigned";
+  addAssetHistory(asset.id, 'Assigned', `Assigned to ${employee.firstName} ${employee.lastName}`);
 
-    saveAssets(assets);
+  addEmployeeHistory(employee.id, 'Asset Assigned', asset.name);
 
-    addAssetHistory(
-        asset.id,
-        "Assigned",
-        `Assigned to ${employee.firstName} ${employee.lastName}`
-    );
+  addAssignment(assignment);
 
-    addEmployeeHistory(
-        employee.id,
-        "Asset Assigned",
-        asset.name
-    );
-    
-    addAssignment(assignment);
+  loadAssignments();
 
-    loadAssignments();
-
-    bootstrap.Modal.getInstance(
-        document.getElementById("assignAssetModal")
-    ).hide();
+  bootstrap.Modal.getInstance(document.getElementById('assignAssetModal')).hide();
 }

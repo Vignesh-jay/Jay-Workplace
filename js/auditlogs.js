@@ -1,15 +1,9 @@
 function loadAuditLogs() {
+  const activities = getActivities();
 
-    const activities =
-        getActivities();
+  setActiveMenu('nav-administration');
 
-    setActiveMenu(
-        'nav-administration'
-    );
-
-    document.getElementById(
-        "content"
-    ).innerHTML = `
+  document.getElementById('content').innerHTML = `
 
 <div class="page-header">
 
@@ -47,11 +41,13 @@ function loadAuditLogs() {
 
         <tbody>
 
-            ${activities.map((item,index)=>`
+            ${activities
+              .map(
+                (item, index) => `
 
             <tr>
 
-                <td>${index+1}</td>
+                <td>${index + 1}</td>
 
                 <td>${item.timestamp}</td>
 
@@ -59,7 +55,9 @@ function loadAuditLogs() {
 
             </tr>
 
-            `).join('')}
+            `
+              )
+              .join('')}
 
         </tbody>
 
@@ -68,5 +66,4 @@ function loadAuditLogs() {
 </div>
 
 `;
-
 }

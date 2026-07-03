@@ -1,3 +1,29 @@
 {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  "editor.formatOnSave": true,
+
+  "files.autoSave": "afterDelay",
+
+  "files.autoSaveDelay": 1000,
+
+  "editor.wordWrap": "on",
+
+  "editor.tabSize": 2,
+
+  "editor.insertSpaces": true,
+
+  "editor.rulers": [100],
+
+  "editor.bracketPairColorization.enabled": true,
+
+  "editor.guides.bracketPairs": "active",
+
+  "javascript.updateImportsOnFileMove.enabled": "always",
+
+  "explorer.confirmDelete": false,
+
+  "git.autofetch": true,
+
+  "git.confirmSync": false
 }

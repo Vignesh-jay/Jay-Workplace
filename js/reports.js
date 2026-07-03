@@ -1,18 +1,14 @@
-function loadReports(){
-    const employeeList = getEmployees();
-const assetList = getAssets();
-const assignmentList = getAssignments();
-const activeAssignments =
-    assignmentList.filter(
-        item => item.status === "Assigned"
-    ).length;
+function loadReports() {
+  const employeeList = getEmployees();
+  const assetList = getAssets();
+  const assignmentList = getAssignments();
+  const activeAssignments = assignmentList.filter((item) => item.status === 'Assigned').length;
 
-const expiringWarranty =
-    getExpiringAssets(30).length;
+  const expiringWarranty = getExpiringAssets(30).length;
 
-setActiveMenu('nav-reports');
+  setActiveMenu('nav-reports');
 
-document.getElementById("content").innerHTML = `
+  document.getElementById('content').innerHTML = `
 
 <div class="page-header">
 
@@ -335,55 +331,40 @@ document.getElementById("content").innerHTML = `
 
 `;
 
-renderReportCharts();
-
+  renderReportCharts();
 }
 
 function getToday() {
-
-    return new Date()
-        .toISOString()
-        .split("T")[0];
-
+  return new Date().toISOString().split('T')[0];
 }
 
 function downloadCSV(filename, csvContent) {
+  const blob = new Blob([csvContent], { type: 'text/csv' });
 
-    const blob = new Blob(
-        [csvContent],
-        { type: "text/csv" }
-    );
+  const url = window.URL.createObjectURL(blob);
 
-    const url =
-        window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
 
-    const a =
-        document.createElement("a");
+  a.href = url;
 
-    a.href = url;
+  a.download = filename;
 
-    a.download = filename;
+  a.click();
 
-    a.click();
+  showToast(`${filename} exported successfully.`, 'success');
 
-    showToast(
-        `${filename} exported successfully.`,
-        "success"
-    );
-
-    window.URL.revokeObjectURL(url);
+  window.URL.revokeObjectURL(url);
 }
 
 function exportEmployees() {
+  const employees = getEmployees();
 
-    const employees = getEmployees();
+  let csv =
+    'Employee ID,First Name,Last Name,Email,Phone,Department,Designation,Manager,Location,Employment Type,Joining Date,Leaving Date,Status\n';
 
-    let csv =
-"Employee ID,First Name,Last Name,Email,Phone,Department,Designation,Manager,Location,Employment Type,Joining Date,Leaving Date,Status\n";
-
-employees.forEach(emp => {
-
-    csv += [
+  employees.forEach((emp) => {
+    csv +=
+      [
         emp.id,
         emp.firstName,
         emp.lastName,
@@ -395,30 +376,23 @@ employees.forEach(emp => {
         emp.location,
         emp.employmentType,
         emp.joiningDate,
-        emp.leavingDate || "",
-        emp.status
-    ].join(",") + "\n";
+        emp.leavingDate || '',
+        emp.status,
+      ].join(',') + '\n';
+  });
 
-});
-
-    downloadCSV(
-        `Employee_Report_${getToday()}.csv`,
-        csv
-    );
-
+  downloadCSV(`Employee_Report_${getToday()}.csv`, csv);
 }
 
 function exportAssets() {
+  const assets = getAssets();
 
-    const assets = getAssets();
+  let csv =
+    'Asset ID,Asset Name,Category,Brand,Model,Serial Number,Purchase Date,Warranty Expiry,Vendor,Invoice Number,Cost,Location,Assigned To,Status,Remarks\n';
 
-    let csv =
-"Asset ID,Asset Name,Category,Brand,Model,Serial Number,Purchase Date,Warranty Expiry,Vendor,Invoice Number,Cost,Location,Assigned To,Status,Remarks\n";
-
-assets.forEach(asset=>{
-
-    csv += [
-
+  assets.forEach((asset) => {
+    csv +=
+      [
         asset.id,
         asset.name,
         asset.category,
@@ -431,308 +405,222 @@ assets.forEach(asset=>{
         asset.invoiceNumber,
         asset.cost,
         asset.location,
-        asset.assignedTo || "",
+        asset.assignedTo || '',
         asset.status,
-        asset.remarks || ""
+        asset.remarks || '',
+      ].join(',') + '\n';
+  });
 
-    ].join(",") + "\n";
-
-});
-
-    downloadCSV(
-        `Asset_Report_${getToday()}.csv`,
-        csv
-    );
-
+  downloadCSV(`Asset_Report_${getToday()}.csv`, csv);
 }
 
 function exportAssignments() {
+  const assignments = getAssignments();
 
-    const assignments = getAssignments();
+  let csv =
+    'Asset ID,Asset Name,Employee ID,Employee Name,Assigned Date,Returned Date,Status,Assigned By,Returned By,Notes\n';
 
-    let csv =
-"Asset ID,Asset Name,Employee ID,Employee Name,Assigned Date,Returned Date,Status,Assigned By,Returned By,Notes\n";
-
-assignments.forEach(item=>{
-
-    csv += [
-
+  assignments.forEach((item) => {
+    csv +=
+      [
         item.assetId,
         item.assetName,
         item.employeeId,
         item.employeeName,
         item.assignedDate,
-        item.returnedDate || "",
+        item.returnedDate || '',
         item.status,
-        item.assignedBy || "",
-        item.returnedBy || "",
-        item.notes || ""
+        item.assignedBy || '',
+        item.returnedBy || '',
+        item.notes || '',
+      ].join(',') + '\n';
+  });
 
-    ].join(",") + "\n";
-
-});
-
-    downloadCSV(
-        `Assignment_Report_${getToday()}.csv`,
-        csv
-    );
-
+  downloadCSV(`Assignment_Report_${getToday()}.csv`, csv);
 }
 
 function renderReportCharts() {
+  renderCategoryChart();
 
-    renderCategoryChart();
+  renderLocationChart();
 
-    renderLocationChart();
+  renderDepartmentChart();
 
-    renderDepartmentChart();
-
-    renderAssetStatusChart();
-
+  renderAssetStatusChart();
 }
 
 function renderCategoryChart() {
+  const assets = getAssets();
 
-    const assets = getAssets();
+  const counts = {};
 
-    const counts = {};
+  assets.forEach((asset) => {
+    counts[asset.category] = (counts[asset.category] || 0) + 1;
+  });
 
-    assets.forEach(asset => {
+  new Chart(
+    document.getElementById('categoryChart'),
 
-        counts[asset.category] =
-            (counts[asset.category] || 0) + 1;
+    {
+      type: 'doughnut',
 
-    });
+      data: {
+        labels: Object.keys(counts),
 
-    new Chart(
+        datasets: [
+          {
+            data: Object.values(counts),
+          },
+        ],
+      },
 
-        document.getElementById("categoryChart"),
+      options: {
+        responsive: true,
 
-        {
+        maintainAspectRatio: false,
 
-            type: "doughnut",
-
-            data: {
-
-                labels: Object.keys(counts),
-
-                datasets: [{
-
-                    data: Object.values(counts)
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                plugins: {
-
-                    legend: {
-
-                        position: "bottom"
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    );
-
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+        },
+      },
+    }
+  );
 }
 
 function renderLocationChart() {
+  const assets = getAssets();
 
-    const assets = getAssets();
+  const counts = {};
 
-    const counts = {};
+  assets.forEach((asset) => {
+    counts[asset.location] = (counts[asset.location] || 0) + 1;
+  });
 
-    assets.forEach(asset => {
+  new Chart(
+    document.getElementById('locationChart'),
 
-        counts[asset.location] =
-            (counts[asset.location] || 0) + 1;
+    {
+      type: 'bar',
 
-    });
+      data: {
+        labels: Object.keys(counts),
 
-    new Chart(
+        datasets: [
+          {
+            label: 'Assets',
 
-        document.getElementById("locationChart"),
+            data: Object.values(counts),
+          },
+        ],
+      },
 
-        {
+      options: {
+        responsive: true,
 
-            type: "bar",
+        maintainAspectRatio: false,
 
-            data: {
-
-                labels: Object.keys(counts),
-
-                datasets: [{
-
-                    label: "Assets",
-
-                    data: Object.values(counts)
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                plugins: {
-
-                    legend: {
-
-                        position: "bottom"
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    );
-
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+        },
+      },
+    }
+  );
 }
 
 function renderDepartmentChart() {
+  const employees = getEmployees();
 
-    const employees = getEmployees();
+  const counts = {};
 
-    const counts = {};
+  employees.forEach((employee) => {
+    counts[employee.department] = (counts[employee.department] || 0) + 1;
+  });
 
-    employees.forEach(employee => {
+  new Chart(
+    document.getElementById('departmentChart'),
 
-        counts[employee.department] =
-            (counts[employee.department] || 0) + 1;
+    {
+      type: 'pie',
 
-    });
+      data: {
+        labels: Object.keys(counts),
 
-    new Chart(
+        datasets: [
+          {
+            data: Object.values(counts),
+          },
+        ],
+      },
 
-        document.getElementById("departmentChart"),
+      options: {
+        responsive: true,
 
-        {
+        maintainAspectRatio: false,
 
-            type: "pie",
-
-            data: {
-
-                labels: Object.keys(counts),
-
-                datasets: [{
-
-                    data: Object.values(counts)
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                plugins: {
-
-                    legend: {
-
-                        position: "bottom"
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    );
-
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+        },
+      },
+    }
+  );
 }
 
 function renderAssetStatusChart() {
+  const assets = getAssets();
 
-    const assets = getAssets();
+  const counts = {};
 
-    const counts = {};
+  assets.forEach((asset) => {
+    counts[asset.status] = (counts[asset.status] || 0) + 1;
+  });
 
-    assets.forEach(asset => {
+  new Chart(
+    document.getElementById('assetStatusChart'),
 
-        counts[asset.status] =
-            (counts[asset.status] || 0) + 1;
+    {
+      type: 'doughnut',
 
-    });
+      data: {
+        labels: Object.keys(counts),
 
-    new Chart(
+        datasets: [
+          {
+            data: Object.values(counts),
 
-        document.getElementById("assetStatusChart"),
+            backgroundColor: [
+              '#3b82f6', // Assigned
 
-        {
+              '#22c55e', // Available
 
-            type: "doughnut",
+              '#f59e0b', // Maintenance
 
-            data: {
+              '#ef4444', // Lost
 
-                labels: Object.keys(counts),
+              '#6b7280', // Retired
 
-                datasets: [{
+              '#8b5cf6', // Others
+            ],
+          },
+        ],
+      },
 
-                    data: Object.values(counts),
+      options: {
+        responsive: true,
 
-                    backgroundColor: [
+        maintainAspectRatio: false,
 
-                        "#3b82f6", // Assigned
-
-                        "#22c55e", // Available
-
-                        "#f59e0b", // Maintenance
-
-                        "#ef4444", // Lost
-
-                        "#6b7280", // Retired
-
-                        "#8b5cf6"  // Others
-
-                    ]
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                plugins: {
-
-                    legend: {
-
-                        position: "bottom"
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    );
-
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+        },
+      },
+    }
+  );
 }

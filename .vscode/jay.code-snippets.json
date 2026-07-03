@@ -1,0 +1,12 @@
+{
+  "JAY Module": {
+    "prefix": "jaymodule",
+    "body": ["function ${1:loadModule}() {", "  ${2:// TODO}", "}"],
+    "description": "Create a JAY module"
+  },
+
+  "Console Log": {
+    "prefix": "jlog",
+    "body": ["console.log('${1}', ${2});"]
+  }
+}
