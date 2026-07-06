@@ -191,7 +191,7 @@ function loadDashboard() {
 
             <div class="timeline">
                 ${getActivities()
-                  .slice(0, 5)
+                  .slice(0, 10)
 
                   .map(
                     (item) => `
