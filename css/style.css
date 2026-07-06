@@ -1141,3 +1141,13 @@ body {
 .search-clear:hover {
   color: #2563eb;
 }
+
+.asset-header-icon {
+  font-size: 42px;
+
+  color: #2563eb;
+
+  margin-right: 18px;
+
+  flex-shrink: 0;
+}

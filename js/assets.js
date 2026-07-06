@@ -778,6 +778,7 @@ function renderEditAssetReview() {
 
   const location = document.getElementById('editAssetLocation')?.value || '-';
 
+  const status = document.getElementById('editAssetStatus')?.value || '-';
   const specs = getSpecificationTemplate(category);
 
   let specificationRows = '';
@@ -830,6 +831,8 @@ function renderEditAssetReview() {
             <tr><th>Category</th><td>${category}</td></tr>
 
             <tr><th>Location</th><td>${location}</td></tr>
+
+            <tr><th>Status</th><td>${status}</td></tr>
 
         </table>
 
@@ -1755,6 +1758,27 @@ function buildEditAssetModal(asset) {
                             </select>
 
                         </div>
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Status
+
+                            </label>
+
+                            <select
+                                id="editAssetStatus"
+                                class="form-select">
+
+                                <option value="Available">Available</option>
+
+                                <option value="Repair">Repair</option>
+
+                                <option value="Retired">Retired</option>
+
+                            </select>
+
+                        </div>
 
                     </div>
 
@@ -1972,6 +1996,7 @@ function showEditAssetModal(assetId) {
   const modalElement = document.getElementById('editAssetModal');
   document.getElementById('editAssetCategory').value = asset.category;
   document.getElementById('editAssetLocation').value = asset.location;
+  document.getElementById('editAssetStatus').value = asset.status || 'Available';
   renderSpecificationFields(
     'editAssetCategory',
     'editTechnicalFieldsContainer',
@@ -2112,6 +2137,7 @@ function updateAsset(assetId) {
   asset.name = document.getElementById('editAssetName').value.trim();
   asset.category = document.getElementById('editAssetCategory').value;
   asset.location = document.getElementById('editAssetLocation').value;
+  asset.status = document.getElementById('editAssetStatus').value;
 
   // Specifications
   asset.specifications = {};
@@ -2173,17 +2199,24 @@ function deleteAsset(assetId) {
 
 function getAssetIcon(category) {
   const icons = {
-    Laptop: '💻',
-    Desktop: '🖥️',
-    Monitor: '🖥',
-    Mobile: '📱',
-    Printer: '🖨️',
-    Server: '🖧',
-    Network: '🌐',
-    Tablet: '📲',
+    Laptop: 'fas fa-laptop',
+
+    Desktop: 'fas fa-desktop',
+
+    Monitor: 'fas fa-desktop',
+
+    Mobile: 'fas fa-mobile-alt',
+
+    Printer: 'fas fa-print',
+
+    Server: 'fas fa-server',
+
+    Network: 'fas fa-network-wired',
+
+    Tablet: 'fas fa-tablet-alt',
   };
 
-  return icons[category] || '📦';
+  return icons[category] || 'fas fa-box';
 }
 
 function viewAsset(assetId) {
@@ -2235,7 +2268,7 @@ function viewAsset(assetId) {
 
                 <div class="asset-image">
 
-                    ${getAssetIcon(asset.category)}
+                    <i class="${getAssetIcon(asset.category)} asset-header-icon"></i>
 
                 </div>
 
