@@ -3016,6 +3016,26 @@ function toggleRetirementReason() {
     status === 'Retired' ? 'block' : 'none';
 }
 
+function toggleTransferMode() {
+  const keepSame = document.getElementById('keepSameAssetId').checked;
+
+  document.getElementById('newAssetIdGroup').classList.toggle('d-none', keepSame);
+
+  const label = document.getElementById('transferModeLabel');
+
+  const description = document.getElementById('transferModeDescription');
+
+  if (keepSame) {
+    label.textContent = '📍 Keep Same Asset ID';
+
+    description.textContent = 'Move the existing asset to another location.';
+  } else {
+    label.textContent = '🔄 Use New Asset ID';
+
+    description.textContent = 'Create a new asset and mark the existing asset as transferred.';
+  }
+}
+
 function showAssetTransferModal(assetId) {
   const assets = getAssets();
 
@@ -3097,15 +3117,45 @@ Current Asset ID
 
 </div>
 
-<div class="mb-3">
+<!-- Asset ID Strategy -->
 
-<label>
-New Asset ID
-</label>
+<div class="form-check form-switch mb-3">
 
-<input
-    id="transferAssetId"
-    class="form-control">
+    <input
+        class="form-check-input"
+        type="checkbox"
+        id="keepSameAssetId"
+        checked
+        onchange="toggleTransferMode()">
+
+    <label
+        id="transferModeLabel"
+        class="form-check-label fw-semibold"
+        for="keepSameAssetId">
+
+        📍 Keep Same Asset ID
+
+    </label>
+
+    <div
+        id="transferModeDescription"
+        class="small text-muted">
+
+        Move the existing asset to another location.
+
+    </div>
+
+</div>
+
+<div id="newAssetIdGroup" class="d-none">
+
+    <label class="form-label">
+        New Asset ID
+    </label>
+
+    <input
+        id="newAssetId"
+        class="form-control">
 
 </div>
 
@@ -3196,25 +3246,77 @@ function saveAssetTransfer(oldAssetId) {
 
   const oldAsset = assets.find((a) => a.id === oldAssetId);
 
-  const newAssetId = document.getElementById('transferAssetId').value.trim();
+  const oldLocation = oldAsset.location;
 
   const newLocation = document.getElementById('transferLocation').value;
 
   const remarks = document.getElementById('transferRemarks').value;
 
-  if (!newAssetId) {
-    alert('Enter new Asset ID');
+  const keepSameAssetId = document.getElementById('keepSameAssetId').checked;
+
+  const newAssetId = keepSameAssetId
+    ? oldAsset.id
+    : document.getElementById('newAssetId')?.value.trim();
+
+  if (!keepSameAssetId) {
+    if (!newAssetId) {
+      alert('Enter new Asset ID');
+      return;
+    }
+
+    const existingAsset = assets.find((a) => a.id === newAssetId);
+
+    if (existingAsset) {
+      alert('Asset ID already exists.');
+      return;
+    }
+  }
+
+  // ==================================================
+  // Keep Same Asset ID
+  // ==================================================
+
+  if (keepSameAssetId) {
+    oldAsset.location = newLocation;
+
+    addAssetTransfer({
+      id: Date.now(),
+      oldAssetId: oldAsset.id,
+      newAssetId: oldAsset.id,
+      fromLocation: oldLocation,
+      toLocation: newLocation,
+      remarks,
+      transferDate: formatDateTime(),
+      transferMode: 'KeepSameAssetId',
+    });
+
+    addAssetHistory(oldAsset.id, 'Location Changed', `${oldLocation} → ${newLocation}`);
+
+    addActivity(`${oldAsset.name} moved from ${oldLocation} to ${newLocation}`);
+
+    saveAssets(assets);
+
+    alert('Asset location updated successfully.');
+
+    const transferModal = document.querySelector('.modal.show');
+
+    if (transferModal) {
+      transferModal.remove();
+    }
+
+    document.querySelectorAll('.modal-backdrop').forEach((b) => b.remove());
+
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('padding-right');
+
+    loadAssets();
 
     return;
   }
 
-  const existingAsset = assets.find((a) => a.id === newAssetId);
-
-  if (existingAsset) {
-    alert('Asset ID already exists.');
-
-    return;
-  }
+  // ==================================================
+  // Existing Transfer Logic
+  // ==================================================
 
   const newAsset = {
     ...oldAsset,
@@ -3253,13 +3355,15 @@ function saveAssetTransfer(oldAssetId) {
 
     newAssetId,
 
-    fromLocation: oldAsset.location,
+    fromLocation: oldLocation,
 
     toLocation: newLocation,
 
     remarks,
 
     transferDate: formatDateTime(),
+
+    transferMode: 'NewAssetId',
   });
 
   addActivity(
