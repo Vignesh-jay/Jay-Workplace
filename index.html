@@ -68,7 +68,27 @@
       <!-- Main Area -->
       <main class="main-content">
         <header class="topbar">
-          <input type="text" placeholder="Search..." class="search-box" />
+          <div class="position-relative search-wrapper">
+            <div class="search-box">
+              <i class="bi bi-search search-icon"></i>
+
+              <input
+                id="globalSearchInput"
+                class="form-control"
+                type="search"
+                placeholder="Search Assets, Employees, Locations..."
+                autocomplete="off"
+              />
+
+              <span class="search-shortcut"> ⌘K </span>
+
+              <button id="clearSearchBtn" class="search-clear d-none" onclick="clearGlobalSearch()">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+
+            <div id="globalSearchResults" class="global-search-results d-none"></div>
+          </div>
 
           <div class="user-profile">
             <div class="avatar">A</div>
@@ -114,6 +134,8 @@
     <script src="js/assignments.js"></script>
     <script src="js/reports.js"></script>
     <script src="js/administration.js"></script>
+
+    <script src="js/search.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
