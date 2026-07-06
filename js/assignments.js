@@ -472,7 +472,7 @@ function previewAssignmentAsset() {
             <strong>${asset.status}</strong>
 
             <div>Serial</div>
-            <strong>${asset.serialNumber || '-'}</strong>
+            <strong>${asset.specifications?.serialNumber || '-'}</strong>
 
         </div>
 

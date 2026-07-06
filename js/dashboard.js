@@ -239,7 +239,7 @@ function loadDashboard() {
               expiringAssets
                 .map((asset) => {
                   const daysLeft = Math.ceil(
-                    (new Date(asset.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24)
+                    (new Date(asset.purchase?.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24)
                   );
 
                   const badgeClass =
@@ -250,7 +250,7 @@ function loadDashboard() {
                     <div class="mb-3">
 
                         <strong>
-                            ${asset.name} - ${asset.serialNumber}
+                            ${asset.name} - ${asset.specifications?.serialNumber || '-'}
                         </strong>
 
                         <br>
@@ -272,7 +272,7 @@ function loadDashboard() {
                 </p>`
             }
 
-        </div>       
+        </div>
     </div>
 </div>
 

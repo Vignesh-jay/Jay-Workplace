@@ -36,11 +36,11 @@ function getExpiringAssets(days = 90) {
   const today = new Date();
 
   return assets.filter((asset) => {
-    if (!asset.warrantyExpiry) {
+    if (!asset.purchase?.warrantyExpiry) {
       return false;
     }
 
-    const expiryDate = new Date(asset.warrantyExpiry);
+    const expiryDate = new Date(asset.purchase?.warrantyExpiry);
 
     const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
 

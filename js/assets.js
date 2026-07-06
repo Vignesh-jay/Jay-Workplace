@@ -1,79 +1,864 @@
 let assetFilter = 'all';
 
+const SPEC_OPTIONS = {
+  // =========================
+  // Brands
+  // =========================
+  manufacturers: {
+    Laptop: ['Dell', 'HP', 'Lenovo', 'Apple', 'Acer', 'ASUS', 'MSI'],
+
+    Desktop: ['Dell', 'HP', 'Lenovo', 'Apple', 'Acer', 'ASUS'],
+
+    Monitor: ['Dell', 'LG', 'Samsung', 'BenQ', 'Acer', 'ViewSonic'],
+
+    Mobile: ['Samsung', 'Apple', 'Google', 'Motorola', 'OnePlus', 'Nothing'],
+
+    Printer: ['HP', 'Canon', 'Brother', 'Epson', 'Xerox'],
+
+    Server: ['Dell', 'HP Enterprise', 'Lenovo', 'Supermicro'],
+
+    Network: ['Cisco', 'Fortinet', 'Juniper', 'Aruba', 'TP-Link', 'Ubiquiti'],
+  },
+
+  // =========================
+  // Processor
+  // =========================
+  processors: {
+    Laptop: [
+      'Intel Core i3',
+      'Intel Core i5',
+      'Intel Core i7',
+      'Intel Core Ultra 5',
+      'Intel Core Ultra 7',
+      'AMD Ryzen 5',
+      'AMD Ryzen 7',
+      'Apple M1',
+      'Apple M2',
+      'Apple M3',
+      'Apple M4',
+    ],
+
+    Desktop: [
+      'Intel Core i3',
+      'Intel Core i5',
+      'Intel Core i7',
+      'Intel Core i9',
+      'AMD Ryzen 5',
+      'AMD Ryzen 7',
+      'AMD Ryzen 9',
+    ],
+
+    Mobile: ['Snapdragon', 'Exynos', 'Apple Silicon', 'Google Tensor', 'MediaTek Dimensity'],
+
+    Server: ['Intel Xeon Silver', 'Intel Xeon Gold', 'AMD EPYC'],
+  },
+
+  // =========================
+  // Memory
+  // =========================
+  ram: {
+    Laptop: ['8 GB', '16 GB', '24 GB', '32 GB', '64 GB'],
+
+    Desktop: ['8 GB', '16 GB', '32 GB', '64 GB', '128 GB'],
+
+    Server: ['32 GB', '64 GB', '128 GB', '256 GB', '512 GB'],
+    Mobile: ['4 GB', '6 GB', '8 GB', '12 GB', '16 GB'],
+  },
+
+  // =========================
+  // Storage
+  // =========================
+  storage: {
+    Laptop: ['256 GB SSD', '512 GB SSD', '1 TB SSD'],
+
+    Desktop: ['512 GB SSD', '1 TB SSD', '2 TB SSD', '1 TB HDD'],
+
+    Server: ['1 TB SSD', '2 TB SSD', '4 TB SSD'],
+    Mobile: ['32 GB', '64 GB', '128 GB', '256 GB', '512 GB', '1 TB'],
+  },
+
+  // =========================
+  // Operating System
+  // =========================
+  os: {
+    Laptop: ['Windows 11 Pro', 'Windows 11 Home', 'Ubuntu 24.04 LTS', 'macOS Sequoia'],
+
+    Desktop: ['Windows 11 Pro', 'Ubuntu 24.04 LTS'],
+
+    Server: [
+      'Windows Server',
+      'Ubuntu Server',
+      'Red Hat Enterprise Linux',
+      'VMware ESXi',
+      'Proxmox VE',
+    ],
+
+    Network: ['Cisco IOS', 'FortiOS', 'JunOS', 'ArubaOS'],
+
+    Printer: ['Embedded'],
+    Mobile: ['Android', 'iOS', 'Others'],
+  },
+  screenSizes: ['19"', '21.5"', '22"', '23.8"', '24"', '27"', '32"'],
+
+  resolutions: ['HD', 'Full HD', '2K', '4K'],
+
+  printerTypes: ['Laser', 'Inkjet', 'Thermal', 'Dot Matrix'],
+
+  connectivity: ['USB', 'LAN', 'WiFi', 'USB + LAN', 'USB + WiFi', 'USB + LAN + WiFi'],
+
+  deviceTypes: ['Switch', 'Router', 'Firewall', 'Access Point'],
+
+  refreshRates: ['60 Hz', '75 Hz', '100 Hz', '120 Hz', '144 Hz', '165 Hz', '240 Hz'],
+
+  batteryCapacity: ['3000 mAh', '4000 mAh', '5000 mAh', '6000 mAh'],
+
+  displaySizes: ['5.5"', '6.1"', '6.5"', '6.7"', '7.0"'],
+
+  printerTechnology: ['Laser', 'Inkjet', 'Thermal', 'Dot Matrix'],
+
+  colorModes: ['Monochrome', 'Colour'],
+
+  duplexModes: ['Manual', 'Automatic'],
+
+  raidLevels: ['RAID 0', 'RAID 1', 'RAID 5', 'RAID 6', 'RAID 10'],
+
+  networkSpeeds: ['100 Mbps', '1 Gbps', '2.5 Gbps', '10 Gbps', '40 Gbps', '100 Gbps'],
+
+  displayInputs: ['HDMI', 'DisplayPort', 'VGA', 'DVI', 'USB-C', 'Thunderbolt'],
+
+  networkPorts: ['4', '8', '16', '24', '48'],
+
+  networkInterfaces: ['2 x 1GbE', '4 x 1GbE', '2 x 10GbE', '4 x 10GbE'],
+};
+
+const SPEC_FIELDS = {
+  // =========================
+  // Common
+  // =========================
+
+  manufacturer: {
+    key: 'manufacturer',
+    label: 'Manufacturer',
+    type: 'select',
+    optionType: 'manufacturers',
+  },
+
+  model: {
+    key: 'model',
+    label: 'Model',
+  },
+
+  serialNumber: {
+    key: 'serialNumber',
+    label: 'Serial Number',
+  },
+
+  // =========================
+  // Computer Specs
+  // =========================
+
+  processor: {
+    key: 'processor',
+    label: 'Processor',
+    type: 'select',
+    optionType: 'processors',
+  },
+
+  ram: {
+    key: 'ram',
+    label: 'Memory (RAM)',
+    type: 'select',
+    optionType: 'ram',
+  },
+
+  storage: {
+    key: 'storage',
+    label: 'Storage',
+    type: 'select',
+    optionType: 'storage',
+  },
+
+  operatingSystem: {
+    key: 'operatingSystem',
+    label: 'Operating System',
+    type: 'select',
+    optionType: 'os',
+  },
+
+  // =========================
+  // Monitor
+  // =========================
+
+  screenSize: {
+    key: 'screenSize',
+    label: 'Screen Size',
+    type: 'select',
+    options: SPEC_OPTIONS.screenSizes,
+  },
+
+  resolution: {
+    key: 'resolution',
+    label: 'Resolution',
+    type: 'select',
+    options: SPEC_OPTIONS.resolutions,
+  },
+  refreshRate: {
+    key: 'refreshRate',
+    label: 'Refresh Rate',
+    type: 'select',
+    options: SPEC_OPTIONS.refreshRates,
+  },
+
+  displayInput: {
+    key: 'displayInput',
+    label: 'Display Input',
+    type: 'select',
+    options: SPEC_OPTIONS.displayInputs,
+  },
+
+  // =========================
+  // Mobile
+  // =========================
+
+  imei1: {
+    key: 'imei1',
+    label: 'IMEI 1',
+  },
+
+  imei2: {
+    key: 'imei2',
+    label: 'IMEI 2',
+  },
+  battery: {
+    key: 'battery',
+    label: 'Battery',
+    type: 'select',
+    options: SPEC_OPTIONS.batteryCapacity,
+  },
+
+  display: {
+    key: 'display',
+    label: 'Display Size',
+    type: 'select',
+    options: SPEC_OPTIONS.displaySizes,
+  },
+
+  // =========================
+  // Printer
+  // =========================
+
+  printerType: {
+    key: 'printerType',
+    label: 'Printer Type',
+    type: 'select',
+    options: SPEC_OPTIONS.printerTypes,
+  },
+
+  connectivity: {
+    key: 'connectivity',
+    label: 'Connectivity',
+    type: 'select',
+    options: SPEC_OPTIONS.connectivity,
+  },
+  technology: {
+    key: 'technology',
+    label: 'Technology',
+    type: 'select',
+    options: SPEC_OPTIONS.printerTechnology,
+  },
+
+  colorMode: {
+    key: 'colorMode',
+    label: 'Print Mode',
+    type: 'select',
+    options: SPEC_OPTIONS.colorModes,
+  },
+
+  duplex: {
+    key: 'duplex',
+    label: 'Duplex Printing',
+    type: 'select',
+    options: SPEC_OPTIONS.duplexModes,
+  },
+
+  // =========================
+  // Server
+  // =========================
+
+  raid: {
+    key: 'raid',
+    label: 'RAID',
+    type: 'select',
+    options: SPEC_OPTIONS.raidLevels,
+  },
+
+  network: {
+    key: 'network',
+    label: 'Network Adapter',
+    type: 'select',
+    options: SPEC_OPTIONS.networkInterfaces,
+  },
+
+  // =========================
+  // Network
+  // =========================
+
+  deviceType: {
+    key: 'deviceType',
+    label: 'Device Type',
+    type: 'select',
+    options: SPEC_OPTIONS.deviceTypes,
+  },
+
+  networkPorts: {
+    key: 'networkPorts',
+    label: 'RJ45 Ports',
+    type: 'select',
+    options: SPEC_OPTIONS.networkPorts,
+  },
+
+  managementIP: {
+    key: 'managementIP',
+    label: 'Management IP',
+  },
+  speed: {
+    key: 'speed',
+    label: 'Speed',
+    type: 'select',
+    options: SPEC_OPTIONS.networkSpeeds,
+  },
+
+  macAddress: {
+    key: 'macAddress',
+    label: 'MAC Address',
+  },
+
+  firmware: {
+    key: 'firmware',
+    label: 'Firmware Version',
+  },
+};
+
+const PURCHASE_FIELDS = {
+  invoiceNumber: {
+    key: 'invoiceNumber',
+    label: 'Invoice Number',
+  },
+
+  poNumber: {
+    key: 'poNumber',
+    label: 'Purchase Order Number',
+  },
+
+  vendor: {
+    key: 'vendor',
+    label: 'Vendor',
+  },
+
+  purchasePrice: {
+    key: 'purchasePrice',
+    label: 'Purchase Price (₹)',
+    type: 'number',
+  },
+
+  purchaseDate: {
+    key: 'purchaseDate',
+    label: 'Purchase Date',
+    type: 'date',
+  },
+
+  warrantyExpiry: {
+    key: 'warrantyExpiry',
+    label: 'Warranty Expiry',
+    type: 'date',
+  },
+
+  warrantyType: {
+    key: 'warrantyType',
+    label: 'Warranty Type',
+    type: 'select',
+    options: ['Manufacturer Warranty', 'Extended Warranty', 'AMC', 'No Warranty'],
+  },
+
+  remarks: {
+    key: 'remarks',
+    label: 'Remarks',
+    type: 'textarea',
+  },
+};
+
 const AssetSpecifications = {
   Laptop: [
-    { key: 'manufacturer', label: 'Manufacturer' },
-    { key: 'model', label: 'Model' },
-    { key: 'processor', label: 'Processor' },
-    { key: 'ram', label: 'Memory (RAM)' },
-    { key: 'storage', label: 'Storage' },
-    { key: 'graphics', label: 'Graphics' },
-    { key: 'display', label: 'Display' },
-    { key: 'operatingSystem', label: 'Operating System' },
+    SPEC_FIELDS.manufacturer,
+    SPEC_FIELDS.model,
+    SPEC_FIELDS.serialNumber,
+    SPEC_FIELDS.processor,
+    SPEC_FIELDS.ram,
+    SPEC_FIELDS.storage,
+    SPEC_FIELDS.operatingSystem,
   ],
 
   Desktop: [
-    { key: 'manufacturer', label: 'Manufacturer' },
-    { key: 'model', label: 'Model' },
-    { key: 'processor', label: 'Processor' },
-    { key: 'ram', label: 'Memory (RAM)' },
-    { key: 'storage', label: 'Storage' },
-    { key: 'graphics', label: 'Graphics' },
-    { key: 'motherboard', label: 'Motherboard' },
-    { key: 'operatingSystem', label: 'Operating System' },
+    SPEC_FIELDS.manufacturer,
+    SPEC_FIELDS.model,
+    SPEC_FIELDS.serialNumber,
+    SPEC_FIELDS.processor,
+    SPEC_FIELDS.ram,
+    SPEC_FIELDS.storage,
+    SPEC_FIELDS.operatingSystem,
   ],
 
   Monitor: [
-    { key: 'manufacturer', label: 'Manufacturer' },
-    { key: 'model', label: 'Model' },
-    { key: 'screenSize', label: 'Screen Size' },
-    { key: 'resolution', label: 'Resolution' },
-    { key: 'refreshRate', label: 'Refresh Rate' },
-    { key: 'panelType', label: 'Panel Type' },
-    { key: 'ports', label: 'Ports' },
+    SPEC_FIELDS.manufacturer,
+    SPEC_FIELDS.model,
+    SPEC_FIELDS.serialNumber,
+    SPEC_FIELDS.screenSize,
+    SPEC_FIELDS.resolution,
+    SPEC_FIELDS.refreshRate,
+    SPEC_FIELDS.displayInput,
   ],
 
   Mobile: [
-    { key: 'manufacturer', label: 'Manufacturer' },
-    { key: 'model', label: 'Model' },
-    { key: 'processor', label: 'Processor' },
-    { key: 'ram', label: 'Memory (RAM)' },
-    { key: 'storage', label: 'Storage' },
-    { key: 'battery', label: 'Battery' },
-    { key: 'display', label: 'Display' },
-    { key: 'imei1', label: 'IMEI 1' },
-    { key: 'imei2', label: 'IMEI 2' },
+    SPEC_FIELDS.manufacturer,
+    SPEC_FIELDS.model,
+    SPEC_FIELDS.serialNumber,
+    SPEC_FIELDS.processor,
+    SPEC_FIELDS.ram,
+    SPEC_FIELDS.storage,
+    SPEC_FIELDS.operatingSystem,
+    SPEC_FIELDS.battery,
+    SPEC_FIELDS.display,
+    SPEC_FIELDS.imei1,
+    SPEC_FIELDS.imei2,
   ],
 
   Printer: [
-    { key: 'manufacturer', label: 'Manufacturer' },
-    { key: 'model', label: 'Model' },
-    { key: 'technology', label: 'Technology' },
-    { key: 'colorMode', label: 'Color / Mono' },
-    { key: 'connectivity', label: 'Connectivity' },
-    { key: 'duplex', label: 'Duplex' },
+    SPEC_FIELDS.manufacturer,
+    SPEC_FIELDS.model,
+    SPEC_FIELDS.serialNumber,
+    SPEC_FIELDS.technology,
+    SPEC_FIELDS.colorMode,
+    SPEC_FIELDS.connectivity,
+    SPEC_FIELDS.duplex,
   ],
 
   Server: [
-    { key: 'manufacturer', label: 'Manufacturer' },
-    { key: 'model', label: 'Model' },
-    { key: 'processor', label: 'Processor' },
-    { key: 'ram', label: 'Memory' },
-    { key: 'storage', label: 'Storage' },
-    { key: 'raid', label: 'RAID' },
-    { key: 'network', label: 'Network Ports' },
+    SPEC_FIELDS.manufacturer,
+    SPEC_FIELDS.model,
+    SPEC_FIELDS.serialNumber,
+    SPEC_FIELDS.processor,
+    SPEC_FIELDS.ram,
+    SPEC_FIELDS.storage,
+    SPEC_FIELDS.raid,
+    SPEC_FIELDS.network,
+    SPEC_FIELDS.operatingSystem,
   ],
 
   Network: [
-    { key: 'manufacturer', label: 'Manufacturer' },
-    { key: 'model', label: 'Model' },
-    { key: 'deviceType', label: 'Device Type' },
-    { key: 'ports', label: 'Ports' },
-    { key: 'speed', label: 'Speed' },
-    { key: 'macAddress', label: 'MAC Address' },
-    { key: 'firmware', label: 'Firmware Version' },
+    SPEC_FIELDS.manufacturer,
+    SPEC_FIELDS.model,
+    SPEC_FIELDS.serialNumber,
+    SPEC_FIELDS.deviceType,
+    SPEC_FIELDS.networkPorts,
+    SPEC_FIELDS.speed,
+    SPEC_FIELDS.macAddress,
+    SPEC_FIELDS.firmware,
   ],
 };
+
+const PURCHASE_LAYOUT = [
+  PURCHASE_FIELDS.invoiceNumber,
+  PURCHASE_FIELDS.poNumber,
+  PURCHASE_FIELDS.vendor,
+  PURCHASE_FIELDS.purchasePrice,
+  PURCHASE_FIELDS.purchaseDate,
+  PURCHASE_FIELDS.warrantyExpiry,
+  PURCHASE_FIELDS.warrantyType,
+  PURCHASE_FIELDS.remarks,
+];
+
+function renderPurchaseFields(containerId) {
+  const container = document.getElementById(containerId);
+
+  if (!container) return;
+
+  let html = '';
+
+  PURCHASE_LAYOUT.forEach((field) => {
+    switch (field.type) {
+      case 'select':
+        html += `
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            ${field.label}
+                        </label>
+
+                        <select
+                            id="${field.key}"
+                            class="form-select">
+
+                            ${field.options
+                              .map(
+                                (option) => `
+                                <option value="${option}">
+                                    ${option}
+                                </option>
+                            `
+                              )
+                              .join('')}
+
+                        </select>
+
+                    </div>
+                `;
+
+        break;
+
+      case 'date':
+        html += `
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            ${field.label}
+                        </label>
+
+                        <input
+                            type="date"
+                            id="${field.key}"
+                            class="form-control">
+
+                    </div>
+                `;
+
+        break;
+
+      case 'number':
+        html += `
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            ${field.label}
+                        </label>
+
+                        <input
+                            type="number"
+                            id="${field.key}"
+                            class="form-control">
+
+                    </div>
+                `;
+
+        break;
+
+      case 'textarea':
+        html += `
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            ${field.label}
+                        </label>
+
+                        <textarea
+                            id="${field.key}"
+                            rows="3"
+                            class="form-control"></textarea>
+
+                    </div>
+                `;
+
+        break;
+
+      default:
+        html += `
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            ${field.label}
+                        </label>
+
+                        <input
+                            id="${field.key}"
+                            class="form-control">
+
+                    </div>
+                `;
+    }
+  });
+
+  container.innerHTML = html;
+}
+
+function renderAssetReview() {
+  const container = document.getElementById('assetReviewContainer');
+
+  if (!container) return;
+
+  const assetId = document.getElementById('assetId')?.value || '-';
+
+  const assetName = document.getElementById('assetName')?.value || '-';
+
+  const category = document.getElementById('assetCategory')?.value || '-';
+
+  const specs = AssetSpecifications[category] || [];
+
+  let specificationRows = '';
+
+  let purchaseRows = '';
+
+  specs.forEach((field) => {
+    const value = document.getElementById(`addSpec_${field.key}`)?.value || '-';
+
+    specificationRows += `
+
+        <tr>
+
+            <th width="35%">
+
+                ${field.label}
+
+            </th>
+
+            <td>
+
+                ${value}
+
+            </td>
+
+        </tr>
+
+    `;
+  });
+
+  PURCHASE_LAYOUT.forEach((field) => {
+    const value = document.getElementById(field.key)?.value || '-';
+
+    purchaseRows += `
+
+        <tr>
+
+            <th width="35%">
+
+                ${field.label}
+
+            </th>
+
+            <td>
+
+                ${value}
+
+            </td>
+
+        </tr>
+
+    `;
+  });
+
+  const location = document.getElementById('assetLocation')?.value || '-';
+
+  container.innerHTML = `
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h5 class="mb-4">
+
+                    <i class="fas fa-check-circle text-success me-2"></i>
+
+                    Review Asset
+
+                </h5>
+
+                <div class="card-header bg-primary text-white">
+
+                    <i class="fas fa-folder-open me-2"></i>
+
+                    Basic Information
+
+                </div>
+
+                <table class="table table-bordered">
+
+                    <tr>
+
+                        <th width="35%">
+                            Asset ID
+                        </th>
+
+                        <td>${assetId}</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>
+                            Asset Name
+                        </th>
+
+                        <td>${assetName}</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>
+                            Category
+                        </th>
+
+                        <td>${category}</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>
+                            Location
+                        </th>
+
+                        <td>${location}</td>
+
+                    </tr>
+
+                </table>
+
+                <h5 class="mt-4">
+
+                    <div class="card-header bg-primary text-white">
+
+                        <i class="fas fa-microchip text-white me-2"></i>
+
+                        Technical Specifications
+
+                    </div>
+
+                </h5>
+
+                <table class="table table-bordered">
+
+                    ${specificationRows}
+
+                </table>
+
+                <h5 class="mt-4">
+
+                    <div class="card-header bg-primary text-white">
+
+                        <i class="fas fa-file-invoice-dollar text-white me-2"></i>
+
+                        Purchase Details
+
+                    </div>
+
+                </h5>
+
+                <table class="table table-bordered">
+
+                    ${purchaseRows}
+
+                </table>
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+function renderEditAssetReview() {
+  const container = document.getElementById('EditAssetReviewContainer');
+
+  if (!container) return;
+
+  const assetId = document.getElementById('editAssetId')?.value || '-';
+
+  const assetName = document.getElementById('editAssetName')?.value || '-';
+
+  const category = document.getElementById('editAssetCategory')?.value || '-';
+
+  const location = document.getElementById('editAssetLocation')?.value || '-';
+
+  const specs = getSpecificationTemplate(category);
+
+  let specificationRows = '';
+
+  specs.forEach((field) => {
+    const value = document.getElementById(`editSpec_${field.key}`)?.value || '-';
+
+    specificationRows += `
+            <tr>
+                <th width="35%">${field.label}</th>
+                <td>${value}</td>
+            </tr>
+        `;
+  });
+
+  let purchaseRows = '';
+
+  PURCHASE_LAYOUT.forEach((field) => {
+    const value = document.getElementById(field.key)?.value || '-';
+
+    purchaseRows += `
+            <tr>
+                <th width="35%">${field.label}</th>
+                <td>${value}</td>
+            </tr>
+        `;
+  });
+
+  container.innerHTML = `
+
+<div class="card">
+
+    <div class="card-body">
+
+        <h5 class="mb-4">
+            <i class="fas fa-check-circle text-success me-2"></i>
+            Review Changes
+        </h5>
+
+        <div class="card-header bg-primary text-white">
+            Basic Information
+        </div>
+
+        <table class="table table-bordered">
+
+            <tr><th>Asset ID</th><td>${assetId}</td></tr>
+
+            <tr><th>Asset Name</th><td>${assetName}</td></tr>
+
+            <tr><th>Category</th><td>${category}</td></tr>
+
+            <tr><th>Location</th><td>${location}</td></tr>
+
+        </table>
+
+        <div class="card-header bg-primary text-white mt-3">
+            Technical Specifications
+        </div>
+
+        <table class="table table-bordered">
+
+            ${specificationRows}
+
+        </table>
+
+        <div class="card-header bg-primary text-white mt-3">
+            Purchase Details
+        </div>
+
+        <table class="table table-bordered">
+
+            ${purchaseRows}
+
+        </table>
+
+    </div>
+
+</div>
+
+`;
+}
 
 function getSpecificationTemplate(category) {
   return AssetSpecifications[category] || [];
@@ -83,8 +868,41 @@ function buildSpecificationFields(category, values = {}, prefix = 'spec') {
   const specs = getSpecificationTemplate(category);
 
   return specs
-    .map(
-      (field) => `
+    .map((field) => {
+      if (field.type === 'select') {
+        const options = field.optionType
+          ? SPEC_OPTIONS[field.optionType]?.[category] || []
+          : field.options || [];
+        return `
+            <div class="mb-3">
+
+                <label class="form-label">
+                    ${field.label}
+                </label>
+
+                <select
+                    class="form-select"
+                    id="${prefix}_${field.key}">
+
+                    ${options
+                      .map(
+                        (option) => `
+                        <option
+                            value="${option}"
+                            ${values[field.key] === option ? 'selected' : ''}>
+                            ${option}
+                        </option>
+                    `
+                      )
+                      .join('')}
+
+                </select>
+
+            </div>
+        `;
+      }
+
+      return `
 
         <div class="mb-3">
 
@@ -101,10 +919,9 @@ function buildSpecificationFields(category, values = {}, prefix = 'spec') {
                 value="${values[field.key] || ''}"
             >
 
-        </div>
-
-    `
-    )
+                </div>
+    `;
+    })
     .join('');
 }
 
@@ -162,6 +979,75 @@ function buildSpecificationCard(asset) {
         </div>
 
     `;
+}
+
+function validateCurrentStep() {
+  switch (ASSET_WIZARD.currentStep) {
+    case 1:
+      return validateStep1();
+
+    case 2:
+      return validateStep2();
+
+    case 3:
+      return validateStep3();
+
+    default:
+      return true;
+  }
+}
+
+function validateStep1() {
+  const required = ['assetId', 'assetName', 'assetCategory', 'assetLocation'];
+
+  return validateRequiredFields(required);
+}
+
+function validateStep2() {
+  const category = document.getElementById('assetCategory')?.value;
+
+  if (!category) return false;
+
+  const requiredFields = AssetSpecifications[category].map((field) => `addSpec_${field.key}`);
+
+  return validateRequiredFields(requiredFields);
+}
+
+function validateStep3() {
+  return validateRequiredFields(['vendor', 'purchaseDate']);
+}
+
+function validateRequiredFields(fields) {
+  let valid = true;
+
+  fields.forEach((id) => {
+    const field = document.getElementById(id);
+
+    if (!field) return;
+
+    const value = field.value.trim();
+
+    if (!value) {
+      field.classList.add('is-invalid');
+
+      // Focus the first invalid field
+      if (valid) {
+        field.focus();
+      }
+
+      // Remove the red border when user starts typing
+      field.addEventListener('input', () => field.classList.remove('is-invalid'), { once: true });
+
+      // Also works for dropdowns
+      field.addEventListener('change', () => field.classList.remove('is-invalid'), { once: true });
+
+      valid = false;
+    } else {
+      field.classList.remove('is-invalid');
+    }
+  });
+
+  return valid;
 }
 
 function loadAssets() {
@@ -350,7 +1236,7 @@ function loadAssets() {
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
-            
+
         </thead>
 
         <tbody>
@@ -383,9 +1269,9 @@ function loadAssets() {
                             </div>
 
                             ${
-                              asset.serialNumber
+                              asset.specifications?.serialNumber
                                 ? `<div class="asset-meta">
-                                        S/N : ${asset.serialNumber}
+                                        S/N : ${asset.specifications?.serialNumber}
                                     </div>`
                                 : ''
                             }
@@ -416,10 +1302,10 @@ function loadAssets() {
 
                     <td>
                         ${
-                          asset.warrantyExpiry
+                          asset.purchase?.warrantyExpiry
                             ? (() => {
                                 const days = Math.ceil(
-                                  (new Date(asset.warrantyExpiry) - new Date()) /
+                                  (new Date(asset.purchase?.warrantyExpiry) - new Date()) /
                                     (1000 * 60 * 60 * 24)
                                 );
 
@@ -469,7 +1355,7 @@ function loadAssets() {
                             <button
                                 class="btn btn-light btn-sm asset-action-btn"
                                 title="Edit"
-                                onclick="editAsset('${asset.id}')">
+                                onclick="showEditAssetModal('${asset.id}')">
 
                                 <i class="fas fa-pen"></i>
 
@@ -522,19 +1408,21 @@ function setAssetFilter(filter) {
   loadAssets();
 }
 
-function showAddAssetModal() {
+function removeExistingAssetModal() {
   const existingModal = document.getElementById('addAssetModal');
 
   if (existingModal) {
     existingModal.remove();
   }
+}
 
-  const modalHtml = `
+function buildAddAssetModal() {
+  return `
     <div class="modal fade"
          id="addAssetModal"
          tabindex="-1">
 
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
 
             <div class="modal-content">
 
@@ -552,123 +1440,155 @@ function showAddAssetModal() {
 
                 <div class="modal-body">
 
-                    <div class="mb-3">
-                        <label>Asset ID</label>
+                <!-- Wizard Progress -->
+                    <div class="mb-4">
 
-                        <input
-                            id="assetId"
-                            class="form-control">
-                    </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
 
-                    <div class="mb-3">
-                        <label>Asset Name</label>
+                            <span
+                                id="wizardStepBadge"
+                                class="badge bg-primary">
+                                Step 1 of 4
+                            </span>
 
-                        <input
-                            id="assetName"
-                            class="form-control">
-                    </div>
+                            <small
+                                id="wizardStepTitle"
+                                class="text-muted">
+                                Basic Information
+                            </small>
 
-                    <div class="mb-3">
+                        </div>
 
-                        <label class="form-label">
+                        <div class="progress" style="height: 6px;">
 
-                            Category
+                            <div
+                                id="assetWizardProgress"
+                                class="progress-bar"
+                                style="width:25%">
+                            </div>
 
-                        </label>
-
-                        <select
-                        id="assetCategory"
-                        class="form-select"
-                        onchange="
-                            renderSpecificationFields(
-                                'assetCategory',
-                                'technicalFieldsContainer',
-                                {},
-                                'addSpec'
-                            )
-                        ">
-
-                            <option>Laptop</option>
-                            <option>Desktop</option>
-                            <option>Monitor</option>
-                            <option>Mobile</option>
-                            <option>Printer</option>
-                            <option>Server</option>
-                            <option>Network</option>
-
-                        </select>
+                        </div>
 
                     </div>
 
-                    <hr>
+                    <!-- ========================= -->
+                    <!-- STEP 1 : Basic Information -->
+                    <!-- ========================= -->
+                    <div id="wizard-step-1">
+                        <div class="mb-3">
+                            <label>Asset ID</label>
 
-                    <h6 class="fw-bold mb-3">
+                            <input
+                                id="assetId"
+                                class="form-control">
+                        </div>
 
-                        <i class="fas fa-microchip me-2 text-primary"></i>
+                        <div class="mb-3">
+                            <label>Asset Name</label>
 
-                        Specifications
+                            <input
+                                id="assetName"
+                                class="form-control">
+                        </div>
 
-                    </h6>
+                        <div class="mb-3">
 
-                    <div id="technicalFieldsContainer">
+                            <label class="form-label">
+
+                                Category
+
+                            </label>
+
+                            <select
+                            id="assetCategory"
+                            class="form-select"
+                            onchange="
+                                renderSpecificationFields(
+                                    'assetCategory',
+                                    'technicalFieldsContainer',
+                                    {},
+                                    'addSpec'
+                                )
+                            ">
+
+                                <option>Laptop</option>
+                                <option>Desktop</option>
+                                <option>Monitor</option>
+                                <option>Mobile</option>
+                                <option>Printer</option>
+                                <option>Server</option>
+                                <option>Network</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Location</label>
+
+                            <select
+                                id="assetLocation"
+                                class="form-control">
+
+                                ${getLocations()
+                                  .map(
+                                    (location) => `
+                                    <option value="${location.name}">
+                                        ${location.name}
+                                    </option>
+                                `
+                                  )
+                                  .join('')}
+
+                            </select>
+
+                        </div>
 
                     </div>
 
-                    <div class="mb-3">
+                    <!-- ================================ -->
+                    <!-- STEP 2 : Technical Specifications -->
+                    <!-- ================================ -->
+                    <div id="wizard-step-2" class="d-none">
+                        <h6 class="fw-bold mb-3">
 
-                        <label>Location</label>
+                            <i class="fas fa-microchip me-2 text-primary"></i>
 
-                        <select
-                            id="assetLocation"
-                            class="form-control">
+                            Specifications
 
-                            ${getLocations()
-                              .map(
-                                (location) => `
-                                <option value="${location.name}">
-                                    ${location.name}
-                                </option>
-                            `
-                              )
-                              .join('')}
+                        </h6>
 
-                        </select>
+                        <div id="technicalFieldsContainer">
+
+                        </div>
+                    </div>
+
+                    <!-- ========================= -->
+                    <!-- STEP 3 : Purchase Details -->
+                    <!-- ========================= -->
+                    <div id="wizard-step-3" class="d-none">
+
+                        <div id="purchaseFieldsContainer"></div>
 
                     </div>
 
-                    <div class="mb-3">
-                        <label>Serial Number</label>
-                        <input
-                            id="assetSerial"
-                            class="form-control">
-                    </div>
+                    <!-- ====================== -->
+                    <!-- STEP 4 : Review & Save -->
+                    <!-- ====================== -->
+                    <div id="wizard-step-4" class="d-none">
 
-                    <div class="mb-3">
-                        <label>Vendor</label>
-                        <input
-                            id="assetVendor"
-                            class="form-control">
-                    </div>
+                        <div class="alert alert-info">
 
-                    <div class="mb-3">
-                        <label>Purchase Date</label>
-                        <input
-                            type="date"
-                            id="purchaseDate"
-                            class="form-control">
-                    </div>
+                            <div id="assetReviewContainer"></div>
 
-                    <div class="mb-3">
-                        <label>Warranty Expiry</label>
-                        <input
-                            type="date"
-                            id="warrantyExpiry"
-                            class="form-control">
+                        </div>
+
                     </div>
 
                 </div>
 
-                <div class="modal-footer">
+                <div class="modal-footer justify-content-between">
 
                     <button
                         class="btn btn-secondary"
@@ -676,11 +1596,29 @@ function showAddAssetModal() {
                         Cancel
                     </button>
 
-                    <button
-                        class="btn btn-primary"
-                        onclick="saveAsset()">
-                        Save Asset
-                    </button>
+                    <div>
+
+                        <button
+                            id="wizardPreviousBtn"
+                            class="btn btn-outline-secondary"
+                            disabled>
+                            Previous
+                        </button>
+
+                        <button
+                            id="wizardNextBtn"
+                            class="btn btn-primary">
+                            Next
+                        </button>
+
+                        <button
+                            id="wizardSaveBtn"
+                            class="btn btn-success d-none"
+                            onclick="saveAsset()">
+                            Save Asset
+                        </button>
+
+                    </div>
 
                 </div>
 
@@ -690,13 +1628,418 @@ function showAddAssetModal() {
 
     </div>
     `;
+}
+
+function buildEditAssetModal(asset) {
+  return `
+    <div class="modal fade"
+         id="editAssetModal"
+         tabindex="-1">
+
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Edit Asset
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                <!-- Wizard Progress -->
+                    <div class="mb-4">
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+
+                            <span
+                                id="editWizardStepBadge"
+                                class="badge bg-primary">
+                                Step 1 of 4
+                            </span>
+
+                            <small
+                                id="editWizardStepTitle"
+                                class="text-muted">
+                                Basic Information
+                            </small>
+
+                        </div>
+
+                        <div class="progress" style="height: 6px;">
+
+                            <div
+                                id="editAssetWizardProgress"
+                                class="progress-bar"
+                                style="width:25%">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ========================= -->
+                    <!-- STEP 1 : Basic Information -->
+                    <!-- ========================= -->
+                    <div id="editWizard-step-1">
+                        <div class="mb-3">
+                            <label>Asset ID</label>
+
+                            <input
+                                id="editAssetId"
+                                class="form-control"
+                                readonly
+                                value="${asset.id}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Asset Name</label>
+
+                            <input
+                                id="editAssetName"
+                                class="form-control"
+                                value="${asset.name}">
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Category
+
+                            </label>
+
+                            <select
+                            id="editAssetCategory"
+                            class="form-select"
+                            onchange="
+                                renderSpecificationFields(
+                                    'editAssetCategory',
+                                    'editTechnicalFieldsContainer',
+                                    {},
+                                    'editSpec'
+                                )
+                            ">
+
+                                <option>Laptop</option>
+                                <option>Desktop</option>
+                                <option>Monitor</option>
+                                <option>Mobile</option>
+                                <option>Printer</option>
+                                <option>Server</option>
+                                <option>Network</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Location</label>
+
+                            <select
+                                id="editAssetLocation"
+                                class="form-control">
+
+                                ${getLocations()
+                                  .map(
+                                    (location) => `
+                                    <option value="${location.name}">
+                                        ${location.name}
+                                    </option>
+                                `
+                                  )
+                                  .join('')}
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ================================ -->
+                    <!-- STEP 2 : Technical Specifications -->
+                    <!-- ================================ -->
+                    <div id="editWizard-step-2" class="d-none">
+                        <h6 class="fw-bold mb-3">
+
+                            <i class="fas fa-microchip me-2 text-primary"></i>
+
+                            Specifications
+
+                        </h6>
+
+                        <div id="editTechnicalFieldsContainer">
+
+                        </div>
+                    </div>
+
+                    <!-- ========================= -->
+                    <!-- STEP 3 : Purchase Details -->
+                    <!-- ========================= -->
+                    <div id="editWizard-step-3" class="d-none">
+
+                        <div id="editPurchaseFieldsContainer"></div>
+
+                    </div>
+
+                    <!-- ====================== -->
+                    <!-- STEP 4 : Review & Save -->
+                    <!-- ====================== -->
+                    <div id="editWizard-step-4" class="d-none">
+
+                        <div class="alert alert-info">
+
+                            <div id="EditAssetReviewContainer"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer justify-content-between">
+
+                    <button
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <div>
+
+                        <button
+                            id="editWizardPreviousBtn"
+                            class="btn btn-outline-secondary"
+                            disabled>
+                            Previous
+                        </button>
+
+                        <button
+                            id="editWizardNextBtn"
+                            class="btn btn-primary">
+                            Next
+                        </button>
+
+                        <button
+                            id="editWizardSaveBtn"
+                            class="btn btn-success d-none"
+                            onclick="updateAsset('${asset.id}')">
+                            Update Asset
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    `;
+}
+
+function initializeAddAssetModal(modalElement) {
+  document.getElementById('wizardNextBtn').addEventListener('click', nextWizardStep);
+
+  document.getElementById('wizardPreviousBtn').addEventListener('click', previousWizardStep);
+}
+
+const ASSET_WIZARD = {
+  currentStep: 1,
+  totalSteps: 4,
+  stepTitles: [
+    'Basic Information',
+    'Technical Specifications',
+    'Purchase Details',
+    'Review & Save',
+  ],
+};
+
+let editWizardStep = 1;
+
+const EDIT_WIZARD_TITLES = {
+  1: 'Basic Information',
+  2: 'Technical Specifications',
+  3: 'Purchase Details',
+  4: 'Review & Update',
+};
+
+function showWizardStep(step) {
+  for (let i = 1; i <= ASSET_WIZARD.totalSteps; i++) {
+    const section = document.getElementById(`wizard-step-${i}`);
+
+    if (!section) continue;
+
+    section.classList.toggle('d-none', i !== step);
+  }
+}
+
+function nextWizardStep() {
+  if (!validateCurrentStep()) {
+    alert('Please complete all required fields.');
+
+    return;
+  }
+  if (ASSET_WIZARD.currentStep >= ASSET_WIZARD.totalSteps) return;
+
+  ASSET_WIZARD.currentStep++;
+
+  showWizardStep(ASSET_WIZARD.currentStep);
+
+  if (ASSET_WIZARD.currentStep === 4) {
+    renderAssetReview();
+  }
+
+  updateWizardUI();
+}
+
+function previousWizardStep() {
+  if (ASSET_WIZARD.currentStep <= 1) return;
+
+  ASSET_WIZARD.currentStep--;
+
+  showWizardStep(ASSET_WIZARD.currentStep);
+
+  updateWizardUI();
+}
+
+function updateWizardUI() {
+  const previousBtn = document.getElementById('wizardPreviousBtn');
+  const nextBtn = document.getElementById('wizardNextBtn');
+  const saveBtn = document.getElementById('wizardSaveBtn');
+  const stepBadge = document.getElementById('wizardStepBadge');
+  const stepTitle = document.getElementById('wizardStepTitle');
+  const progress = document.getElementById('assetWizardProgress');
+
+  const percent = (ASSET_WIZARD.currentStep / ASSET_WIZARD.totalSteps) * 100;
+
+  progress.style.width = `${percent}%`;
+
+  stepBadge.textContent = `Step ${ASSET_WIZARD.currentStep} of ${ASSET_WIZARD.totalSteps}`;
+
+  stepTitle.textContent = ASSET_WIZARD.stepTitles[ASSET_WIZARD.currentStep - 1];
+
+  previousBtn.disabled = ASSET_WIZARD.currentStep === 1;
+
+  nextBtn.classList.toggle('d-none', ASSET_WIZARD.currentStep === ASSET_WIZARD.totalSteps);
+
+  saveBtn.classList.toggle('d-none', ASSET_WIZARD.currentStep !== ASSET_WIZARD.totalSteps);
+}
+
+function showAddAssetModal() {
+  removeExistingAssetModal();
+
+  const modalHtml = buildAddAssetModal();
 
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-  const modal = new bootstrap.Modal(document.getElementById('addAssetModal'));
+  const modalElement = document.getElementById('addAssetModal');
+
+  const modal = new bootstrap.Modal(modalElement);
+
+  initializeAddAssetModal(modalElement);
 
   modal.show();
+
+  ASSET_WIZARD.currentStep = 1;
+
+  showWizardStep(ASSET_WIZARD.currentStep);
+  updateWizardUI();
+
   renderSpecificationFields('assetCategory', 'technicalFieldsContainer', {}, 'addSpec');
+  renderPurchaseFields('purchaseFieldsContainer');
+}
+
+function showEditAssetModal(assetId) {
+  const asset = getAssets().find((a) => a.id === assetId);
+
+  if (!asset) {
+    alert('Asset not found.');
+    return;
+  }
+  const existingModal = document.getElementById('editAssetModal');
+
+  if (existingModal) {
+    existingModal.remove();
+  }
+  const modalHtml = buildEditAssetModal(asset);
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+  const modalElement = document.getElementById('editAssetModal');
+  document.getElementById('editAssetCategory').value = asset.category;
+  document.getElementById('editAssetLocation').value = asset.location;
+  renderSpecificationFields(
+    'editAssetCategory',
+    'editTechnicalFieldsContainer',
+    asset.specifications || {},
+    'editSpec'
+  );
+  renderPurchaseFields('editPurchaseFieldsContainer', 'editPurchase');
+  // Populate purchase details
+  if (asset.purchase) {
+    PURCHASE_LAYOUT.forEach((field) => {
+      const input = document.getElementById(field.key);
+
+      if (input) {
+        input.value = asset.purchase[field.key] || '';
+      }
+    });
+  }
+  document.getElementById('editWizardPreviousBtn').onclick = () => {
+    if (editWizardStep > 1) {
+      editWizardStep--;
+
+      updateEditWizard();
+    }
+  };
+  document.getElementById('editWizardNextBtn').onclick = () => {
+    if (editWizardStep < 4) {
+      editWizardStep++;
+
+      if (editWizardStep === 4) {
+        renderEditAssetReview();
+      }
+
+      updateEditWizard();
+    }
+  };
+  editWizardStep = 1;
+
+  updateEditWizard();
+
+  const modal = new bootstrap.Modal(document.getElementById('editAssetModal'));
+
+  modal.show();
+}
+
+function updateEditWizard() {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`editWizard-step-${i}`).classList.add('d-none');
+  }
+
+  document.getElementById(`editWizard-step-${editWizardStep}`).classList.remove('d-none');
+
+  document.getElementById('editWizardStepBadge').textContent = `Step ${editWizardStep} of 4`;
+
+  document.getElementById('editWizardStepTitle').textContent = EDIT_WIZARD_TITLES[editWizardStep];
+
+  document.getElementById('editAssetWizardProgress').style.width = `${editWizardStep * 25}%`;
+
+  document.getElementById('editWizardPreviousBtn').disabled = editWizardStep === 1;
+
+  document.getElementById('editWizardNextBtn').classList.toggle('d-none', editWizardStep === 4);
+
+  document.getElementById('editWizardSaveBtn').classList.toggle('d-none', editWizardStep !== 4);
 }
 
 function saveAsset() {
@@ -708,14 +2051,6 @@ function saveAsset() {
     category: document.getElementById('assetCategory').value,
 
     location: document.getElementById('assetLocation').value,
-
-    serialNumber: document.getElementById('assetSerial').value.trim(),
-
-    vendor: document.getElementById('assetVendor').value.trim(),
-
-    purchaseDate: document.getElementById('purchaseDate').value,
-
-    warrantyExpiry: document.getElementById('warrantyExpiry').value,
 
     status: 'Available',
 
@@ -740,6 +2075,20 @@ function saveAsset() {
 
   asset.specifications = specifications;
 
+  if (!asset.specifications) {
+    asset.specifications = {};
+  }
+
+  asset.specifications.serialNumber = document.getElementById('addSpec_serialNumber').value.trim();
+
+  const purchase = {};
+
+  PURCHASE_LAYOUT.forEach((field) => {
+    purchase[field.key] = document.getElementById(field.key)?.value.trim() || '';
+  });
+
+  asset.purchase = purchase;
+
   if (!asset.id || !asset.name) {
     alert('Asset ID and Asset Name are required.');
 
@@ -751,6 +2100,49 @@ function saveAsset() {
   addAssetHistory(asset.id, 'Added to Inventory', `${asset.name} added to inventory`);
 
   bootstrap.Modal.getInstance(document.getElementById('addAssetModal')).hide();
+
+  loadAssets();
+}
+
+function updateAsset(assetId) {
+  const assets = getAssets();
+
+  const asset = assets.find((a) => a.id === assetId);
+
+  if (!asset) {
+    alert('Asset not found.');
+    return;
+  }
+
+  // Basic Information
+  asset.name = document.getElementById('editAssetName').value.trim();
+  asset.category = document.getElementById('editAssetCategory').value;
+  asset.location = document.getElementById('editAssetLocation').value;
+
+  // Specifications
+  asset.specifications = {};
+
+  getSpecificationTemplate(asset.category).forEach((field) => {
+    asset.specifications[field.key] = document.getElementById(`editSpec_${field.key}`)?.value || '';
+  });
+
+  // Purchase Details
+  asset.purchase = {};
+
+  PURCHASE_LAYOUT.forEach((field) => {
+    const input = document.getElementById(field.key);
+
+    asset.purchase[field.key] = input ? input.value : '';
+  });
+
+  // Save
+  saveAssets(assets);
+
+  addActivity(`${asset.name} updated`);
+
+  addAssetHistory(asset.id, 'Updated', `${asset.name} information updated`);
+
+  bootstrap.Modal.getInstance(document.getElementById('editAssetModal')).hide();
 
   loadAssets();
 }
@@ -817,12 +2209,12 @@ function viewAsset(assetId) {
 
   const totalAssignments = history.filter((h) => h.action === 'Assigned').length;
 
-  const warrantyDaysRemaining = asset.warrantyExpiry
-    ? Math.ceil((new Date(asset.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24))
+  const warrantyDaysRemaining = asset.purchase?.warrantyExpiry
+    ? Math.ceil((new Date(asset.purchase.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24))
     : null;
 
-  const assetAgeDays = asset.purchaseDate
-    ? Math.ceil((new Date() - new Date(asset.purchaseDate)) / (1000 * 60 * 60 * 24))
+  const assetAgeDays = asset.purchase?.purchaseDate
+    ? Math.ceil((new Date() - new Date(asset.purchase.purchaseDate)) / (1000 * 60 * 60 * 24))
     : null;
 
   const currentAssignment = getAssignments().find(
@@ -1023,7 +2415,7 @@ function viewAsset(assetId) {
                     <strong>${asset.category}</strong>
 
                     <div>Serial Number</div>
-                    <strong>${asset.serialNumber || '-'}</strong>
+                    <strong>${asset.specifications?.serialNumber || '-'}</strong>
 
                     <div>Location</div>
                     <strong>${asset.location || '-'}</strong>
@@ -1043,13 +2435,13 @@ function viewAsset(assetId) {
                 <div class="info-grid">
 
                     <div>Vendor</div>
-                    <strong>${asset.vendor || '-'}</strong>
+                    <strong>${asset.purchase?.vendor || '-'}</strong>
 
                     <div>Purchase Date</div>
-                    <strong>${asset.purchaseDate || '-'}</strong>
+                    <strong>${asset.purchase?.purchaseDate || '-'}</strong>
 
                     <div>Warranty Expiry</div>
-                    <strong>${asset.warrantyExpiry || '-'}</strong>
+                    <strong>${asset.purchase?.warrantyExpiry || '-'}</strong>
 
                     <div>Current Holder</div>
                     <strong>
@@ -1459,8 +2851,9 @@ function buildTimeline(history, asset) {
 
                 <small class="text-muted">
 
-                    Date : ${asset.purchaseDate || 'Unknown Date'}<br>
-                    Warranty Expiry : ${asset.warrantyExpiry || 'Unknown Warranty Expiry'}
+                    Date : ${asset.purchase?.purchaseDate || 'Unknown Date'}<br>
+
+                    Warranty Expiry : ${asset.purchase?.warrantyExpiry || 'Unknown Warranty Expiry'}
 
                 </small>
 
@@ -1493,320 +2886,6 @@ function filterAssets() {
   });
 }
 
-function editAsset(assetId) {
-  const existingModal = document.getElementById('editAssetModal');
-
-  if (existingModal) {
-    existingModal.remove();
-  }
-
-  const assets = getAssets();
-
-  const asset = assets.find((a) => a.id === assetId);
-
-  if (asset.status === 'Transferred') {
-    alert('Transferred assets cannot be edited.');
-
-    return;
-  }
-
-  if (!asset) {
-    return;
-  }
-
-  if (asset.status === 'Transferred') {
-    alert('Transferred assets cannot be edited.');
-
-    return;
-  }
-
-  const activeAssignment = getAssignments().find(
-    (a) => a.assetId === asset.id && a.status === 'Assigned'
-  );
-
-  const isAssigned = !!activeAssignment;
-
-  const modalHtml = `
-
-    ${
-      isAssigned
-        ? `
-
-    <div class="modal-body">
-
-        This asset is currently assigned to
-        ${activeAssignment.employeeName}.
-
-        Return the asset before changing
-        status, location, retiring or
-        transferring.
-
-    </div>
-
-    `
-        : ''
-    }
-
-    <input
-        type="hidden"
-        id="editAssetId"
-        value="${asset.id}">
-
-    <div class="modal fade"
-         id="editAssetModal"
-         tabindex="-1">
-
-        <div class="modal-dialog">
-
-            <div class="modal-content">
-
-                <div class="modal-header">
-
-                    <h5 class="modal-title">
-                        Edit Asset
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
-
-                <div class="modal-body">
-
-                    <input
-                        type="hidden"
-                        id="editAssetId"
-                        value="${asset.id}">
-
-                    <div class="mb-3">
-
-                        <label>Asset ID</label>
-
-                        <input
-                            class="form-control"
-                            value="${asset.id}"
-                            readonly>
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label>Asset Name</label>
-
-                        <input
-                            id="editAssetName"
-                            class="form-control"
-                            value="${asset.name}">
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label>Category</label>
-
-                        <select
-                            id="editAssetCategory"
-                            class="form-select"
-                            onchange="
-                            renderSpecificationFields(
-                                'editAssetCategory',
-                                'editTechnicalFieldsContainer',
-                                asset.specifications || {},
-                                'editSpec'
-                            )
-                            ">
-
-                            <option ${asset.category == 'Laptop' ? 'selected' : ''}>Laptop</option>
-                            <option ${asset.category == 'Desktop' ? 'selected' : ''}>Desktop</option>
-                            <option ${asset.category == 'Monitor' ? 'selected' : ''}>Monitor</option>
-                            <option ${asset.category == 'Mobile' ? 'selected' : ''}>Mobile</option>
-                            <option ${asset.category == 'Printer' ? 'selected' : ''}>Printer</option>
-                            <option ${asset.category == 'Server' ? 'selected' : ''}>Server</option>
-                            <option ${asset.category == 'Network' ? 'selected' : ''}>Network</option>
-
-                        </select>
-
-                    </div>
-
-                    <hr>
-
-                    <h6 class="fw-bold mb-3">
-
-                        <i class="fas fa-microchip me-2 text-primary"></i>
-
-                        Specifications
-
-                    </h6>
-
-                    <div id="editTechnicalFieldsContainer">
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label>Location</label>
-
-                        <input
-                            class="form-control"
-                            value="${asset.location || ''}"
-                            readonly>
-
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Serial Number</label>
-                        <input
-                            id="editAssetSerial"
-                            class="form-control"
-                            value="${asset.serialNumber || ''}">
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Vendor</label>
-                        <input
-                            id="editAssetVendor"
-                            class="form-control"
-                            value="${asset.vendor || ''}">
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Purchase Date</label>
-                        <input
-                            type="date"
-                            id="editAssetPurchaseDate"
-                            class="form-control"
-                            value="${asset.purchaseDate || ''}">
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Warranty Expiry</label>
-                        <input
-                            type="date"
-                            id="editAssetWarrantyExpiry"
-                            class="form-control"
-                            value="${asset.warrantyExpiry || ''}">
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label>Status</label>
-
-                        <select
-                            id="editAssetStatus"
-                            class="form-control"
-                            ${isAssigned ? 'disabled' : ''}
-                            onchange="toggleRetirementReason()">
-
-                            <option ${asset.status === 'Available' ? 'selected' : ''}>
-                                Available
-                            </option>
-
-                            <option ${asset.status === 'Maintenance' ? 'selected' : ''}>
-                                Maintenance
-                            </option>
-
-                            <option ${asset.status === 'Retired' ? 'selected' : ''}>
-                                Retired
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                <div
-                        class="mb-3"
-                        id="retirementReasonContainer"
-                        style="
-                            display:
-                            ${asset.status === 'Retired' ? 'block' : 'none'};
-                        "
-                    >
-
-                        <label>
-                            Retirement Reason
-                        </label>
-
-                        <select
-                            id="retirementReason"
-                            class="form-control">
-
-                            <option
-                                ${asset.retirementReason === 'End of Life' ? 'selected' : ''}
-                            >
-                                End of Life
-                            </option>
-
-                            <option
-                                ${asset.retirementReason === 'Hardware Failure' ? 'selected' : ''}
-                            >
-                                Hardware Failure
-                            </option>
-
-                            <option
-                                ${asset.retirementReason === 'Lost' ? 'selected' : ''}
-                            >
-                                Lost
-                            </option>
-
-                            <option
-                                ${asset.retirementReason === 'Stolen' ? 'selected' : ''}
-                            >
-                                Stolen
-                            </option>
-
-                            <option
-                                ${asset.retirementReason === 'Disposed' ? 'selected' : ''}
-                            >
-                                Disposed
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-
-                    <button
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">
-
-                        Cancel
-
-                    </button>
-
-                    <button
-                        class="btn btn-primary"
-                        onclick="saveAssetEdit()">
-
-                        Save Changes
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-    `;
-
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-  new bootstrap.Modal(document.getElementById('editAssetModal')).show();
-  renderSpecificationFields(
-    'editAssetCategory',
-    'editTechnicalFieldsContainer',
-    asset.specifications || {},
-    'editSpec'
-  );
-}
-
 function saveAssetEdit() {
   const assetId = document.getElementById('editAssetId').value;
 
@@ -1827,13 +2906,20 @@ function saveAssetEdit() {
   asset.category = document.getElementById('editAssetCategory').value;
 
   asset.status = document.getElementById('editAssetStatus').value;
-  asset.serialNumber = document.getElementById('editAssetSerial').value;
+  asset.specifications = asset.specifications || {};
 
-  asset.vendor = document.getElementById('editAssetVendor').value;
+  asset.specifications.serialNumber = document.getElementById('editAssetSerial').value;
+  asset.purchase = asset.purchase || {};
 
-  asset.purchaseDate = document.getElementById('editAssetPurchaseDate').value;
+  asset.purchase.vendor = document.getElementById('editAssetVendor').value;
 
-  asset.warrantyExpiry = document.getElementById('editAssetWarrantyExpiry').value;
+  asset.purchase = asset.purchase || {};
+
+  asset.purchase.purchaseDate = document.getElementById('editAssetPurchaseDate').value;
+
+  asset.purchase ??= {};
+
+  asset.purchase.warrantyExpiry = document.getElementById('editAssetWarrantyExpiry').value;
 
   const specifications = {};
 
@@ -1843,6 +2929,11 @@ function saveAssetEdit() {
   });
 
   asset.specifications = specifications;
+  if (!asset.specifications) {
+    asset.specifications = {};
+  }
+
+  asset.specifications.serialNumber = document.getElementById('editAssetSerial').value.trim();
 
   if (asset.status === 'Retired') {
     asset.retirementReason = document.getElementById('retirementReason').value;
@@ -1879,19 +2970,30 @@ function saveAssetEdit() {
   if (oldAsset.category !== asset.category)
     changes.push(`Category: ${oldAsset.category} → ${asset.category}`);
 
-  if (oldAsset.serialNumber !== asset.serialNumber)
-    changes.push(`Serial Number: ${oldAsset.serialNumber || '-'} → ${asset.serialNumber || '-'}`);
-
-  if (oldAsset.vendor !== asset.vendor)
-    changes.push(`Vendor: ${oldAsset.vendor || '-'} → ${asset.vendor || '-'}`);
-
-  if (oldAsset.purchaseDate !== asset.purchaseDate)
-    changes.push(`Purchase Date: ${oldAsset.purchaseDate || '-'} → ${asset.purchaseDate || '-'}`);
-
-  if (oldAsset.warrantyExpiry !== asset.warrantyExpiry)
+  if (oldAsset.specifications?.serialNumber !== asset.specifications?.serialNumber)
     changes.push(
-      `Warranty Expiry: ${oldAsset.warrantyExpiry || '-'} → ${asset.warrantyExpiry || '-'}`
+      `Serial Number: ${oldAsset.specifications?.serialNumber || '-'} → ${
+        asset.specifications?.serialNumber || '-'
+      }`
     );
+
+  if (oldAsset.purchase?.vendor !== asset.purchase?.vendor)
+    changes.push(`Vendor: ${oldAsset.purchase?.vendor || '-'} → ${asset.purchase?.vendor || '-'}`);
+
+  if (oldAsset.purchase?.warrantyExpiry !== asset.purchase?.warrantyExpiry)
+    changes.push(
+      `Warranty Expiry: ${oldAsset.purchase?.warrantyExpiry || '-'} → ${
+        asset.purchase?.warrantyExpiry || '-'
+      }`
+    );
+
+  if (oldAsset.purchase?.warrantyExpiry !== asset.purchase?.warrantyExpiry) {
+    changes.push(
+      `Warranty Expiry: ${oldAsset.purchase?.warrantyExpiry || '-'} → ${
+        asset.purchase?.warrantyExpiry || '-'
+      }`
+    );
+  }
 
   if (oldAsset.status !== asset.status)
     changes.push(`Status: ${oldAsset.status} → ${asset.status}`);
@@ -1930,7 +3032,7 @@ function showAssetTransferModal(assetId) {
   if (activeAssignment) {
     alert(
       `Asset is currently assigned to ${activeAssignment.employeeName}.
-            
+
 Please return the asset before transferring.`
     );
 
