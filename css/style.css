@@ -856,11 +856,6 @@ body {
   flex-direction: column;
 }
 
-.text-bg-orange {
-  background: #fd7e14;
-  color: #fff;
-}
-
 .bg-orange {
   background-color: #fd7e14 !important;
   color: white !important;

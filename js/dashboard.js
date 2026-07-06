@@ -242,8 +242,19 @@ function loadDashboard() {
                     (new Date(asset.purchase?.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24)
                   );
 
-                  const badgeClass =
-                    daysLeft <= 30 ? 'bg-danger' : daysLeft <= 60 ? 'bg-warning' : 'bg-success';
+                  let badgeClass;
+
+                  if (daysLeft < 0) {
+                    badgeClass = 'bg-danger';
+                  } else if (daysLeft <= 30) {
+                    badgeClass = 'bg-orange';
+                  } else if (daysLeft <= 60) {
+                    badgeClass = 'bg-warning text-dark';
+                  } else if (daysLeft <= 90) {
+                    badgeClass = 'bg-info';
+                  } else {
+                    badgeClass = 'bg-success';
+                  }
 
                   return `
 
