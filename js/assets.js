@@ -1309,24 +1309,18 @@ function loadAssets() {
                                     (1000 * 60 * 60 * 24)
                                 );
 
-                                if (days < 0)
-                                  return `<span class="badge bg-danger">
-                                                    Expired
-                                                </span>`;
+                                if (days < 0) return `<span class="badge bg-danger">Expired</span>`;
 
                                 if (days <= 30)
-                                  return `<span class="badge bg-danger">
-                                                    ${days} Days
-                                                </span>`;
+                                  return `<span class="badge bg-orange">${days} Days</span>`;
+
+                                if (days <= 60)
+                                  return `<span class="badge bg-warning text-dark">${days} Days</span>`;
 
                                 if (days <= 90)
-                                  return `<span class="badge bg-warning">
-                                                    ${days} Days
-                                                </span>`;
+                                  return `<span class="badge bg-info">${days} Days</span>`;
 
-                                return `<span class="badge bg-success">
-                                                ${days} Days
-                                            </span>`;
+                                return `<span class="badge bg-success">${days} Days</span>`;
                               })()
                             : '-'
                         }
