@@ -47,3 +47,27 @@ function getExpiringAssets(days = 90) {
     return diffDays >= 0 && diffDays <= days;
   });
 }
+
+function getAssetById(assetId) {
+  const assets = getAssets();
+
+  return assets.find((asset) => asset.id === assetId);
+}
+
+function updateAsset(assetId, updatedAsset) {
+  const assets = getAssets();
+
+  const index = assets.findIndex((asset) => asset.id === assetId);
+
+  if (index === -1) {
+    return null;
+  }
+
+  assets[index] = updatedAsset;
+
+  saveAssets(assets);
+
+  addActivity(`${updatedAsset.name} updated`);
+
+  return updatedAsset;
+}
