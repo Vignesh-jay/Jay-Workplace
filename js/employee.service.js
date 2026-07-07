@@ -31,3 +31,27 @@ function addAssignmentHistory(assignmentId, action, details) {
 
   saveAssignmentHistory(history);
 }
+
+function getEmployeeById(employeeId) {
+  const employees = getEmployees();
+
+  return employees.find((employee) => employee.id === employeeId);
+}
+
+function updateEmployee(employeeId, updatedEmployee) {
+  const employees = getEmployees();
+
+  const index = employees.findIndex((employee) => employee.id === employeeId);
+
+  if (index === -1) {
+    return null;
+  }
+
+  employees[index] = updatedEmployee;
+
+  saveEmployees(employees);
+
+  addActivity(`${updatedEmployee.name} updated`);
+
+  return updatedEmployee;
+}
