@@ -1,11 +1,12 @@
-function loadDashboard() {
+async function loadDashboard() {
   const employees = getEmployees();
   const assets = getAssets();
+  const departments = await getDepartments();
 
   if (
     getEmployees().length === 0 &&
     getAssets().length === 0 &&
-    getDepartments().length === 0 &&
+    departments.length === 0 &&
     getLocations().length === 0
   ) {
     loadFirstRunScreen();

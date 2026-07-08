@@ -1,5 +1,7 @@
-function loadAdministration() {
+async function loadAdministration() {
   setActiveMenu('nav-administration');
+
+  const departments = await getDepartments();
 
   document.getElementById('content').innerHTML = `
 
@@ -56,7 +58,7 @@ function loadAdministration() {
 
                     </div>
 
-                    <h2>${getDepartments().length}</h2>
+                    <h2>${departments.length}</h2>
 
                 </div>
 
@@ -559,8 +561,6 @@ function exportBackup() {
 
     activities: getActivities(),
 
-    departments: getDepartments(),
-
     locations: getLocations(),
 
     auditLogs: getAuditLogs(),
@@ -619,8 +619,6 @@ function restoreBackup() {
       saveAssignments(backup.assignments || []);
 
       saveActivities(backup.activities || []);
-
-      saveDepartments(backup.departments || []);
 
       saveLocations(backup.locations || []);
 

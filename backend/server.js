@@ -14,13 +14,6 @@ const PORT = 3000;
 
 const prisma = require('./db');
 
-(async () => {
-  const departments = await prisma.department.findMany();
-
-  console.log('DATABASE CONTENTS:');
-  console.table(departments);
-})();
-
 app.listen(PORT, () => {
   console.log(
     `🚀 JAY Workplace Backend v2 - Disable/Enable API Loaded on http://localhost:${PORT}`

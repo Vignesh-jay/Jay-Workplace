@@ -57,14 +57,6 @@ const STORAGE_KEYS = {
   assignmentHistory: 'jay_assignment_history',
 };
 
-function getDepartments() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.departments)) || [];
-}
-
-function saveDepartments(departments) {
-  localStorage.setItem(STORAGE_KEYS.departments, JSON.stringify(departments));
-}
-
 function addAssetHistory(assetId, action, details) {
   const history = getAssetHistory();
 
