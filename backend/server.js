@@ -10,6 +10,10 @@ const departmentRoutes = require('./routes/departments');
 
 app.use('/departments', departmentRoutes);
 
+const locationRoutes = require('./routes/locations');
+
+app.use('/locations', locationRoutes);
+
 const PORT = 3000;
 
 const prisma = require('./db');

@@ -1,37 +1,25 @@
-const LOCATIONS_KEY = 'jayworkplace_locations';
+async function getLocations(status = 'active') {
+  const response = await apiGet(`/locations?status=${status}`);
 
-function getLocations() {
-  return JSON.parse(localStorage.getItem(LOCATIONS_KEY)) || [];
+  return response.data;
 }
 
-function saveLocations(locations) {
-  localStorage.setItem(LOCATIONS_KEY, JSON.stringify(locations));
+async function createLocation(location) {
+  return await apiPost('/locations', location);
 }
 
-function addLocation(location) {
-  const locations = getLocations();
-
-  locations.push(location);
-
-  saveLocations(locations);
+async function updateLocation(id, location) {
+  return await apiPut(`/locations/${id}`, location);
 }
 
-function updateLocation(updatedLocation) {
-  const locations = getLocations();
-
-  const index = locations.findIndex((l) => l.id === updatedLocation.id);
-
-  if (index !== -1) {
-    locations[index] = updatedLocation;
-  }
-
-  saveLocations(locations);
+async function disableLocation(id) {
+  return await apiPut(`/locations/${id}/disable`);
 }
 
-function deleteLocation(id) {
-  const locations = getLocations().filter((l) => l.id !== id);
-
-  saveLocations(locations);
+async function enableLocation(id) {
+  return await apiPut(`/locations/${id}/enable`);
 }
 
-getLocations();
+async function deleteLocation(id) {
+  return await apiDelete(`/locations/${id}`);
+}
