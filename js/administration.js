@@ -2,6 +2,7 @@ async function loadAdministration() {
   setActiveMenu('nav-administration');
 
   const departments = await getDepartments();
+  const locations = await getLocations();
 
   document.getElementById('content').innerHTML = `
 
@@ -84,7 +85,7 @@ async function loadAdministration() {
 
                     </div>
 
-                    <h2>${getLocations().length}</h2>
+                    <h2>${locations.length}</h2>
 
                 </div>
 
