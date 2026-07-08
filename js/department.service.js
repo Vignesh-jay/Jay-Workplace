@@ -1,5 +1,5 @@
-async function getDepartments() {
-  const response = await apiGet('/departments');
+async function getDepartments(status = 'active') {
+  const response = await apiGet(`/departments?status=${status}`);
 
   return response.data;
 }

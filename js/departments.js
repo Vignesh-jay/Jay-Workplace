@@ -31,9 +31,20 @@ async function loadDepartments() {
         style="width:180px;"
         onchange="changeDepartmentFilter(this.value)">
 
-        <option value="active">Active</option>
-        <option value="disabled">Disabled</option>
-        <option value="all">All</option>
+        <option value="active"
+            ${departmentFilter === 'active' ? 'selected' : ''}>
+            Active
+        </option>
+
+        <option value="disabled"
+            ${departmentFilter === 'disabled' ? 'selected' : ''}>
+            Disabled
+        </option>
+
+        <option value="all"
+            ${departmentFilter === 'all' ? 'selected' : ''}>
+            All
+        </option>
 
     </select>
 
