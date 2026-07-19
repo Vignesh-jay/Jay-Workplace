@@ -18,6 +18,10 @@ const employeeRoutes = require('./routes/employees');
 
 app.use('/employees', employeeRoutes);
 
+const activityRoutes = require('./routes/activities');
+
+app.use('/activities', activityRoutes);
+
 const PORT = 3000;
 
 const prisma = require('./db');

@@ -1,10 +1,10 @@
 async function loadDashboard() {
-  const employees = getEmployees();
+  const employees = await getEmployeesApi();
   const assets = getAssets();
   const departments = await getDepartments();
 
   if (
-    getEmployees().length === 0 &&
+    employees.length === 0 &&
     getAssets().length === 0 &&
     departments.length === 0 &&
     getLocations().length === 0
@@ -16,7 +16,7 @@ async function loadDashboard() {
 
   const expiringAssets = getExpiringAssets();
 
-  const employeeList = getEmployees();
+  const employeeList = employees;
   const assetList = getAssets();
 
   const totalEmployees = employeeList.length;
@@ -38,6 +38,8 @@ async function loadDashboard() {
   const retiredAssets = getAssets().filter((a) => a.status === 'Retired').length;
 
   const transferredAssets = getAssets().filter((a) => a.status === 'Transferred').length;
+
+  const activities = await getActivitiesApi();
 
   setActiveMenu('nav-dashboard');
 
@@ -191,7 +193,7 @@ async function loadDashboard() {
             <h5>Recent Activities</h5>
 
             <div class="timeline">
-                ${getActivities()
+                ${activities
                   .slice(0, 10)
 
                   .map(
@@ -289,7 +291,7 @@ async function loadDashboard() {
 </div>
 
 `;
-  renderCharts();
+  renderCharts(employeeList);
 }
 
 function loadWelcomeDashboard() {
@@ -456,9 +458,7 @@ function loadFirstRunScreen() {
     `;
 }
 
-function renderCharts() {
-  const employees = getEmployees();
-
+function renderCharts(employees) {
   const departmentCounts = {};
 
   employees.forEach((emp) => {

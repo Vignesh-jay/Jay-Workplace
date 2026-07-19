@@ -3,14 +3,13 @@ async function getEmployeesApi(status = '') {
 
   const response = await apiGet(url);
 
-  console.log('API Response:', response);
-  console.log('Returning:', response.data);
-
   return response.data;
 }
 
 async function createEmployeeApi(employee) {
-  return await apiPost('/employees', employee);
+  const response = await apiPost('/employees', employee);
+
+  return response.data;
 }
 
 async function updateEmployeeApi(id, employee) {

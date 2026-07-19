@@ -6,20 +6,12 @@ function initializeStore() {
   });
 }
 
-function getEmployees() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.employees)) || [];
-}
-
 function getAssets() {
   return JSON.parse(localStorage.getItem(STORAGE_KEYS.assets)) || [];
 }
 
 function getAssignments() {
   return JSON.parse(localStorage.getItem(STORAGE_KEYS.assignments)) || [];
-}
-
-function getActivities() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.activities)) || [];
 }
 
 function getAssetHistory() {
@@ -36,10 +28,6 @@ function saveEmployees(employeeList) {
 
 function saveAssignments(assignmentList) {
   localStorage.setItem(STORAGE_KEYS.assignments, JSON.stringify(assignmentList));
-}
-
-function saveActivities(activityList) {
-  localStorage.setItem(STORAGE_KEYS.activities, JSON.stringify(activityList));
 }
 
 function saveAssetHistory(history) {

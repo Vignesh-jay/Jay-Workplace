@@ -42,6 +42,7 @@ router.post('/', async (req, res) => {
       firstName,
       lastName,
       email,
+      phone,
       department,
       designation,
       manager,
@@ -57,6 +58,7 @@ router.post('/', async (req, res) => {
         firstName,
         lastName,
         email,
+        phone,
         department,
         designation,
         manager,
@@ -103,6 +105,7 @@ router.put('/:id', async (req, res) => {
       firstName,
       lastName,
       email,
+      phone,
       department,
       designation,
       manager,
@@ -120,6 +123,7 @@ router.put('/:id', async (req, res) => {
         firstName,
         lastName,
         email,
+        phone,
         department,
         designation,
         manager,
@@ -208,6 +212,61 @@ router.get('/:id', async (req, res) => {
     success: true,
     data: employee,
   });
+});
+
+router.get('/:id/history', async (req, res) => {
+  try {
+    const employeeId = Number(req.params.id);
+
+    const history = await prisma.employeeHistory.findMany({
+      where: {
+        employeeId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    res.json({
+      success: true,
+      data: history,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch employee history.',
+    });
+  }
+});
+
+router.post('/:id/history', async (req, res) => {
+  try {
+    const employeeId = Number(req.params.id);
+
+    const { action, details } = req.body;
+
+    const history = await prisma.employeeHistory.create({
+      data: {
+        employeeId,
+        action,
+        details,
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      data: history,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create employee history.',
+    });
+  }
 });
 
 module.exports = router;

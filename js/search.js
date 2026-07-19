@@ -2,7 +2,7 @@
 // JΛY Workplace - Global Search Engine
 // ======================================
 
-function globalSearch(query) {
+async function globalSearch(query) {
   query = query.trim().toLowerCase();
 
   if (!query) {
@@ -17,7 +17,7 @@ function globalSearch(query) {
   return {
     assets: searchAssets(query),
 
-    employees: searchEmployees(query),
+    employees: await searchEmployees(query),
 
     departments: searchDepartments(query),
 
@@ -104,8 +104,10 @@ function searchAssets(query) {
   });
 }
 
-function searchEmployees(query) {
-  return getEmployees().filter((employee) => {
+async function searchEmployees(query) {
+  const employees = await getEmployeesApi();
+
+  return employees.filter((employee) => {
     return [
       employee.employeeId,
 
@@ -114,6 +116,8 @@ function searchEmployees(query) {
       employee.lastName,
 
       employee.email,
+
+      employee.phone,
 
       employee.department,
 
@@ -150,10 +154,10 @@ document.addEventListener('DOMContentLoaded', () => {
   input.addEventListener('input', handleGlobalSearch);
 });
 
-function handleGlobalSearch(e) {
+async function handleGlobalSearch(e) {
   const query = e.target.value;
 
-  const results = globalSearch(query);
+  const results = await globalSearch(query);
 
   const shortcut = document.querySelector('.search-shortcut');
   const clearBtn = document.getElementById('clearSearchBtn');

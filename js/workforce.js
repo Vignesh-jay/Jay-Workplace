@@ -1,13 +1,8 @@
 async function loadWorkforce() {
   const employeeList = await getEmployeesApi();
 
-  console.log('Employee List:', employeeList);
-  console.log('Length:', employeeList.length);
-
   const raw = await fetch('http://localhost:3000/employees');
   const json = await raw.json();
-
-  console.log('Raw API:', json);
 
   const totalEmployees = employeeList.length;
 
@@ -421,6 +416,17 @@ async function showAddEmployeeModal() {
                     class="form-control">
 
             </div>
+            <div class="col-md-6">
+                <label class="form-label">
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    class="form-control"
+                    id="employeePhone"
+                    placeholder="+91 9876543210">
+            </div>
 
             <div class="col-md-6">
 
@@ -574,6 +580,8 @@ async function saveEmployee() {
 
     designation: document.getElementById('employeeDesignation').value.trim(),
 
+    phone: document.getElementById('employeePhone').value.trim(),
+
     manager: document.getElementById('employeeManager').value.trim(),
 
     joiningDate: document.getElementById('employeeJoiningDate').value,
@@ -616,9 +624,11 @@ async function saveEmployee() {
   }
 
   try {
-    await createEmployeeApi(employee);
+    const createdEmployee = await createEmployeeApi(employee);
 
-    addEmployeeHistory(employee.employeeId, 'Created', 'Employee onboarded');
+    await addEmployeeHistoryApi(createdEmployee.id, 'Created', 'Employee onboarded');
+
+    await addActivityApi(`Employee ${employee.firstName} ${employee.lastName} created`);
 
     alert(`Employee ${employee.firstName} ${employee.lastName} added successfully`);
 
@@ -651,9 +661,9 @@ async function deleteEmployeeUI(employeeId) {
 
   await deleteEmployeeApi(employeeId);
 
-  addEmployeeHistory(employeeId, 'Deleted', 'Employee removed');
+  await addEmployeeHistoryApi(employeeId, 'Deleted', 'Employee removed');
 
-  addActivity(`Employee with ID ${employeeId} deleted`);
+  await addActivityApi(`Employee with ID ${employeeId} deleted`);
 
   await loadWorkforce();
 }
@@ -668,7 +678,7 @@ function filterEmployees() {
   rows.forEach((row) => {
     const rowText = row.innerText.toLowerCase();
 
-    const locationCell = row.children[3]?.innerText || '';
+    const locationCell = row.children[2]?.innerText || '';
 
     const matchesSearch = rowText.includes(searchText);
 
@@ -778,6 +788,15 @@ async function editEmployee(employeeId) {
                                 id="editEmployeeDesignation"
                                 class="form-control"
                                 value="${employee.designation || ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Phone Number</label>
+
+                            <input
+                                id="editEmployeePhone"
+                                class="form-control"
+                                value="${employee.phone || ''}">
                         </div>
 
                         <div class="col-md-6">
@@ -939,6 +958,8 @@ async function saveEmployeeEdit() {
 
   employee.designation = document.getElementById('editEmployeeDesignation').value;
 
+  employee.phone = document.getElementById('editEmployeePhone').value.trim();
+
   employee.email = document.getElementById('editEmployeeEmail').value;
 
   employee.manager = document.getElementById('editEmployeeManager').value;
@@ -955,9 +976,7 @@ async function saveEmployeeEdit() {
 
   employee.status = document.getElementById('editEmployeeStatus').value;
 
-  employee.name = `${employee.firstName} ${employee.lastName}`;
-
-  addActivity(`Employee ${employee.firstName} ${employee.lastName} updated`);
+  await addActivityApi(`Employee ${employee.firstName} ${employee.lastName} updated`);
 
   const changes = [];
 
@@ -1022,14 +1041,16 @@ async function saveEmployeeEdit() {
       remarks: 'Location changed via Employee Edit',
     });
 
-    addActivity(`Employee ${employee.name} transferred from ${oldLocation} to ${newLocation}`);
+    await addActivityApi(
+      `Employee ${employee.name} transferred from ${oldLocation} to ${newLocation}`
+    );
 
-    addEmployeeHistory(employee.id, 'Transferred', `${oldLocation} → ${newLocation}`);
+    await addEmployeeHistoryApi(employee.id, 'Transferred', `${oldLocation} → ${newLocation}`);
   }
 
   await updateEmployeeApi(employee.id, employee);
 
-  addEmployeeHistory(
+  await addEmployeeHistoryApi(
     employee.id,
     'Updated',
     changes.length > 0 ? changes.join('<br>') : 'No changes detected'
@@ -1043,6 +1064,11 @@ async function saveEmployeeEdit() {
 async function viewEmployee(employeeId) {
   const employee = await getEmployeeApi(employeeId);
 
+  const departments = await getDepartments('active');
+  const departmentInfo = departments.find((d) => d.name === employee.department);
+
+  const departmentCode = departmentInfo?.code || employee.department;
+
   const assignments = getAssignments();
 
   if (!employee) {
@@ -1053,7 +1079,7 @@ async function viewEmployee(employeeId) {
     (item) => item.employeeId === employeeId && item.status === 'Assigned'
   );
 
-  const history = (getEmployeeHistory() || []).filter((item) => item.employeeId === employeeId);
+  const history = await getEmployeeHistoryApi(employeeId);
 
   const modalHtml = `
 
@@ -1087,7 +1113,7 @@ async function viewEmployee(employeeId) {
                     </h2>
 
                     <div class="text-muted fw-semibold">
-                        ${employee.id}
+                        ${employee.employeeId}
                         •
                         ${employee.designation}
                         •
@@ -1150,7 +1176,7 @@ async function viewEmployee(employeeId) {
 
                                 <small>Department</small>
 
-                                <h6>${employee.department}</h6>
+                                <h6>${departmentCode}</h6>
 
                             </div>
 
@@ -1249,7 +1275,7 @@ async function viewEmployee(employeeId) {
                                 <strong>${employee.employmentType}</strong>
 
                                 <div>Joined</div>
-                                <strong>${employee.joiningDate}</strong>
+                                <strong>${employee.joiningDate.substring(0, 10)}</strong>
 
                             </div>
 
@@ -1319,7 +1345,7 @@ async function viewEmployee(employeeId) {
 
                                         <small>
 
-                                            ${item.timestamp}
+                                            ${formatActivityDate(item.createdAt)}
 
                                         </small>
 
@@ -1450,7 +1476,7 @@ async function viewEmployee(employeeId) {
 
   new bootstrap.Modal(document.getElementById('employeeProfileModal')).show();
 
-  addActivity(`Viewed employee profile: ${employee.firstName} ${employee.lastName}`);
+  await addActivityApi(`Viewed employee profile: ${employee.firstName} ${employee.lastName}`);
 }
 
 function getTimelineColor(action) {
@@ -1469,4 +1495,14 @@ function getTimelineColor(action) {
 
 function getEmployeeName(employee) {
   return [employee.firstName, employee.lastName].join(' ');
+}
+
+function formatActivityDate(date) {
+  return new Date(date).toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }

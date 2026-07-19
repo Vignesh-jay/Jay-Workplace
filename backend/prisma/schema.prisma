@@ -35,28 +35,50 @@ model Location {
 }
 
 model Employee {
-  id               Int      @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
+  employeeId     String   @unique
+  firstName      String
+  lastName       String
+  email          String   @unique
+  phone          String?
 
-  employeeId       String   @unique
+  department     String
+  designation    String
+  manager        String?
 
-  firstName        String
-  lastName         String
+  location       String
 
-  email            String   @unique
+  employmentType String
 
-  department       String
-  designation      String
-  manager          String?
+  joiningDate    DateTime
+  leavingDate    DateTime?
 
-  location         String
+  status         String   @default("Active")
 
-  employmentType   String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  joiningDate      DateTime
-  leavingDate      DateTime?
+  history        EmployeeHistory[]
+}
 
-  status           String @default("Active")
+model EmployeeHistory {
+  id         Int      @id @default(autoincrement())
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  employeeId Int
+
+  action     String
+  details    String
+
+  createdAt  DateTime @default(now())
+
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+
+  id Int @id @default(autoincrement())
+
+  message String
+
+  timestamp DateTime @default(now())
 }
