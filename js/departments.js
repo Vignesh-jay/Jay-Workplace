@@ -295,7 +295,7 @@ async function disableDepartmentClick(id) {
   try {
     await disableDepartment(id);
 
-    addActivity('Department disabled');
+    await addActivity('Department disabled');
 
     await loadDepartments();
   } catch (error) {
@@ -461,7 +461,7 @@ async function enableDepartmentClick(id) {
   try {
     await enableDepartment(id);
 
-    addActivity('Department enabled');
+    await addActivity('Department enabled');
 
     await loadDepartments();
   } catch (error) {

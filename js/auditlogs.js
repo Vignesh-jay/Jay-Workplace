@@ -1,5 +1,5 @@
-function loadAuditLogs() {
-  const activities = getActivities();
+async function loadAuditLogs() {
+  const activities = await getActivitiesApi();
 
   setActiveMenu('nav-administration');
 

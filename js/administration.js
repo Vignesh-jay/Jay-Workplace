@@ -1,6 +1,7 @@
 async function loadAdministration() {
   setActiveMenu('nav-administration');
-
+  const employees = await getEmployeesApi();
+  const activities = await getActivitiesApi();
   const departments = await getDepartments();
   const locations = await getLocations();
 
@@ -33,7 +34,7 @@ async function loadAdministration() {
 
                     </div>
 
-                    <h2>${getEmployees().length}</h2>
+                    <h2>${employees.length}</h2>
 
                 </div>
 
@@ -552,15 +553,17 @@ function openDataManagement() {
   new bootstrap.Modal(document.getElementById('dataManagementModal')).show();
 }
 
-function exportBackup() {
+async function exportBackup() {
+  const employees = await getEmployeesApi();
+  const activities = await getActivitiesApi();
   const backup = {
-    employees: getEmployees(),
+    employees: employees,
 
     assets: getAssets(),
 
     assignments: getAssignments(),
 
-    activities: getActivities(),
+    activities: activities,
 
     locations: getLocations(),
 
