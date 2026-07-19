@@ -1,57 +1,27 @@
-function addEmployee(employee) {
-  const employees = getEmployees();
+async function getEmployeesApi(status = '') {
+  const url = status ? `/employees?status=${encodeURIComponent(status)}` : '/employees';
 
-  employees.push(employee);
+  const response = await apiGet(url);
 
-  saveEmployees(employees);
+  console.log('API Response:', response);
+  console.log('Returning:', response.data);
 
-  addActivity(`${employee.name} added to workforce`);
-
-  return employee;
+  return response.data;
 }
 
-function deleteEmployeeById(employeeId) {
-  const employees = getEmployees();
-
-  const updatedEmployees = employees.filter((employee) => employee.id !== employeeId);
-
-  saveEmployees(updatedEmployees);
+async function createEmployeeApi(employee) {
+  return await apiPost('/employees', employee);
 }
 
-function addAssignmentHistory(assignmentId, action, details) {
-  const history = getAssignmentHistory();
-
-  history.push({
-    assignmentId,
-    action,
-    details,
-
-    timestamp: formatDateTime(),
-  });
-
-  saveAssignmentHistory(history);
+async function updateEmployeeApi(id, employee) {
+  return await apiPut(`/employees/${id}`, employee);
 }
 
-function getEmployeeById(employeeId) {
-  const employees = getEmployees();
-
-  return employees.find((employee) => employee.id === employeeId);
+async function deleteEmployeeApi(id) {
+  return await apiDelete(`/employees/${id}`);
 }
 
-function updateEmployee(employeeId, updatedEmployee) {
-  const employees = getEmployees();
-
-  const index = employees.findIndex((employee) => employee.id === employeeId);
-
-  if (index === -1) {
-    return null;
-  }
-
-  employees[index] = updatedEmployee;
-
-  saveEmployees(employees);
-
-  addActivity(`${updatedEmployee.name} updated`);
-
-  return updatedEmployee;
+async function getEmployeeApi(id) {
+  const response = await apiGet(`/employees/${id}`);
+  return response.data;
 }

@@ -1,13 +1,23 @@
-function loadWorkforce() {
-  const employeeList = getEmployees();
+async function loadWorkforce() {
+  const employeeList = await getEmployeesApi();
+
+  console.log('Employee List:', employeeList);
+  console.log('Length:', employeeList.length);
+
+  const raw = await fetch('http://localhost:3000/employees');
+  const json = await raw.json();
+
+  console.log('Raw API:', json);
 
   const totalEmployees = employeeList.length;
 
   const activeEmployees = employeeList.filter((e) => e.status === 'Active').length;
 
-  const onLeaveEmployees = employeeList.filter((e) => e.status === 'On Leave').length;
+  const inactiveEmployees = employeeList.filter((e) => e.status === 'Inactive').length;
 
   const departments = [...new Set(employeeList.map((e) => e.department))].length;
+
+  const locations = await getLocations('active');
 
   setActiveMenu('nav-workforce');
 
@@ -83,10 +93,10 @@ function loadWorkforce() {
                 <div>
 
                     <small class="text-muted">
-                        On Leave
+                        Inactive
                     </small>
 
-                    <h2>${onLeaveEmployees}</h2>
+                    <h2>${inactiveEmployees}</h2>
 
                 </div>
 
@@ -145,7 +155,7 @@ function loadWorkforce() {
                 All Locations
             </option>
 
-            ${getLocations()
+            ${locations
               .map(
                 (location) => `
                 <option value="${location.name}">
@@ -213,7 +223,7 @@ function loadWorkforce() {
 
                             <div class="asset-meta">
 
-                                ${emp.id}
+                                ${emp.employeeId}
 
                                 •
 
@@ -232,20 +242,20 @@ function loadWorkforce() {
                 <td>${emp.location || '-'}</td>
 
                 <td>
-
-                    <span class="status-badge ${emp.status.toLowerCase().replace(/\s/g, '-')}">
-
-                        ${emp.status}
-
-                    </span>
-
+                    ${
+                      emp.status === 'Active'
+                        ? `<span class="badge bg-success">Active</span>`
+                        : emp.status === 'Inactive'
+                          ? `<span class="badge bg-warning text-dark">Inactive</span>`
+                          : `<span class="badge bg-secondary">${emp.status}</span>`
+                    }
                 </td>
                 <td class="text-nowrap">
 
                     <button
                         class="btn btn-light btn-sm asset-action-btn"
                         title="View"
-                        onclick="viewEmployee('${emp.id}')">
+                        onclick="viewEmployee(${emp.id})">
 
                         <i class="fas fa-eye"></i>
 
@@ -254,7 +264,7 @@ function loadWorkforce() {
                     <button
                         class="btn btn-light btn-sm asset-action-btn"
                         title="Edit"
-                        onclick="editEmployee('${emp.id}')">
+                        onclick="editEmployee(${emp.id})">
 
                         <i class="fas fa-pen"></i>
 
@@ -263,7 +273,7 @@ function loadWorkforce() {
                     <button
                         class="btn btn-light btn-sm asset-action-btn text-danger"
                         title="Delete"
-                        onclick="deleteEmployee('${emp.id}')">
+                        onclick="deleteEmployeeUI(${emp.id})">
 
                         <i class="fas fa-trash"></i>
 
@@ -286,8 +296,10 @@ function loadWorkforce() {
 `;
 }
 
-function showAddEmployeeModal() {
-  const locations = getLocations();
+async function showAddEmployeeModal() {
+  const locations = await getLocations('active');
+
+  const departments = await getDepartments('active');
 
   const modalHtml = `
     <div class="modal fade"
@@ -383,11 +395,13 @@ function showAddEmployeeModal() {
                     id="employeeDepartment"
                     class="form-select">
 
-                    ${getDepartments()
+                    ${departments
                       .map(
                         (dep) => `
-                        <option>${dep}</option>
-                    `
+                        <option value="${dep.name}">
+                            ${dep.name}
+                        </option>
+                        `
                       )
                       .join('')}
 
@@ -508,7 +522,6 @@ function showAddEmployeeModal() {
 
                     <option>Active</option>
                     <option>Inactive</option>
-                    <option>On Leave</option>
                     <option>Resigned</option>
 
                 </select>
@@ -547,21 +560,21 @@ function showAddEmployeeModal() {
   new bootstrap.Modal(document.getElementById('addEmployeeModal')).show();
 }
 
-function saveEmployee() {
+async function saveEmployee() {
   const employee = {
-    id: document.getElementById('employeeId').value,
+    employeeId: document.getElementById('employeeId').value.trim(),
 
-    firstName: document.getElementById('employeeFirstName').value,
+    firstName: document.getElementById('employeeFirstName').value.trim(),
 
-    lastName: document.getElementById('employeeLastName').value,
+    lastName: document.getElementById('employeeLastName').value.trim(),
 
-    email: document.getElementById('employeeEmail').value,
+    email: document.getElementById('employeeEmail').value.trim(),
 
     department: document.getElementById('employeeDepartment').value,
 
-    designation: document.getElementById('employeeDesignation').value,
+    designation: document.getElementById('employeeDesignation').value.trim(),
 
-    manager: document.getElementById('employeeManager').value,
+    manager: document.getElementById('employeeManager').value.trim(),
 
     joiningDate: document.getElementById('employeeJoiningDate').value,
 
@@ -575,11 +588,12 @@ function saveEmployee() {
   };
 
   if (
-    !employee.id ||
+    !employee.employeeId ||
     !employee.department ||
     !employee.designation ||
     !employee.status ||
     !employee.email ||
+    !employee.department ||
     !employee.joiningDate ||
     !employee.employmentType ||
     !employee.location ||
@@ -591,29 +605,32 @@ function saveEmployee() {
     return;
   }
 
-  employee.name = `${employee.firstName} ${employee.lastName}`;
-  const existingEmployees = getEmployees();
+  const existingEmployees = await getEmployeesApi();
 
-  const employeeExists = existingEmployees.some((emp) => emp.id === employee.id);
+  const employeeExists = existingEmployees.some((emp) => emp.employeeId === employee.employeeId);
 
   if (employeeExists) {
-    alert(`Employee ID ${employee.id} already exists`);
+    alert(`Employee ID ${employee.employeeId} already exists`);
 
     return;
   }
 
-  addEmployee(employee);
+  try {
+    await createEmployeeApi(employee);
 
-  addEmployeeHistory(employee.id, 'Created', 'Employee onboarded');
+    addEmployeeHistory(employee.employeeId, 'Created', 'Employee onboarded');
 
-  alert(`Employee ${employee.firstName} ${employee.lastName} added successfully`);
+    alert(`Employee ${employee.firstName} ${employee.lastName} added successfully`);
 
-  loadWorkforce();
+    bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal')).hide();
 
-  bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal')).hide();
+    await loadWorkforce();
+  } catch (error) {
+    alert(error.message);
+  }
 }
 
-function deleteEmployee(employeeId) {
+async function deleteEmployeeUI(employeeId) {
   const assignedAssets = getAssignments().filter(
     (a) => a.employeeId === employeeId && a.status === 'Assigned'
   );
@@ -632,13 +649,13 @@ function deleteEmployee(employeeId) {
     return;
   }
 
-  deleteEmployeeById(employeeId);
+  await deleteEmployeeApi(employeeId);
 
   addEmployeeHistory(employeeId, 'Deleted', 'Employee removed');
 
   addActivity(`Employee with ID ${employeeId} deleted`);
 
-  loadWorkforce();
+  await loadWorkforce();
 }
 
 function filterEmployees() {
@@ -661,13 +678,13 @@ function filterEmployees() {
   });
 }
 
-function editEmployee(employeeId) {
+async function editEmployee(employeeId) {
   const existingModal = document.getElementById('editEmployeeModal');
 
   if (existingModal) {
     existingModal.remove();
   }
-  const employees = getEmployees();
+  const employees = await getEmployeesApi();
 
   const employee = employees.find((e) => e.id === employeeId);
 
@@ -675,7 +692,8 @@ function editEmployee(employeeId) {
     return;
   }
 
-  const locations = getLocations();
+  const locations = await getLocations('active');
+  const departments = await getDepartments('active');
   const modalHtml = `
 
     <div class="modal fade"
@@ -739,15 +757,15 @@ function editEmployee(employeeId) {
                                 id="editEmployeeDepartment"
                                 class="form-select">
 
-                                ${getDepartments()
+                                ${departments
                                   .map(
                                     (dep) => `
-                                    <option
-                                        value="${dep}"
-                                        ${employee.department === dep ? 'selected' : ''}>
-                                        ${dep}
-                                    </option>
-                                `
+                                        <option
+                                            value="${dep.name}"
+                                            ${employee.department === dep.name ? 'selected' : ''}>
+                                            ${dep.name}
+                                        </option>
+`
                                   )
                                   .join('')}
 
@@ -797,7 +815,7 @@ function editEmployee(employeeId) {
                                 type="date"
                                 id="editEmployeeJoiningDate"
                                 class="form-control"
-                                value="${employee.joiningDate || ''}">
+                                value="${employee.joiningDate ? employee.joiningDate.substring(0, 10) : ''}">
                         </div>
 
                         <div class="col-md-6">
@@ -806,7 +824,7 @@ function editEmployee(employeeId) {
                                 type="date"
                                 id="editEmployeeLeavingDate"
                                 class="form-control"
-                                value="${employee.leavingDate || ''}">
+                                value="${employee.leavingDate ? employee.leavingDate.substring(0, 10) : ''}">
                         </div>
 
                         <div class="col-md-6">
@@ -898,12 +916,10 @@ function editEmployee(employeeId) {
   new bootstrap.Modal(document.getElementById('editEmployeeModal')).show();
 }
 
-function saveEmployeeEdit() {
+async function saveEmployeeEdit() {
   const employeeId = document.getElementById('editEmployeeId').value;
 
-  const employees = getEmployees();
-
-  const employee = employees.find((e) => e.id === employeeId);
+  const employee = await getEmployeeApi(Number(document.getElementById('editEmployeeId').value));
 
   if (!employee) {
     return;
@@ -1011,7 +1027,7 @@ function saveEmployeeEdit() {
     addEmployeeHistory(employee.id, 'Transferred', `${oldLocation} → ${newLocation}`);
   }
 
-  saveEmployees(employees);
+  await updateEmployeeApi(employee.id, employee);
 
   addEmployeeHistory(
     employee.id,
@@ -1024,12 +1040,10 @@ function saveEmployeeEdit() {
   loadWorkforce();
 }
 
-function viewEmployee(employeeId) {
-  const employees = getEmployees();
+async function viewEmployee(employeeId) {
+  const employee = await getEmployeeApi(employeeId);
 
   const assignments = getAssignments();
-
-  const employee = employees.find((e) => e.id === employeeId);
 
   if (!employee) {
     return;
@@ -1094,7 +1108,7 @@ function viewEmployee(employeeId) {
                 </button>
 
             </div>
-            
+
 
             <div class="modal-body">
 
@@ -1197,7 +1211,7 @@ function viewEmployee(employeeId) {
                             <div class="info-grid">
 
                                 <div>Employee ID</div>
-                                <strong>${employee.id}</strong>
+                                <strong>${employee.employeeId}</strong>
 
                                 <div>Email</div>
                                 <strong>${employee.email || '-'}</strong>
@@ -1415,7 +1429,7 @@ function viewEmployee(employeeId) {
 
                     </div>
 
-                </div>    
+                </div>
 
             </div>
 
