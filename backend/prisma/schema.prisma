@@ -8,77 +8,208 @@ datasource db {
 }
 
 model Department {
-  id          Int      @id @default(autoincrement())
-  code        String   @unique
+  id          Int     @id @default(autoincrement())
+  code        String  @unique
   name        String
   description String?
-  status      Boolean  @default(true)
+  status      Boolean @default(true)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Location {
-  id          Int      @id @default(autoincrement())
-  code        String   @unique
-  name        String
+  id   Int    @id @default(autoincrement())
+  code String @unique
+  name String
 
-  city        String?
-  state       String?
-  country     String?
-  address     String?
+  city    String?
+  state   String?
+  country String?
+  address String?
 
-  status      Boolean  @default(true)
+  status Boolean @default(true)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Employee {
-  id             Int      @id @default(autoincrement())
-  employeeId     String   @unique
-  firstName      String
-  lastName       String
-  email          String   @unique
-  phone          String?
+  id         Int     @id @default(autoincrement())
+  employeeId String  @unique
+  firstName  String
+  lastName   String
+  email      String  @unique
+  phone      String?
 
-  department     String
-  designation    String
-  manager        String?
+  department  String
+  designation String
+  manager     String?
 
-  location       String
+  location String
 
   employmentType String
 
-  joiningDate    DateTime
-  leavingDate    DateTime?
+  joiningDate DateTime
+  leavingDate DateTime?
 
-  status         String   @default("Active")
+  status String @default("Active")
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  history        EmployeeHistory[]
+  history EmployeeHistory[]
 }
 
 model EmployeeHistory {
-  id         Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   employeeId Int
 
-  action     String
-  details    String
+  action  String
+  details String
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 model Activity {
-
   id Int @id @default(autoincrement())
 
   message String
 
   timestamp DateTime @default(now())
+}
+
+model Asset {
+  id Int @id @default(autoincrement())
+
+  assetId  String @unique
+  name     String
+  category String
+
+  location String
+
+  status String @default("Available")
+
+  // ===========================
+  // Technical Specifications
+  // ===========================
+
+  manufacturer String?
+  model        String?
+  serialNumber String?
+
+  processor       String?
+  ram             String?
+  storage         String?
+  operatingSystem String?
+
+  screenSize   String?
+  resolution   String?
+  refreshRate  String?
+  displayInput String?
+
+  imei1   String?
+  imei2   String?
+  battery String?
+  display String?
+
+  printerType  String?
+  connectivity String?
+  technology   String?
+  colorMode    String?
+  duplex       String?
+
+  raid    String?
+  network String?
+
+  deviceType   String?
+  networkPorts String?
+  managementIP String?
+  speed        String?
+  macAddress   String?
+  firmware     String?
+
+  // ===========================
+  // Purchase
+  // ===========================
+
+  invoiceNumber String?
+  poNumber      String?
+  vendor        String?
+
+  purchasePrice Float?
+
+  purchaseDate   DateTime?
+  warrantyExpiry DateTime?
+
+  warrantyType String?
+
+  remarks String?
+
+  // ===========================
+  // Lifecycle
+  // ===========================
+
+  retiredDate      DateTime?
+  retirementReason String?
+
+  transferredTo   String?
+  previousAssetId String?
+
+  transferDate    DateTime?
+  transferRemarks String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  history AssetHistory[]
+  transfersFrom AssetTransfer[] @relation("OldAssetTransfer")
+
+  transfersTo AssetTransfer[] @relation("NewAssetTransfer")
+}
+
+model AssetHistory {
+  id Int @id @default(autoincrement())
+
+  assetId Int
+
+  action  String
+  details String
+
+  createdAt DateTime @default(now())
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+}
+
+model AssetStatus {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AssetTransfer {
+  id             Int      @id @default(autoincrement())
+
+  oldAssetId     Int
+  newAssetId     Int?
+
+  fromLocation   String
+  toLocation     String
+
+  remarks        String?
+
+  transferMode   String
+
+  transferDate   DateTime @default(now())
+
+  oldAsset Asset @relation("OldAssetTransfer", fields: [oldAssetId], references: [id], onDelete: Cascade)
+  newAsset Asset? @relation("NewAssetTransfer", fields: [newAssetId], references: [id])
+
+  createdAt DateTime @default(now())
 }

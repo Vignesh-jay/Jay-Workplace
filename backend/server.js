@@ -22,6 +22,18 @@ const activityRoutes = require('./routes/activities');
 
 app.use('/activities', activityRoutes);
 
+const assetRoutes = require('./routes/assets');
+
+app.use('/assets', assetRoutes);
+
+const assetStatuses = require('./routes/assetStatuses');
+
+app.use('/asset-statuses', assetStatuses);
+
+const assetTransfers = require('./routes/assetTransfers');
+
+app.use('/asset-transfers', assetTransfers);
+
 const PORT = 3000;
 
 const prisma = require('./db');

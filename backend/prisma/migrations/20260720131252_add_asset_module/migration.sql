@@ -1,0 +1,66 @@
+-- CreateTable
+CREATE TABLE "Asset" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "assetId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "category" TEXT NOT NULL,
+    "location" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'Available',
+    "manufacturer" TEXT,
+    "model" TEXT,
+    "serialNumber" TEXT,
+    "processor" TEXT,
+    "ram" TEXT,
+    "storage" TEXT,
+    "operatingSystem" TEXT,
+    "screenSize" TEXT,
+    "resolution" TEXT,
+    "refreshRate" TEXT,
+    "displayInput" TEXT,
+    "imei1" TEXT,
+    "imei2" TEXT,
+    "battery" TEXT,
+    "display" TEXT,
+    "printerType" TEXT,
+    "connectivity" TEXT,
+    "technology" TEXT,
+    "colorMode" TEXT,
+    "duplex" TEXT,
+    "raid" TEXT,
+    "network" TEXT,
+    "deviceType" TEXT,
+    "networkPorts" TEXT,
+    "managementIP" TEXT,
+    "speed" TEXT,
+    "macAddress" TEXT,
+    "firmware" TEXT,
+    "invoiceNumber" TEXT,
+    "poNumber" TEXT,
+    "vendor" TEXT,
+    "purchasePrice" REAL,
+    "purchaseDate" DATETIME,
+    "warrantyExpiry" DATETIME,
+    "warrantyType" TEXT,
+    "remarks" TEXT,
+    "retiredDate" DATETIME,
+    "retirementReason" TEXT,
+    "transferredTo" TEXT,
+    "previousAssetId" TEXT,
+    "transferDate" DATETIME,
+    "transferRemarks" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "AssetHistory" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "assetId" INTEGER NOT NULL,
+    "action" TEXT NOT NULL,
+    "details" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "AssetHistory_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Asset_assetId_key" ON "Asset"("assetId");

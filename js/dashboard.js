@@ -2,6 +2,7 @@ async function loadDashboard() {
   const employees = await getEmployeesApi();
   const assets = getAssets();
   const departments = await getDepartments();
+  const expiringAssets = await getExpiringAssets(30);
 
   if (
     employees.length === 0 &&
@@ -14,7 +15,7 @@ async function loadDashboard() {
     return;
   }
 
-  const expiringAssets = getExpiringAssets();
+  const expiringWarranty = await getExpiringAssets(30);
 
   const employeeList = employees;
   const assetList = getAssets();

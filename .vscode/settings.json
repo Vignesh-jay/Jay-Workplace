@@ -25,5 +25,6 @@
 
   "git.autofetch": true,
 
-  "git.confirmSync": false
+  "git.confirmSync": false,
+  "cSpell.words": ["autoincrement", "imei"]
 }

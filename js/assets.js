@@ -939,7 +939,7 @@ function renderSpecificationFields(categorySelectId, containerId, values = {}, p
 }
 
 function buildSpecificationCard(asset) {
-  const specs = asset.specifications || {};
+  const specs = asset;
 
   const fields = getSpecificationTemplate(asset.category);
 
@@ -1053,8 +1053,8 @@ function validateRequiredFields(fields) {
   return valid;
 }
 
-function loadAssets() {
-  let assetList = getAssets();
+async function loadAssets() {
+  let assetList = await getAssetsApi();
 
   const assignments = getAssignments();
 
@@ -1064,9 +1064,21 @@ function loadAssets() {
 
   const availableAssets = assetList.filter((a) => a.status === 'Available').length;
 
-  const expiringWarranty = getExpiringAssets(30).length;
+  const transferredAssets = assetList.filter((a) => a.status === 'Transferred').length;
+
+  const expiringWarranty = assetList.filter((asset) => {
+    if (asset.status === 'Transferred') return false;
+
+    if (!asset.warrantyExpiry) return false;
+
+    const days = Math.ceil((new Date(asset.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24));
+
+    return days >= 0 && days <= 30;
+  }).length;
 
   const searchText = document.getElementById('assetSearch')?.value || '';
+
+  const locations = await getLocations();
 
   setActiveMenu('nav-assets');
 
@@ -1084,8 +1096,11 @@ function loadAssets() {
       break;
 
     case 'warranty':
-      assetList = getExpiringAssets(30);
+      assetList = (await getExpiringAssets(30)).filter((asset) => asset.status !== 'Transferred');
+      break;
 
+    case 'transferred':
+      assetList = assetList.filter((asset) => asset.status === 'Transferred');
       break;
   }
 
@@ -1104,7 +1119,7 @@ function loadAssets() {
 
 <div class="row g-3 mb-4">
 
-    <div class="col-md-3">
+    <div class="col">
 
         <div class="card dashboard-card h-100" onclick="setAssetFilter('all')">
 
@@ -1124,7 +1139,7 @@ function loadAssets() {
 
     </div>
 
-    <div class="col-md-3">
+    <div class="col">
 
         <div class="card dashboard-card h-100" data-filter="assigned" onclick="setAssetFilter('assigned')">
 
@@ -1144,7 +1159,7 @@ function loadAssets() {
 
     </div>
 
-    <div class="col-md-3">
+    <div class="col">
 
         <div class="card dashboard-card h-100" data-filter="available" onclick="setAssetFilter('available')">
 
@@ -1164,7 +1179,32 @@ function loadAssets() {
 
     </div>
 
-    <div class="col-md-3">
+    <div class="col">
+
+    <div
+        class="card dashboard-card h-100"
+        data-filter="transferred"
+        onclick="setAssetFilter('transferred')">
+
+        <div class="card-body">
+
+            <div class="text-muted small">
+
+                Transferred
+
+            </div>
+
+            <h2>${transferredAssets}</h2>
+
+            <i class="fas fa-exchange-alt fa-2x text-secondary"></i>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <div class="col">
 
         <div class="card dashboard-card h-100" data-filter="warranty" onclick="setAssetFilter('warranty')">
 
@@ -1206,7 +1246,7 @@ function loadAssets() {
                 All Locations
             </option>
 
-            ${getLocations()
+            ${locations
               .map(
                 (location) => `
                 <option value="${location.name}">
@@ -1264,7 +1304,7 @@ function loadAssets() {
                             </div>
 
                             <div class="asset-meta">
-                                ${asset.id}
+                                ${asset.assetId}
                             </div>
 
                             <div class="asset-meta">
@@ -1272,9 +1312,9 @@ function loadAssets() {
                             </div>
 
                             ${
-                              asset.specifications?.serialNumber
+                              asset.serialNumber
                                 ? `<div class="asset-meta">
-                                        S/N : ${asset.specifications?.serialNumber}
+                                        S/N : ${asset.serialNumber}
                                     </div>`
                                 : ''
                             }
@@ -1305,10 +1345,10 @@ function loadAssets() {
 
                     <td>
                         ${
-                          asset.purchase?.warrantyExpiry
+                          asset.warrantyExpiry
                             ? (() => {
                                 const days = Math.ceil(
-                                  (new Date(asset.purchase?.warrantyExpiry) - new Date()) /
+                                  (new Date(asset.warrantyExpiry) - new Date()) /
                                     (1000 * 60 * 60 * 24)
                                 );
 
@@ -1413,7 +1453,9 @@ function removeExistingAssetModal() {
   }
 }
 
-function buildAddAssetModal() {
+async function buildAddAssetModal() {
+  const locations = await getLocations();
+  const statuses = await getAssetStatuses('active');
   return `
     <div class="modal fade"
          id="addAssetModal"
@@ -1528,7 +1570,7 @@ function buildAddAssetModal() {
                                 id="assetLocation"
                                 class="form-control">
 
-                                ${getLocations()
+                                ${locations
                                   .map(
                                     (location) => `
                                     <option value="${location.name}">
@@ -1627,7 +1669,9 @@ function buildAddAssetModal() {
     `;
 }
 
-function buildEditAssetModal(asset) {
+async function buildEditAssetModal(asset) {
+  const locations = await getLocations();
+  const statuses = await getAssetStatuses('active');
   return `
     <div class="modal fade"
          id="editAssetModal"
@@ -1693,7 +1737,7 @@ function buildEditAssetModal(asset) {
                                 id="editAssetId"
                                 class="form-control"
                                 readonly
-                                value="${asset.id}">
+                                value="${asset.assetId}">
                         </div>
 
                         <div class="mb-3">
@@ -1743,9 +1787,9 @@ function buildEditAssetModal(asset) {
 
                             <select
                                 id="editAssetLocation"
-                                class="form-control">
+                                class="form-control" disabled>
 
-                                ${getLocations()
+                                ${locations
                                   .map(
                                     (location) => `
                                     <option value="${location.name}">
@@ -1760,21 +1804,23 @@ function buildEditAssetModal(asset) {
                         </div>
                         <div class="mb-3">
 
-                            <label class="form-label">
-
-                                Status
-
-                            </label>
+                            <label>Status</label>
 
                             <select
                                 id="editAssetStatus"
                                 class="form-select">
 
-                                <option value="Available">Available</option>
-
-                                <option value="Repair">Repair</option>
-
-                                <option value="Retired">Retired</option>
+                                ${statuses
+                                  .map(
+                                    (status) => `
+                                            <option
+                                                value="${status.name}"
+                                                ${asset.status === status.name ? 'selected' : ''}>
+                                                ${status.name}
+                                            </option>
+                                        `
+                                  )
+                                  .join('')}
 
                             </select>
 
@@ -1953,10 +1999,10 @@ function updateWizardUI() {
   saveBtn.classList.toggle('d-none', ASSET_WIZARD.currentStep !== ASSET_WIZARD.totalSteps);
 }
 
-function showAddAssetModal() {
+async function showAddAssetModal() {
   removeExistingAssetModal();
 
-  const modalHtml = buildAddAssetModal();
+  const modalHtml = await buildAddAssetModal();
 
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 
@@ -1977,8 +2023,8 @@ function showAddAssetModal() {
   renderPurchaseFields('purchaseFieldsContainer');
 }
 
-function showEditAssetModal(assetId) {
-  const asset = getAssets().find((a) => a.id === assetId);
+async function showEditAssetModal(assetId) {
+  const asset = await getAssetApi(assetId);
 
   if (!asset) {
     alert('Asset not found.');
@@ -1989,31 +2035,95 @@ function showEditAssetModal(assetId) {
   if (existingModal) {
     existingModal.remove();
   }
-  const modalHtml = buildEditAssetModal(asset);
+  const modalHtml = await buildEditAssetModal(asset);
 
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 
   const modalElement = document.getElementById('editAssetModal');
+
+  // Set current values
   document.getElementById('editAssetCategory').value = asset.category;
   document.getElementById('editAssetLocation').value = asset.location;
-  document.getElementById('editAssetStatus').value = asset.status || 'Available';
+  const specValues = {
+    manufacturer: asset.manufacturer,
+
+    model: asset.model,
+
+    serialNumber: asset.serialNumber,
+
+    processor: asset.processor,
+
+    ram: asset.ram,
+
+    storage: asset.storage,
+
+    operatingSystem: asset.operatingSystem,
+
+    screenSize: asset.screenSize,
+
+    resolution: asset.resolution,
+
+    refreshRate: asset.refreshRate,
+
+    displayInput: asset.displayInput,
+
+    imei1: asset.imei1,
+
+    imei2: asset.imei2,
+
+    battery: asset.battery,
+
+    display: asset.display,
+
+    printerType: asset.printerType,
+
+    connectivity: asset.connectivity,
+
+    technology: asset.technology,
+
+    colorMode: asset.colorMode,
+
+    duplex: asset.duplex,
+
+    raid: asset.raid,
+
+    network: asset.network,
+
+    deviceType: asset.deviceType,
+
+    networkPorts: asset.networkPorts,
+
+    managementIP: asset.managementIP,
+
+    speed: asset.speed,
+
+    macAddress: asset.macAddress,
+
+    firmware: asset.firmware,
+  };
+
   renderSpecificationFields(
     'editAssetCategory',
     'editTechnicalFieldsContainer',
-    asset.specifications || {},
+    specValues,
     'editSpec'
   );
+
   renderPurchaseFields('editPurchaseFieldsContainer', 'editPurchase');
   // Populate purchase details
-  if (asset.purchase) {
-    PURCHASE_LAYOUT.forEach((field) => {
-      const input = document.getElementById(field.key);
+  PURCHASE_LAYOUT.forEach((field) => {
+    const input = document.getElementById(field.key);
 
-      if (input) {
-        input.value = asset.purchase[field.key] || '';
-      }
-    });
-  }
+    if (!input) return;
+
+    let value = asset[field.key];
+
+    if (field.type === 'date' && value) {
+      value = value.split('T')[0];
+    }
+
+    input.value = value || '';
+  });
   document.getElementById('editWizardPreviousBtn').onclick = () => {
     if (editWizardStep > 1) {
       editWizardStep--;
@@ -2061,114 +2171,246 @@ function updateEditWizard() {
   document.getElementById('editWizardSaveBtn').classList.toggle('d-none', editWizardStep !== 4);
 }
 
-function saveAsset() {
+async function saveAsset() {
   const asset = {
-    id: document.getElementById('assetId').value.trim(),
-
+    assetId: document.getElementById('assetId').value.trim(),
     name: document.getElementById('assetName').value.trim(),
-
     category: document.getElementById('assetCategory').value,
-
     location: document.getElementById('assetLocation').value,
-
     status: 'Available',
 
-    retiredDate: '',
+    // Technical Specifications
+    manufacturer: document.getElementById('addSpec_manufacturer')?.value || '',
+    model: document.getElementById('addSpec_model')?.value || '',
+    serialNumber: document.getElementById('addSpec_serialNumber')?.value || '',
+    processor: document.getElementById('addSpec_processor')?.value || '',
+    ram: document.getElementById('addSpec_ram')?.value || '',
+    storage: document.getElementById('addSpec_storage')?.value || '',
+    operatingSystem: document.getElementById('addSpec_operatingSystem')?.value || '',
+    screenSize: document.getElementById('addSpec_screenSize')?.value || '',
+    resolution: document.getElementById('addSpec_resolution')?.value || '',
+    refreshRate: document.getElementById('addSpec_refreshRate')?.value || '',
+    displayInput: document.getElementById('addSpec_displayInput')?.value || '',
+    imei1: document.getElementById('addSpec_imei1')?.value || '',
+    imei2: document.getElementById('addSpec_imei2')?.value || '',
+    battery: document.getElementById('addSpec_battery')?.value || '',
+    display: document.getElementById('addSpec_display')?.value || '',
+    printerType: document.getElementById('addSpec_printerType')?.value || '',
+    connectivity: document.getElementById('addSpec_connectivity')?.value || '',
+    technology: document.getElementById('addSpec_technology')?.value || '',
+    colorMode: document.getElementById('addSpec_colorMode')?.value || '',
+    duplex: document.getElementById('addSpec_duplex')?.value || '',
+    raid: document.getElementById('addSpec_raid')?.value || '',
+    network: document.getElementById('addSpec_network')?.value || '',
+    deviceType: document.getElementById('addSpec_deviceType')?.value || '',
+    networkPorts: document.getElementById('addSpec_networkPorts')?.value || '',
+    managementIP: document.getElementById('addSpec_managementIP')?.value || '',
+    speed: document.getElementById('addSpec_speed')?.value || '',
+    macAddress: document.getElementById('addSpec_macAddress')?.value || '',
+    firmware: document.getElementById('addSpec_firmware')?.value || '',
 
+    // Purchase
+    invoiceNumber: document.getElementById('invoiceNumber')?.value || '',
+    poNumber: document.getElementById('poNumber')?.value || '',
+    vendor: document.getElementById('vendor')?.value || '',
+    purchasePrice: Number(document.getElementById('purchasePrice')?.value || 0),
+    purchaseDate: document.getElementById('purchaseDate')?.value || null,
+    warrantyExpiry: document.getElementById('warrantyExpiry')?.value || null,
+    warrantyType: document.getElementById('warrantyType')?.value || '',
+    remarks: document.getElementById('remarks')?.value || '',
+
+    retiredDate: null,
     retirementReason: '',
-
     transferredTo: '',
-
     previousAssetId: '',
-
-    transferDate: '',
-
+    transferDate: null,
     transferRemarks: '',
   };
 
-  const specifications = {};
-
-  getSpecificationTemplate(asset.category).forEach((field) => {
-    specifications[field.key] = document.getElementById(`addSpec_${field.key}`)?.value.trim() || '';
-  });
-
-  asset.specifications = specifications;
-
-  if (!asset.specifications) {
-    asset.specifications = {};
-  }
-
-  asset.specifications.serialNumber = document.getElementById('addSpec_serialNumber').value.trim();
-
-  const purchase = {};
-
-  PURCHASE_LAYOUT.forEach((field) => {
-    purchase[field.key] = document.getElementById(field.key)?.value.trim() || '';
-  });
-
-  asset.purchase = purchase;
-
-  if (!asset.id || !asset.name) {
+  if (!asset.assetId || !asset.name) {
     alert('Asset ID and Asset Name are required.');
 
     return;
   }
 
-  addAsset(asset);
+  try {
+    const createdAsset = await createAssetApi(asset);
 
-  addAssetHistory(asset.id, 'Added to Inventory', `${asset.name} added to inventory`);
+    await addAssetHistoryApi(
+      createdAsset.id,
+      'Added to Inventory',
+      `${createdAsset.name} added to inventory`
+    );
 
-  bootstrap.Modal.getInstance(document.getElementById('addAssetModal')).hide();
+    await addActivityApi(`${createdAsset.name} added to inventory`);
 
-  loadAssets();
-}
+    bootstrap.Modal.getInstance(document.getElementById('addAssetModal')).hide();
 
-function updateAsset(assetId) {
-  const assets = getAssets();
-
-  const asset = assets.find((a) => a.id === assetId);
-
-  if (!asset) {
-    alert('Asset not found.');
-    return;
+    await loadAssets();
+    alert('✅ Asset created successfully.');
+  } catch (error) {
+    console.error(error);
+    alert('Failed to create asset.');
   }
-
-  // Basic Information
-  asset.name = document.getElementById('editAssetName').value.trim();
-  asset.category = document.getElementById('editAssetCategory').value;
-  asset.location = document.getElementById('editAssetLocation').value;
-  asset.status = document.getElementById('editAssetStatus').value;
-
-  // Specifications
-  asset.specifications = {};
-
-  getSpecificationTemplate(asset.category).forEach((field) => {
-    asset.specifications[field.key] = document.getElementById(`editSpec_${field.key}`)?.value || '';
-  });
-
-  // Purchase Details
-  asset.purchase = {};
-
-  PURCHASE_LAYOUT.forEach((field) => {
-    const input = document.getElementById(field.key);
-
-    asset.purchase[field.key] = input ? input.value : '';
-  });
-
-  // Save
-  saveAssets(assets);
-
-  addActivity(`${asset.name} updated`);
-
-  addAssetHistory(asset.id, 'Updated', `${asset.name} information updated`);
-
-  bootstrap.Modal.getInstance(document.getElementById('editAssetModal')).hide();
-
-  loadAssets();
 }
 
-function deleteAsset(assetId) {
-  const asset = getAssets().find((a) => a.id === assetId);
+function getAssetChanges(oldAsset, newAsset) {
+  const fields = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'name', label: 'Asset Name' },
+    { key: 'category', label: 'Category' },
+    { key: 'location', label: 'Location' },
+    { key: 'status', label: 'Status' },
+
+    { key: 'manufacturer', label: 'Manufacturer' },
+    { key: 'model', label: 'Model' },
+    { key: 'serialNumber', label: 'Serial Number' },
+    { key: 'processor', label: 'Processor' },
+    { key: 'ram', label: 'Memory (RAM)' },
+    { key: 'storage', label: 'Storage' },
+    { key: 'operatingSystem', label: 'Operating System' },
+
+    { key: 'screenSize', label: 'Screen Size' },
+    { key: 'resolution', label: 'Resolution' },
+    { key: 'refreshRate', label: 'Refresh Rate' },
+    { key: 'displayInput', label: 'Display Input' },
+
+    { key: 'imei1', label: 'IMEI 1' },
+    { key: 'imei2', label: 'IMEI 2' },
+    { key: 'battery', label: 'Battery' },
+    { key: 'display', label: 'Display Size' },
+
+    { key: 'printerType', label: 'Printer Type' },
+    { key: 'technology', label: 'Technology' },
+    { key: 'connectivity', label: 'Connectivity' },
+    { key: 'colorMode', label: 'Colour Mode' },
+    { key: 'duplex', label: 'Duplex' },
+
+    { key: 'raid', label: 'RAID' },
+    { key: 'network', label: 'Network Adapter' },
+
+    { key: 'deviceType', label: 'Device Type' },
+    { key: 'networkPorts', label: 'Network Ports' },
+    { key: 'managementIP', label: 'Management IP' },
+    { key: 'speed', label: 'Speed' },
+    { key: 'macAddress', label: 'MAC Address' },
+    { key: 'firmware', label: 'Firmware' },
+
+    { key: 'invoiceNumber', label: 'Invoice Number' },
+    { key: 'poNumber', label: 'PO Number' },
+    { key: 'vendor', label: 'Vendor' },
+    { key: 'purchasePrice', label: 'Purchase Price' },
+    { key: 'purchaseDate', label: 'Purchase Date' },
+    { key: 'warrantyExpiry', label: 'Warranty Expiry' },
+    { key: 'warrantyType', label: 'Warranty Type' },
+    { key: 'remarks', label: 'Remarks' },
+  ];
+
+  const changes = [];
+
+  fields.forEach(({ key, label }) => {
+    let oldValue = oldAsset[key] ?? '';
+    let newValue = newAsset[key] ?? '';
+
+    // Normalize dates
+    if (key === 'purchaseDate' || key === 'warrantyExpiry') {
+      oldValue = oldValue ? oldValue.toString().substring(0, 10) : '';
+      newValue = newValue ? newValue.toString().substring(0, 10) : '';
+    }
+
+    if (String(oldValue) !== String(newValue)) {
+      changes.push(`<strong>${label}</strong><br>${oldValue || '-'} → ${newValue || '-'}`);
+    }
+  });
+
+  return changes;
+}
+
+async function updateAsset(assetId) {
+  const asset = {
+    assetId: document.getElementById('editAssetId').value.trim(),
+    name: document.getElementById('editAssetName').value.trim(),
+    category: document.getElementById('editAssetCategory').value,
+    location: document.getElementById('editAssetLocation').value,
+    status: document.getElementById('editAssetStatus').value,
+
+    // Technical Specifications
+    manufacturer: document.getElementById('editSpec_manufacturer')?.value || '',
+    model: document.getElementById('editSpec_model')?.value || '',
+    serialNumber: document.getElementById('editSpec_serialNumber')?.value || '',
+    processor: document.getElementById('editSpec_processor')?.value || '',
+    ram: document.getElementById('editSpec_ram')?.value || '',
+    storage: document.getElementById('editSpec_storage')?.value || '',
+    operatingSystem: document.getElementById('editSpec_operatingSystem')?.value || '',
+    screenSize: document.getElementById('editSpec_screenSize')?.value || '',
+    resolution: document.getElementById('editSpec_resolution')?.value || '',
+    refreshRate: document.getElementById('editSpec_refreshRate')?.value || '',
+    displayInput: document.getElementById('editSpec_displayInput')?.value || '',
+    imei1: document.getElementById('editSpec_imei1')?.value || '',
+    imei2: document.getElementById('editSpec_imei2')?.value || '',
+    battery: document.getElementById('editSpec_battery')?.value || '',
+    display: document.getElementById('editSpec_display')?.value || '',
+    printerType: document.getElementById('editSpec_printerType')?.value || '',
+    connectivity: document.getElementById('editSpec_connectivity')?.value || '',
+    technology: document.getElementById('editSpec_technology')?.value || '',
+    colorMode: document.getElementById('editSpec_colorMode')?.value || '',
+    duplex: document.getElementById('editSpec_duplex')?.value || '',
+    raid: document.getElementById('editSpec_raid')?.value || '',
+    network: document.getElementById('editSpec_network')?.value || '',
+    deviceType: document.getElementById('editSpec_deviceType')?.value || '',
+    networkPorts: document.getElementById('editSpec_networkPorts')?.value || '',
+    managementIP: document.getElementById('editSpec_managementIP')?.value || '',
+    speed: document.getElementById('editSpec_speed')?.value || '',
+    macAddress: document.getElementById('editSpec_macAddress')?.value || '',
+    firmware: document.getElementById('editSpec_firmware')?.value || '',
+
+    // Purchase Details
+    invoiceNumber: document.getElementById('invoiceNumber')?.value || '',
+    poNumber: document.getElementById('poNumber')?.value || '',
+    vendor: document.getElementById('vendor')?.value || '',
+    purchasePrice: Number(document.getElementById('purchasePrice')?.value || 0),
+    purchaseDate: document.getElementById('purchaseDate')?.value || null,
+    warrantyExpiry: document.getElementById('warrantyExpiry')?.value || null,
+    warrantyType: document.getElementById('warrantyType')?.value || '',
+    remarks: document.getElementById('remarks')?.value || '',
+
+    retiredDate: null,
+    retirementReason: '',
+    transferredTo: '',
+    previousAssetId: '',
+    transferDate: null,
+    transferRemarks: '',
+  };
+
+  const oldAsset = await getAssetApi(assetId);
+
+  const changes = getAssetChanges(oldAsset, asset);
+
+  try {
+    await updateAssetApi(assetId, asset);
+
+    await addAssetHistoryApi(
+      assetId,
+      'Updated',
+      changes.length ? changes.join('<hr class="my-2">') : 'No changes detected.'
+    );
+
+    await addActivityApi(`${asset.name} updated`);
+
+    bootstrap.Modal.getInstance(document.getElementById('editAssetModal')).hide();
+
+    await loadAssets();
+
+    alert('✅ Asset updated successfully.');
+  } catch (error) {
+    console.error(error);
+
+    alert('Failed to update asset.');
+  }
+}
+
+async function deleteAsset(assetId) {
+  const asset = await getAssetApi(assetId);
 
   if (asset.status === 'Transferred') {
     alert('Transferred assets cannot be deleted.');
@@ -2190,11 +2432,11 @@ function deleteAsset(assetId) {
     return;
   }
 
-  deleteAssetById(assetId);
+  await deleteAssetApi(assetId);
 
-  addAssetHistory(asset.id, 'Deleted', `${asset.name} removed from inventory`);
+  await addActivityApi(`${asset.name} deleted`);
 
-  loadAssets();
+  await loadAssets();
 }
 
 function getAssetIcon(category) {
@@ -2219,29 +2461,26 @@ function getAssetIcon(category) {
   return icons[category] || 'fas fa-box';
 }
 
-function viewAsset(assetId) {
-  const assets = getAssets();
-
-  const assignments = getAssignments();
-
-  const asset = assets.find((a) => a.id === assetId);
+async function viewAsset(assetId) {
+  const asset = await getAssetApi(assetId);
 
   if (!asset) {
+    alert('Asset not found.');
     return;
   }
 
-  const history = getAssetHistory()
-    .filter((h) => h.assetId === assetId)
-    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const assignments = getAssignments();
+
+  const history = await getAssetHistoryApi(assetId);
 
   const totalAssignments = history.filter((h) => h.action === 'Assigned').length;
 
-  const warrantyDaysRemaining = asset.purchase?.warrantyExpiry
-    ? Math.ceil((new Date(asset.purchase.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24))
+  const warrantyDaysRemaining = asset.warrantyExpiry
+    ? Math.ceil((new Date(asset.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24))
     : null;
 
-  const assetAgeDays = asset.purchase?.purchaseDate
-    ? Math.ceil((new Date() - new Date(asset.purchase.purchaseDate)) / (1000 * 60 * 60 * 24))
+  const assetAgeDays = asset.purchaseDate
+    ? Math.ceil((new Date() - new Date(asset.purchaseDate)) / (1000 * 60 * 60 * 24))
     : null;
 
   const currentAssignment = getAssignments().find(
@@ -2252,9 +2491,9 @@ function viewAsset(assetId) {
     .filter((a) => a.assetId === assetId)
     .sort((a, b) => new Date(b.assignedDate) - new Date(a.assignedDate));
 
-  const transferHistory = getAssetTransfers()
-    .filter((t) => t.oldAssetId === asset.id || t.newAssetId === asset.id)
-    .sort((a, b) => new Date(b.transferDate) - new Date(a.transferDate));
+  const transferHistory = (await getAssetTransfersApi()).filter(
+    (t) => t.oldAssetId === asset.id || t.newAssetId === asset.id
+  );
 
   const displayStatus = currentAssignment ? 'Assigned' : asset.status;
 
@@ -2284,7 +2523,7 @@ function viewAsset(assetId) {
 
                 <div class="asset-id">
 
-                    ${asset.id}
+                    ${asset.assetId}
 
                 </div>
 
@@ -2436,13 +2675,13 @@ function viewAsset(assetId) {
                 <div class="info-grid">
 
                     <div>Asset ID</div>
-                    <strong>${asset.id}</strong>
+                    <strong>${asset.assetId}</strong>
 
                     <div>Category</div>
                     <strong>${asset.category}</strong>
 
                     <div>Serial Number</div>
-                    <strong>${asset.specifications?.serialNumber || '-'}</strong>
+                    <strong>${asset.serialNumber || '-'}</strong>
 
                     <div>Location</div>
                     <strong>${asset.location || '-'}</strong>
@@ -2462,13 +2701,13 @@ function viewAsset(assetId) {
                 <div class="info-grid">
 
                     <div>Vendor</div>
-                    <strong>${asset.purchase?.vendor || '-'}</strong>
+                    <strong>${asset.vendor || '-'}</strong>
 
                     <div>Purchase Date</div>
-                    <strong>${asset.purchase?.purchaseDate || '-'}</strong>
+                    <strong>${formatDate(asset.purchaseDate)}</strong>
 
                     <div>Warranty Expiry</div>
-                    <strong>${asset.purchase?.warrantyExpiry || '-'}</strong>
+                    <strong>${formatDate(asset.warrantyExpiry)}</strong>
 
                     <div>Current Holder</div>
                     <strong>
@@ -2692,13 +2931,13 @@ function buildAssignmentHistory(assignmentHistory) {
 
                     <td>
 
-                        ${item.assignedDate}
+                        ${formatDate(item.assignedDate)}
 
                     </td>
 
                     <td>
 
-                        ${item.returnedDate || '-'}
+                        ${formatDate(item.returnedDate) || '-'}
 
                     </td>
 
@@ -2769,34 +3008,20 @@ function buildTransferHistory(transferHistory) {
                 <tr>
 
                     <td>
-
-                        ${item.oldAssetId}
-
+                        <strong>${item.oldAsset?.assetId || '-'}</strong><br>
+                        <small>${item.oldAsset?.name || ''}</small>
                     </td>
 
                     <td>
-
-                        ${item.newAssetId}
-
+                        <strong>${item.newAsset?.assetId || '-'}</strong><br>
+                        <small>${item.newAsset?.name || ''}</small>
                     </td>
 
-                    <td>
+                    <td>${item.fromLocation}</td>
 
-                        ${item.fromLocation}
+                    <td>${item.toLocation}</td>
 
-                    </td>
-
-                    <td>
-
-                        ${item.toLocation}
-
-                    </td>
-
-                    <td>
-
-                        ${item.transferDate}
-
-                    </td>
+                    <td>${formatDate(item.transferDate)}</td>
 
                 </tr>
 
@@ -2850,7 +3075,7 @@ function buildTimeline(history, asset) {
 
                     <small class="text-muted">
 
-                        ${item.timestamp}
+                        ${formatDate(item.createdAt || item.timestamp)}
 
                     </small>
 
@@ -2878,9 +3103,15 @@ function buildTimeline(history, asset) {
 
                 <small class="text-muted">
 
-                    Date : ${asset.purchase?.purchaseDate || 'Unknown Date'}<br>
+                    Date : ${
+                      asset.purchaseDate ? formatDate(asset.purchaseDate) : 'Unknown Date'
+                    }<br>
 
-                    Warranty Expiry : ${asset.purchase?.warrantyExpiry || 'Unknown Warranty Expiry'}
+                    Warranty Expiry : ${
+                      asset.warrantyExpiry
+                        ? formatDate(asset.warrantyExpiry)
+                        : 'Unknown Warranty Expiry'
+                    }
 
                 </small>
 
@@ -2913,162 +3144,11 @@ function filterAssets() {
   });
 }
 
-function saveAssetEdit() {
-  const assetId = document.getElementById('editAssetId').value;
-
-  const assets = getAssets();
-
-  const asset = assets.find((a) => a.id === assetId);
+async function showAssetTransferModal(assetId) {
+  const asset = await getAssetApi(assetId);
 
   if (!asset) {
-    return;
-  }
-
-  const oldAsset = {
-    ...asset,
-  };
-
-  asset.name = document.getElementById('editAssetName').value;
-
-  asset.category = document.getElementById('editAssetCategory').value;
-
-  asset.status = document.getElementById('editAssetStatus').value;
-  asset.specifications = asset.specifications || {};
-
-  asset.specifications.serialNumber = document.getElementById('editAssetSerial').value;
-  asset.purchase = asset.purchase || {};
-
-  asset.purchase.vendor = document.getElementById('editAssetVendor').value;
-
-  asset.purchase = asset.purchase || {};
-
-  asset.purchase.purchaseDate = document.getElementById('editAssetPurchaseDate').value;
-
-  asset.purchase ??= {};
-
-  asset.purchase.warrantyExpiry = document.getElementById('editAssetWarrantyExpiry').value;
-
-  const specifications = {};
-
-  getSpecificationTemplate(asset.category).forEach((field) => {
-    specifications[field.key] =
-      document.getElementById(`editSpec_${field.key}`)?.value.trim() || '';
-  });
-
-  asset.specifications = specifications;
-  if (!asset.specifications) {
-    asset.specifications = {};
-  }
-
-  asset.specifications.serialNumber = document.getElementById('editAssetSerial').value.trim();
-
-  if (asset.status === 'Retired') {
-    asset.retirementReason = document.getElementById('retirementReason').value;
-
-    if (!asset.retiredDate) {
-      asset.retiredDate = formatDateTime();
-    }
-  }
-
-  addActivity(`Asset ${asset.name} updated`);
-
-  if (asset.status === 'Retired') {
-    const activeAssignment = getAssignments().find(
-      (a) => a.assetId === asset.id && a.status === 'Assigned'
-    );
-
-    if (activeAssignment) {
-      alert('Asset is currently assigned and cannot be retired.');
-
-      return;
-    }
-  }
-
-  if (oldAsset.status !== 'Retired' && asset.status === 'Retired') {
-    addAssetHistory(asset.id, 'Retired', `Reason: ${asset.retirementReason}`);
-  }
-
-  saveAssets(assets);
-
-  const changes = [];
-
-  if (oldAsset.name !== asset.name) changes.push(`Asset Name: ${oldAsset.name} → ${asset.name}`);
-
-  if (oldAsset.category !== asset.category)
-    changes.push(`Category: ${oldAsset.category} → ${asset.category}`);
-
-  if (oldAsset.specifications?.serialNumber !== asset.specifications?.serialNumber)
-    changes.push(
-      `Serial Number: ${oldAsset.specifications?.serialNumber || '-'} → ${
-        asset.specifications?.serialNumber || '-'
-      }`
-    );
-
-  if (oldAsset.purchase?.vendor !== asset.purchase?.vendor)
-    changes.push(`Vendor: ${oldAsset.purchase?.vendor || '-'} → ${asset.purchase?.vendor || '-'}`);
-
-  if (oldAsset.purchase?.warrantyExpiry !== asset.purchase?.warrantyExpiry)
-    changes.push(
-      `Warranty Expiry: ${oldAsset.purchase?.warrantyExpiry || '-'} → ${
-        asset.purchase?.warrantyExpiry || '-'
-      }`
-    );
-
-  if (oldAsset.purchase?.warrantyExpiry !== asset.purchase?.warrantyExpiry) {
-    changes.push(
-      `Warranty Expiry: ${oldAsset.purchase?.warrantyExpiry || '-'} → ${
-        asset.purchase?.warrantyExpiry || '-'
-      }`
-    );
-  }
-
-  if (oldAsset.status !== asset.status)
-    changes.push(`Status: ${oldAsset.status} → ${asset.status}`);
-
-  addAssetHistory(
-    asset.id,
-    'Updated',
-    changes.length > 0 ? changes.join('<br>') : 'No changes detected'
-  );
-
-  bootstrap.Modal.getInstance(document.getElementById('editAssetModal')).hide();
-
-  loadAssets();
-}
-
-function toggleRetirementReason() {
-  const status = document.getElementById('editAssetStatus').value;
-
-  document.getElementById('retirementReasonContainer').style.display =
-    status === 'Retired' ? 'block' : 'none';
-}
-
-function toggleTransferMode() {
-  const keepSame = document.getElementById('keepSameAssetId').checked;
-
-  document.getElementById('newAssetIdGroup').classList.toggle('d-none', keepSame);
-
-  const label = document.getElementById('transferModeLabel');
-
-  const description = document.getElementById('transferModeDescription');
-
-  if (keepSame) {
-    label.textContent = '📍 Keep Same Asset ID';
-
-    description.textContent = 'Move the existing asset to another location.';
-  } else {
-    label.textContent = '🔄 Use New Asset ID';
-
-    description.textContent = 'Create a new asset and mark the existing asset as transferred.';
-  }
-}
-
-function showAssetTransferModal(assetId) {
-  const assets = getAssets();
-
-  const asset = assets.find((a) => a.id === assetId);
-
-  if (!asset) {
+    alert('Asset not found.');
     return;
   }
 
@@ -3101,8 +3181,8 @@ Please return the asset before transferring.`
   showTransferAssetForm(asset);
 }
 
-function showTransferAssetForm(asset) {
-  const locations = getLocations();
+async function showTransferAssetForm(asset) {
+  const locations = await getLocations();
 
   const modal = document.createElement('div');
 
@@ -3139,7 +3219,7 @@ Current Asset ID
 
 <input
     class="form-control"
-    value="${asset.id}"
+    value="${asset.assetId}"
     readonly>
 
 </div>
@@ -3266,12 +3346,16 @@ Transfer
 `;
 
   document.body.appendChild(modal);
+  toggleTransferMode();
 }
 
-function saveAssetTransfer(oldAssetId) {
-  const assets = getAssets();
+async function saveAssetTransfer(oldAssetId) {
+  const oldAsset = await getAssetApi(oldAssetId);
 
-  const oldAsset = assets.find((a) => a.id === oldAssetId);
+  if (!oldAsset) {
+    alert('Asset not found.');
+    return;
+  }
 
   const oldLocation = oldAsset.location;
 
@@ -3291,7 +3375,9 @@ function saveAssetTransfer(oldAssetId) {
       return;
     }
 
-    const existingAsset = assets.find((a) => a.id === newAssetId);
+    const assets = await getAssetsApi();
+
+    const existingAsset = assets.find((a) => a.assetId === newAssetId);
 
     if (existingAsset) {
       alert('Asset ID already exists.');
@@ -3306,22 +3392,41 @@ function saveAssetTransfer(oldAssetId) {
   if (keepSameAssetId) {
     oldAsset.location = newLocation;
 
-    addAssetTransfer({
-      id: Date.now(),
+    await createAssetTransferApi({
       oldAssetId: oldAsset.id,
+
       newAssetId: oldAsset.id,
+
       fromLocation: oldLocation,
+
       toLocation: newLocation,
+
       remarks,
-      transferDate: formatDateTime(),
+
       transferMode: 'KeepSameAssetId',
     });
 
-    addAssetHistory(oldAsset.id, 'Location Changed', `${oldLocation} → ${newLocation}`);
+    await addAssetHistoryApi(
+      oldAsset.id,
+      'Transferred',
+      `Transferred from ${oldLocation} to ${newLocation}`
+    );
 
-    addActivity(`${oldAsset.name} moved from ${oldLocation} to ${newLocation}`);
+    await addActivityApi(`${oldAsset.name} transferred from ${oldLocation} to ${newLocation}`);
 
-    saveAssets(assets);
+    const updatedAsset = {
+      ...oldAsset,
+
+      location: newLocation,
+
+      transferDate: new Date(),
+
+      transferRemarks: remarks,
+
+      transferredTo: newLocation,
+    };
+
+    await updateAssetApi(oldAsset.id, updatedAsset);
 
     alert('Asset location updated successfully.');
 
@@ -3336,51 +3441,62 @@ function saveAssetTransfer(oldAssetId) {
     document.body.classList.remove('modal-open');
     document.body.style.removeProperty('padding-right');
 
-    loadAssets();
+    await loadAssets();
+
+    document.querySelector('.modal.show')?.remove();
 
     return;
   }
 
   // ==================================================
-  // Existing Transfer Logic
+  // New Asset ID Workflow
   // ==================================================
 
+  // Create the new asset record
   const newAsset = {
     ...oldAsset,
 
-    transferredTo: '',
-
-    transferDate: '',
-
-    transferRemarks: '',
-
-    id: newAssetId,
+    assetId: newAssetId,
 
     location: newLocation,
 
-    previousAssetId: oldAsset.id,
+    previousAssetId: oldAsset.assetId,
 
     status: 'Available',
+
+    transferredTo: '',
+
+    transferDate: null,
+
+    transferRemarks: '',
   };
 
-  oldAsset.status = 'Transferred';
+  // Remove Prisma primary key so a new row is created
+  delete newAsset.id;
 
-  oldAsset.transferredTo = newAssetId;
+  // Create the new asset
+  const createdAsset = await createAssetApi(newAsset);
 
-  oldAsset.transferDate = formatDateTime();
+  // Mark old asset as transferred
+  const updatedOldAsset = {
+    ...oldAsset,
 
-  oldAsset.transferRemarks = remarks;
+    status: 'Transferred',
 
-  assets.push(newAsset);
+    transferredTo: createdAsset.assetId,
 
-  saveAssets(assets);
+    transferDate: new Date(),
 
-  addAssetTransfer({
-    id: Date.now(),
+    transferRemarks: remarks,
+  };
 
+  await updateAssetApi(oldAsset.id, updatedOldAsset);
+
+  // Save transfer record
+  await createAssetTransferApi({
     oldAssetId: oldAsset.id,
 
-    newAssetId,
+    newAssetId: createdAsset.id,
 
     fromLocation: oldLocation,
 
@@ -3388,25 +3504,22 @@ function saveAssetTransfer(oldAssetId) {
 
     remarks,
 
-    transferDate: formatDateTime(),
-
     transferMode: 'NewAssetId',
   });
 
-  addActivity(
-    `Asset transferred:
-${oldAsset.id}
-→
-${newAssetId}`
-  );
+  // Old asset history
+  await addAssetHistoryApi(oldAsset.id, 'Transferred', `Transferred to ${createdAsset.assetId}`);
+
+  // New asset history
+  await addAssetHistoryApi(createdAsset.id, 'Received', `Received from ${oldAsset.assetId}`);
+
+  // Activity Log
+  await addActivityApi(`${oldAsset.assetId} transferred to ${createdAsset.assetId}`);
 
   alert('Asset transferred successfully.');
 
-  const transferModal = document.querySelector('.modal.show');
-
-  if (transferModal) {
-    transferModal.remove();
-  }
+  // Close modal
+  document.querySelector('.modal.show')?.remove();
 
   document.querySelectorAll('.modal-backdrop').forEach((b) => b.remove());
 
@@ -3414,5 +3527,40 @@ ${newAssetId}`
 
   document.body.style.removeProperty('padding-right');
 
-  loadAssets();
+  // Reload assets
+  await loadAssets();
+}
+
+function toggleTransferMode() {
+  const keepSame = document.getElementById('keepSameAssetId').checked;
+
+  const newAssetGroup = document.getElementById('newAssetIdGroup');
+
+  const label = document.getElementById('transferModeLabel');
+
+  const description = document.getElementById('transferModeDescription');
+
+  if (keepSame) {
+    newAssetGroup.classList.add('d-none');
+
+    label.innerHTML = '📍 Keep Same Asset ID';
+
+    description.textContent = 'Move the existing asset to another location.';
+  } else {
+    newAssetGroup.classList.remove('d-none');
+
+    label.innerHTML = '🆕 Create New Asset ID';
+
+    description.textContent = 'Create a new asset record for the destination location.';
+  }
+}
+
+function formatDate(date) {
+  if (!date) return '-';
+
+  return new Date(date).toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
 }

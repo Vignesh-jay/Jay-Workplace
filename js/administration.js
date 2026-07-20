@@ -4,6 +4,7 @@ async function loadAdministration() {
   const activities = await getActivitiesApi();
   const departments = await getDepartments();
   const locations = await getLocations();
+  const assetStatuses = await getAssetStatuses();
 
   document.getElementById('content').innerHTML = `
 
@@ -253,6 +254,39 @@ async function loadAdministration() {
         </div>
 
     </div>
+    <div class="col-md-4">
+
+    <div class="export-card">
+
+        <div class="export-icon bg-info-subtle text-info">
+
+            <i class="fas fa-tags"></i>
+
+        </div>
+
+        <h6>
+
+            Asset Statuses
+
+        </h6>
+
+        <p class="text-muted">
+
+            Manage available asset statuses.
+
+        </p>
+
+        <button
+            class="btn btn-info w-100"
+            onclick="loadAssetStatuses()">
+
+            Manage
+
+        </button>
+
+    </div>
+
+</div>
 
     <div class="col-md-4">
 
