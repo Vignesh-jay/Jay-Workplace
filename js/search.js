@@ -14,14 +14,18 @@ async function globalSearch(query) {
     };
   }
 
+  const [assets, employees, departments, locations] = await Promise.all([
+    searchAssets(query),
+    searchEmployees(query),
+    searchDepartments(query),
+    searchLocations(query),
+  ]);
+
   return {
-    assets: searchAssets(query),
-
-    employees: await searchEmployees(query),
-
-    departments: searchDepartments(query),
-
-    locations: searchLocations(query),
+    assets,
+    employees,
+    departments,
+    locations,
   };
 }
 
@@ -80,24 +84,19 @@ function getAssetIcon(category) {
   }
 }
 
-function searchAssets(query) {
-  return getAssets().filter((asset) => {
+async function searchAssets(query) {
+  const assets = await getAssetsApi();
+
+  return assets.filter((asset) => {
     return [
-      asset.id,
-
+      asset.assetId,
       asset.name,
-
       asset.category,
-
       asset.location,
-
       asset.status,
-
-      asset.specifications?.manufacturer,
-
-      asset.specifications?.model,
-
-      asset.specifications?.serialNumber,
+      asset.manufacturer,
+      asset.model,
+      asset.serialNumber,
     ]
       .filter(Boolean)
       .some((value) => value.toString().toLowerCase().includes(query));
@@ -130,19 +129,30 @@ async function searchEmployees(query) {
   });
 }
 
-function searchDepartments(query) {
-  return getDepartments().filter((department) => {
-    const name = typeof department === 'string' ? department : department?.name;
+async function searchDepartments(query) {
+  const departments = await getDepartments();
 
-    return name?.toLowerCase().includes(query);
+  return departments.filter((department) => {
+    return [department.code, department.name, department.description]
+      .filter(Boolean)
+      .some((value) => value.toString().toLowerCase().includes(query));
   });
 }
 
-function searchLocations(query) {
-  return getLocations().filter((location) => {
-    const name = typeof location === 'string' ? location : location?.name;
+async function searchLocations(query) {
+  const locations = await getLocations();
 
-    return name?.toLowerCase().includes(query);
+  return locations.filter((location) => {
+    return [
+      location.code,
+      location.name,
+      location.city,
+      location.state,
+      location.country,
+      location.address,
+    ]
+      .filter(Boolean)
+      .some((value) => value.toString().toLowerCase().includes(query));
   });
 }
 
@@ -159,14 +169,11 @@ async function handleGlobalSearch(e) {
 
   const results = await globalSearch(query);
 
-  const shortcut = document.querySelector('.search-shortcut');
   const clearBtn = document.getElementById('clearSearchBtn');
 
   if (query.trim()) {
-    shortcut.classList.add('d-none');
     clearBtn.classList.remove('d-none');
   } else {
-    shortcut.classList.remove('d-none');
     clearBtn.classList.add('d-none');
   }
 
@@ -208,7 +215,7 @@ function renderGlobalSearch(results) {
 
                     <small class="text-muted">
 
-                        ${asset.id}
+                        ${asset.assetId}
 
                         •
 
@@ -365,8 +372,6 @@ function clearGlobalSearch() {
   const input = document.getElementById('globalSearchInput');
 
   input.value = '';
-
-  document.querySelector('.search-shortcut').classList.remove('d-none');
 
   document.getElementById('clearSearchBtn').classList.add('d-none');
 
