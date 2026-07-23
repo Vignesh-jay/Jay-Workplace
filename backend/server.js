@@ -34,6 +34,10 @@ const assetTransfers = require('./routes/assetTransfers');
 
 app.use('/asset-transfers', assetTransfers);
 
+const assignmentRoutes = require('./routes/assignments');
+
+app.use('/assignments', assignmentRoutes);
+
 const PORT = 3000;
 
 const prisma = require('./db');

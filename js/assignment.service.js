@@ -1,53 +1,23 @@
-function addAssignment(assignment) {
-  const assignments = getAssignments();
+async function getAssignmentsApi() {
+  const response = await apiGet('/assignments');
 
-  assignments.push(assignment);
-
-  saveAssignments(assignments);
-
-  addActivity(`${assignment.assetName} assigned to ${assignment.employeeName}`);
-
-  return assignment;
+  return response.data;
 }
 
-function saveAssignment() {
-  const employeeId = document.getElementById('employeeSelect').value;
+async function getAssignmentApi(id) {
+  const response = await apiGet(`/assignments/${id}`);
 
-  const assetId = document.getElementById('assetSelect').value;
+  return response.data;
+}
 
-  const employees = getEmployees();
-  const assets = getAssets();
+async function createAssignmentApi(assignment) {
+  const response = await apiPost('/assignments', assignment);
 
-  const employee = employees.find((emp) => emp.id === employeeId);
+  return response.data;
+}
 
-  const asset = assets.find((ast) => ast.id === assetId);
+async function updateAssignmentApi(id, assignment) {
+  const response = await apiPut(`/assignments/${id}`, assignment);
 
-  const assignment = {
-    id: crypto.randomUUID(), // <-- Add this
-
-    assetId: asset.id,
-    assetName: asset.name,
-
-    employeeId: employee.id,
-    employeeName: `${employee.firstName} ${employee.lastName}`,
-
-    assignedDate: formatDateTime(),
-    returnedDate: '',
-
-    status: 'Assigned',
-  };
-
-  asset.status = 'Assigned';
-
-  saveAssets(assets);
-
-  addAssetHistory(asset.id, 'Assigned', `Assigned to ${employee.firstName} ${employee.lastName}`);
-
-  addEmployeeHistory(employee.id, 'Asset Assigned', asset.name);
-
-  addAssignment(assignment);
-
-  loadAssignments();
-
-  bootstrap.Modal.getInstance(document.getElementById('assignAssetModal')).hide();
+  return response.data;
 }

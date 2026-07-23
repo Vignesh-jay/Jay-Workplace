@@ -1,5 +1,5 @@
-function loadAssignments() {
-  const assignmentList = getAssignments();
+async function loadAssignments() {
+  const assignmentList = await getAssignmentsApi();
 
   const totalAssignments = assignmentList.length;
 
@@ -7,7 +7,9 @@ function loadAssignments() {
 
   const returnedAssignments = assignmentList.filter((a) => a.status === 'Returned').length;
 
-  const availableAssets = getAssets().filter((a) => a.status === 'Available').length;
+  const assets = await getAssetsApi();
+
+  const availableAssets = assets.filter((a) => a.status === 'Available').length;
 
   setActiveMenu('nav-assignments');
 
@@ -188,13 +190,13 @@ function loadAssignments() {
 
                         <div class="asset-name">
 
-                            ${item.assetName}
+                            ${item.asset.name}
 
                         </div>
 
                         <div class="asset-meta">
 
-                            ${item.assetId}
+                            ${item.asset.assetId}
 
                         </div>
 
@@ -204,13 +206,13 @@ function loadAssignments() {
 
                         <div class="asset-name">
 
-                            ${item.employeeName}
+                            ${item.employee.firstName} ${item.employee.lastName}
 
                         </div>
 
                         <div class="asset-meta">
 
-                            ${item.employeeId}
+                            ${item.employee.employeeId}
 
                         </div>
 
@@ -218,13 +220,13 @@ function loadAssignments() {
 
                     <td>
 
-                        ${item.assignedDate}
+                        ${formatDateTime(item.assignedDate)}
 
                     </td>
 
                     <td>
 
-                        ${item.returnedDate || '-'}
+                        ${item.returnedDate ? formatDateTime(item.returnedDate) : '-'}
 
                     </td>
 
@@ -261,7 +263,7 @@ function loadAssignments() {
 
                                 title="Return"
 
-                                onclick="returnAsset('${item.assetId}')">
+                                onclick="returnAsset(${item.id})">
 
                                 <i class="fas fa-rotate-left"></i>
 
@@ -299,10 +301,9 @@ function loadAssignments() {
 `;
 }
 
-function showAssignAssetModal() {
-  const employees = getEmployees();
-
-  const assets = getAssets().filter((asset) => asset.status === 'Available');
+async function showAssignAssetModal() {
+  const employees = await getEmployeesApi();
+  const assets = (await getAssetsApi()).filter((asset) => asset.status === 'Available');
 
   const modalHtml = `
     <div class="modal fade"
@@ -344,11 +345,9 @@ function showAssignAssetModal() {
                                 (emp) => `
 
                                 <option value="${emp.id}">
-
-                                    ${emp.firstName} ${emp.lastName}
+                                    ${emp.employeeId}
                                     •
-                                    ${emp.department}
-
+                                    ${emp.firstName} ${emp.lastName}
                                 </option>
 
                             `
@@ -381,16 +380,14 @@ function showAssignAssetModal() {
                             ${assets
                               .map(
                                 (asset) => `
-
-                                <option value="${asset.id}">
-
-                                    ${asset.name}
-                                    •
-                                    ${asset.location}
-
-                                </option>
-
-                            `
+                                    <option value="${asset.id}">
+                                        ${asset.assetId}
+                                        •
+                                        ${asset.name}
+                                        •
+                                        ${asset.serialNumber}
+                                    </option>
+                                    `
                               )
                               .join('')}
 
@@ -434,10 +431,12 @@ function showAssignAssetModal() {
   previewAssignmentAsset();
 }
 
-function previewAssignmentAsset() {
+async function previewAssignmentAsset() {
   const assetId = document.getElementById('assetSelect').value;
 
-  const asset = getAssets().find((a) => a.id === assetId);
+  const assets = await getAssetsApi();
+
+  const asset = assets.find((a) => a.id === Number(assetId));
 
   const preview = document.getElementById('assignmentAssetPreview');
 
@@ -460,7 +459,7 @@ function previewAssignmentAsset() {
         <div class="info-grid">
 
             <div>Asset ID</div>
-            <strong>${asset.id}</strong>
+            <strong>${asset.assetId}</strong>
 
             <div>Category</div>
             <strong>${asset.category}</strong>
@@ -472,7 +471,7 @@ function previewAssignmentAsset() {
             <strong>${asset.status}</strong>
 
             <div>Serial</div>
-            <strong>${asset.specifications?.serialNumber || '-'}</strong>
+            <strong>${asset.serialNumber || '-'}</strong>
 
         </div>
 
@@ -481,46 +480,26 @@ function previewAssignmentAsset() {
     `;
 }
 
-function returnAsset(assetId) {
+async function returnAsset(assignmentId) {
   if (!confirm('Return this asset?')) {
     return;
   }
 
-  const assets = getAssets();
+  try {
+    await updateAssignmentApi(assignmentId, {
+      returnedBy: 'System',
+      condition: 'Good',
+      remarks: '',
+    });
 
-  const assignments = getAssignments();
+    alert('Asset returned successfully.');
 
-  const asset = assets.find((a) => a.id === assetId);
+    await loadAssignments();
+  } catch (error) {
+    console.error(error);
 
-  const assignment = assignments.find((a) => a.assetId === assetId && a.status === 'Assigned');
-
-  if (!asset || !assignment) {
-    return;
+    alert('Failed to return asset.');
   }
-
-  asset.status = 'Available';
-
-  assignment.status = 'Returned';
-
-  assignment.returnedDate = formatDateTime();
-
-  addAssetHistory(asset.id, 'Returned', `Returned by ${assignment.employeeName}`);
-
-  addAssignmentHistory(
-    asset.id,
-    'Returned',
-    `${asset.name} returned by ${assignment.employeeName}`
-  );
-
-  saveAssets(assets);
-
-  saveAssignments(assignments);
-
-  addEmployeeHistory(assignment.employeeId, 'Asset Returned', asset.name);
-
-  addActivity(`${asset.name} returned by ${assignment.employeeName}`);
-
-  loadAssignments();
 }
 
 function filterAssignments() {
@@ -533,18 +512,14 @@ function filterAssignments() {
   });
 }
 
-function viewAssignment(assignmentId) {
-  const assignments = getAssignments();
-  const assets = getAssets();
-  const employees = getEmployees();
-
-  const assignment = assignments.find((a) => a.id === assignmentId);
+async function viewAssignment(assignmentId) {
+  const assignment = await getAssignmentApi(assignmentId);
 
   if (!assignment) return;
 
-  const asset = assets.find((a) => a.id === assignment.assetId);
+  const asset = assignment.asset;
 
-  const employee = employees.find((e) => e.id === assignment.employeeId);
+  const employee = assignment.employee;
 
   if (!asset || !employee) return;
 
@@ -575,7 +550,7 @@ function viewAssignment(assignmentId) {
 
         <div class="text-muted fw-semibold">
 
-            ${asset.id}
+            ${asset.assetId}
 
             •
 
@@ -669,7 +644,7 @@ function viewAssignment(assignmentId) {
 
                 <small>Assigned</small>
 
-                <h6>${assignment.assignedDate}</h6>
+                <h6>${formatDateTime(assignment.assignedDate)}</h6>
 
             </div>
 
@@ -691,7 +666,7 @@ function viewAssignment(assignmentId) {
 
                 <small>Returned</small>
 
-                <h6>${assignment.returnedDate || '-'}</h6>
+                <h6>${assignment.returnedDate ? formatDateTime(assignment.returnedDate) : '-'}</h6>
 
             </div>
 
@@ -713,10 +688,10 @@ function viewAssignment(assignmentId) {
         <strong>${employee.department}</strong>
 
         <div>Assigned On</div>
-        <strong>${assignment.assignedDate}</strong>
+        <strong>${formatDateTime(assignment.assignedDate)}</strong>
 
         <div>Returned On</div>
-        <strong>${assignment.returnedDate || '-'}</strong>
+        <strong>${assignment.returnedDate ? formatDateTime(assignment.returnedDate) : '-'}</strong>
 
     </div>
 
@@ -740,4 +715,38 @@ function viewAssignment(assignmentId) {
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 
   new bootstrap.Modal(document.getElementById('viewAssignmentModal')).show();
+}
+
+async function saveAssignment() {
+  const employeeId = Number(document.getElementById('employeeSelect').value);
+
+  const assetId = Number(document.getElementById('assetSelect').value);
+
+  if (!employeeId || !assetId) {
+    alert('Please select an employee and an asset.', 'warning');
+
+    return;
+  }
+
+  try {
+    await createAssignmentApi({
+      assetId,
+
+      employeeId,
+
+      assignedBy: 'System',
+
+      remarks: '',
+    });
+
+    bootstrap.Modal.getInstance(document.getElementById('assignAssetModal')).hide();
+
+    await loadAssignments();
+
+    alert('Asset assigned successfully.', 'success');
+  } catch (error) {
+    console.error(error);
+
+    alert('Failed to assign asset.', 'danger');
+  }
 }

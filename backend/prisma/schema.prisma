@@ -59,6 +59,8 @@ model Employee {
   updatedAt DateTime @updatedAt
 
   history EmployeeHistory[]
+
+  assignments Assignment[]
 }
 
 model EmployeeHistory {
@@ -165,10 +167,11 @@ model Asset {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  history AssetHistory[]
+  history       AssetHistory[]
   transfersFrom AssetTransfer[] @relation("OldAssetTransfer")
 
   transfersTo AssetTransfer[] @relation("NewAssetTransfer")
+  assignments Assignment[]
 }
 
 model AssetHistory {
@@ -185,31 +188,62 @@ model AssetHistory {
 }
 
 model AssetStatus {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  isActive  Boolean  @default(true)
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model AssetTransfer {
-  id             Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  oldAssetId     Int
-  newAssetId     Int?
+  oldAssetId Int
+  newAssetId Int?
 
-  fromLocation   String
-  toLocation     String
+  fromLocation String
+  toLocation   String
 
-  remarks        String?
+  remarks String?
 
-  transferMode   String
+  transferMode String
 
-  transferDate   DateTime @default(now())
+  transferDate DateTime @default(now())
 
-  oldAsset Asset @relation("OldAssetTransfer", fields: [oldAssetId], references: [id], onDelete: Cascade)
+  oldAsset Asset  @relation("OldAssetTransfer", fields: [oldAssetId], references: [id], onDelete: Cascade)
   newAsset Asset? @relation("NewAssetTransfer", fields: [newAssetId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+model Assignment {
+  id Int @id @default(autoincrement())
+
+  assetId    Int
+  employeeId Int
+
+  assignedDate DateTime
+
+  expectedReturn DateTime?
+
+  returnedDate DateTime?
+
+  assignedBy String
+
+  returnedBy String?
+
+  remarks String?
+
+  condition String?
+
+  status String @default("Assigned")
+
+  asset Asset @relation(fields: [assetId], references: [id])
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 }
