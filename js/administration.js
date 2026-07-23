@@ -19,9 +19,9 @@ async function loadAdministration() {
 
 </div>
 
-<div class="row g-3 mb-4">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3 mb-4">
 
-    <div class="col-lg-2 col-md-4">
+    <div class="col">
 
         <div class="dashboard-card card h-100">
 
@@ -30,9 +30,7 @@ async function loadAdministration() {
                 <div>
 
                     <div class="text-muted small">
-
                         Employees
-
                     </div>
 
                     <h2>${employees.length}</h2>
@@ -47,7 +45,7 @@ async function loadAdministration() {
 
     </div>
 
-    <div class="col-lg-2 col-md-4">
+    <div class="col">
 
         <div class="dashboard-card card h-100">
 
@@ -56,9 +54,7 @@ async function loadAdministration() {
                 <div>
 
                     <div class="text-muted small">
-
                         Departments
-
                     </div>
 
                     <h2>${departments.length}</h2>
@@ -73,7 +69,7 @@ async function loadAdministration() {
 
     </div>
 
-    <div class="col-lg-2 col-md-4">
+    <div class="col">
 
         <div class="dashboard-card card h-100">
 
@@ -82,9 +78,7 @@ async function loadAdministration() {
                 <div>
 
                     <div class="text-muted small">
-
                         Locations
-
                     </div>
 
                     <h2>${locations.length}</h2>
@@ -99,7 +93,7 @@ async function loadAdministration() {
 
     </div>
 
-    <div class="col-lg-2 col-md-4">
+    <div class="col">
 
         <div class="dashboard-card card h-100">
 
@@ -108,35 +102,7 @@ async function loadAdministration() {
                 <div>
 
                     <div class="text-muted small">
-
-                        Audit Logs
-
-                    </div>
-
-                    <h2>${getAuditLogs().length}</h2>
-
-                </div>
-
-                <i class="fas fa-clipboard-list fa-2x text-warning"></i>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-lg-2 col-md-4">
-
-        <div class="dashboard-card card h-100">
-
-            <div class="card-body">
-
-                <div>
-
-                    <div class="text-muted small">
-
                         Transfers
-
                     </div>
 
                     <h2>${getAssetTransfers().length}</h2>
@@ -151,7 +117,7 @@ async function loadAdministration() {
 
     </div>
 
-    <div class="col-lg-2 col-md-4">
+    <div class="col">
 
         <div class="dashboard-card card h-100">
 
@@ -160,9 +126,7 @@ async function loadAdministration() {
                 <div>
 
                     <div class="text-muted small">
-
                         Version
-
                     </div>
 
                     <h2>1.1</h2>
@@ -287,40 +251,6 @@ async function loadAdministration() {
     </div>
 
 </div>
-
-    <div class="col-md-4">
-
-        <div class="export-card">
-
-            <div class="export-icon bg-warning-subtle text-warning">
-
-                <i class="fas fa-clipboard-list"></i>
-
-            </div>
-
-            <h6>
-
-                Audit Logs
-
-            </h6>
-
-            <p class="text-muted">
-
-                View complete activity logs.
-
-            </p>
-
-            <button
-                class="btn btn-warning w-100"
-                onclick="loadAuditLogs()">
-
-                View Logs
-
-            </button>
-
-        </div>
-
-    </div>
 
     <div class="col-md-4">
 
