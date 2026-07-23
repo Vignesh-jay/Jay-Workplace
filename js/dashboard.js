@@ -203,10 +203,18 @@ async function loadDashboard() {
                         <div class="timeline-content">
 
                             <strong>
-
-                                ${item.message}
-
+                                ${item.description}
                             </strong>
+
+                            <br>
+
+                            <small class="text-muted">
+
+                                ${item.module}
+                                •
+                                ${item.performedBy}
+
+                            </small>
 
                             <br>
 
