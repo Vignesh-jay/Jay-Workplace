@@ -1056,7 +1056,7 @@ function validateRequiredFields(fields) {
 async function loadAssets() {
   let assetList = await getAssetsApi();
 
-  const assignments = getAssignments();
+  const assignments = await getAssignmentsApi();
 
   const totalAssets = assetList.length;
 
@@ -1286,7 +1286,7 @@ async function loadAssets() {
 
             ${assetList
               .map((asset) => {
-                const activeAssignment = getAssignments().find(
+                const activeAssignment = assignments.find(
                   (a) => a.assetId === asset.id && a.status === 'Assigned'
                 );
 
@@ -1327,7 +1327,11 @@ async function loadAssets() {
                             ? `
                                     <div>
                                         <i class="fas fa-user text-primary"></i>
-                                        ${activeAssignment.employeeName}
+                                        ${
+                                          activeAssignment.employee
+                                            ? `${activeAssignment.employee.firstName} ${activeAssignment.employee.lastName}`
+                                            : 'Unknown'
+                                        }
                                     </div>
                                 `
                             : `
@@ -2417,9 +2421,9 @@ async function deleteAsset(assetId) {
 
     return;
   }
-
-  const activeAssignment = getAssignments().find(
-    (a) => a.assetId === assetId && a.status === 'Assigned'
+  const assignments = await getAssignmentsApi();
+  const activeAssignment = assignments.find(
+    (a) => a.assetId === asset.id && a.status === 'Assigned'
   );
 
   if (activeAssignment) {
@@ -2469,11 +2473,9 @@ async function viewAsset(assetId) {
     return;
   }
 
-  const assignments = getAssignments();
+  const assignments = await getAssignmentsApi();
 
   const history = await getAssetHistoryApi(assetId);
-
-  const totalAssignments = history.filter((h) => h.action === 'Assigned').length;
 
   const warrantyDaysRemaining = asset.warrantyExpiry
     ? Math.ceil((new Date(asset.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24))
@@ -2483,12 +2485,12 @@ async function viewAsset(assetId) {
     ? Math.ceil((new Date() - new Date(asset.purchaseDate)) / (1000 * 60 * 60 * 24))
     : null;
 
-  const currentAssignment = getAssignments().find(
-    (a) => a.assetId === assetId && a.status === 'Assigned'
+  const currentAssignment = assignments.find(
+    (a) => a.assetId === asset.id && a.status === 'Assigned'
   );
 
-  const assignmentHistory = getAssignments()
-    .filter((a) => a.assetId === assetId)
+  const assignmentHistory = assignments
+    .filter((a) => a.assetId === asset.id)
     .sort((a, b) => new Date(b.assignedDate) - new Date(a.assignedDate));
 
   const transferHistory = (await getAssetTransfersApi()).filter(
@@ -2496,6 +2498,8 @@ async function viewAsset(assetId) {
   );
 
   const displayStatus = currentAssignment ? 'Assigned' : asset.status;
+
+  const totalAssignments = assignmentHistory.length;
 
   const heroSection = `
 
@@ -2572,7 +2576,11 @@ async function viewAsset(assetId) {
 
                     <h6>
 
-                        ${currentAssignment ? currentAssignment.employeeName : 'Inventory'}
+                        ${
+                          currentAssignment?.employee
+                            ? `${currentAssignment.employee.firstName} ${currentAssignment.employee.lastName}`
+                            : 'Inventory'
+                        }
 
                     </h6>
 
@@ -2711,7 +2719,11 @@ async function viewAsset(assetId) {
 
                     <div>Current Holder</div>
                     <strong>
-                        ${currentAssignment ? currentAssignment.employeeName : 'In Inventory'}
+                        ${
+                          currentAssignment?.employee
+                            ? `${currentAssignment.employee.firstName} ${currentAssignment.employee.lastName}`
+                            : 'In Inventory'
+                        }
                     </strong>
 
                 </div>
@@ -2925,7 +2937,11 @@ function buildAssignmentHistory(assignmentHistory) {
 
                     <td>
 
-                        ${item.employeeName}
+                        ${
+                          item.employee
+                            ? `${item.employee.firstName} ${item.employee.lastName} (${item.employee.employeeId})`
+                            : '-'
+                        }
 
                     </td>
 
@@ -3152,13 +3168,18 @@ async function showAssetTransferModal(assetId) {
     return;
   }
 
-  const activeAssignment = getAssignments().find(
+  const assignments = await getAssignmentsApi();
+  const activeAssignment = assignments.find(
     (a) => a.assetId === asset.id && a.status === 'Assigned'
   );
 
   if (activeAssignment) {
     alert(
-      `Asset is currently assigned to ${activeAssignment.employeeName}.
+      `Asset is currently assigned to ${
+        activeAssignment.employee
+          ? `${activeAssignment.employee.firstName} ${activeAssignment.employee.lastName}`
+          : 'Unknown'
+      }.
 
 Please return the asset before transferring.`
     );
