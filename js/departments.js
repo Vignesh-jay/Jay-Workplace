@@ -108,8 +108,6 @@ async function loadDepartments() {
                     }
                 </td>
 
-                <td>
-
                     <td class="text-nowrap">
 
                         ${
@@ -155,8 +153,6 @@ async function loadDepartments() {
                         }
 
                     </td>
-
-                </td>
 
             </tr>
 
@@ -277,7 +273,14 @@ async function saveDepartment() {
       description,
     });
 
-    await addActivity(`Department ${name} created`);
+    await logActivity({
+      module: 'Departments',
+      action: 'Created',
+      description: `Department ${name} created`,
+      entityType: 'Department',
+      entityId: null,
+      entityCode: code,
+    });
 
     bootstrap.Modal.getInstance(document.getElementById('addDepartmentModal')).hide();
 
@@ -288,14 +291,44 @@ async function saveDepartment() {
 }
 
 async function disableDepartmentClick(id) {
-  if (!confirm('Disable this department?')) {
-    return;
-  }
+  if (!confirm('Disable this department?')) return;
 
   try {
+    const departments = await getDepartments('all');
+    const department = departments.find((dep) => dep.id === id);
+
+    if (!department) {
+      alert('Department not found.');
+      return;
+    }
+
+    const employees = await getEmployeesApi();
+
+    const assignedEmployees = employees.filter((emp) => emp.department === department.name);
+
+    if (assignedEmployees.length > 0) {
+      let message = `Cannot disable "${department.name}".\n\n`;
+
+      message += `Employees Assigned:\n`;
+
+      message += assignedEmployees
+        .map((emp) => `${emp.employeeId} - ${emp.firstName} ${emp.lastName}`)
+        .join('\n');
+
+      alert(message);
+      return;
+    }
+
     await disableDepartment(id);
 
-    await addActivity('Department disabled');
+    await logActivity({
+      module: 'Departments',
+      action: 'Disabled',
+      description: `Department "${department.name}" disabled`,
+      entityType: 'Department',
+      entityId: id,
+      entityCode: department.code,
+    });
 
     await loadDepartments();
   } catch (error) {
@@ -439,7 +472,14 @@ async function updateDepartmentClick(id) {
       status: true,
     });
 
-    await addActivity(`Department ${name} updated`);
+    await logActivity({
+      module: 'Departments',
+      action: 'Updated',
+      description: `Department ${name} updated`,
+      entityType: 'Department',
+      entityId: id,
+      entityCode: code,
+    });
 
     bootstrap.Modal.getInstance(document.getElementById('editDepartmentModal')).hide();
 
@@ -459,9 +499,19 @@ async function enableDepartmentClick(id) {
   if (!confirm('Enable this department?')) return;
 
   try {
+    const departments = await getDepartments('all');
+    const department = departments.find((dep) => dep.id === id);
+
     await enableDepartment(id);
 
-    await addActivity('Department enabled');
+    await logActivity({
+      module: 'Departments',
+      action: 'Enabled',
+      description: `Department "${department.name}" enabled`,
+      entityType: 'Department',
+      entityId: id,
+      entityCode: department.code,
+    });
 
     await loadDepartments();
   } catch (error) {
@@ -473,9 +523,41 @@ async function deleteDepartmentClick(id) {
   if (!confirm('Permanently delete this department?')) return;
 
   try {
+    const departments = await getDepartments('all');
+    const department = departments.find((dep) => dep.id === id);
+
+    if (!department) {
+      alert('Department not found.');
+      return;
+    }
+
+    const employees = await getEmployeesApi();
+
+    const assignedEmployees = employees.filter((emp) => emp.department === department.name);
+
+    if (assignedEmployees.length > 0) {
+      let message = `Cannot delete "${department.name}".\n\n`;
+
+      message += `Employees Assigned:\n`;
+
+      message += assignedEmployees
+        .map((emp) => `${emp.employeeId} - ${emp.firstName} ${emp.lastName}`)
+        .join('\n');
+
+      alert(message);
+      return;
+    }
+
     await deleteDepartment(id);
 
-    await addActivity('Department deleted');
+    await logActivity({
+      module: 'Departments',
+      action: 'Deleted',
+      description: `Department "${department.name}" deleted`,
+      entityType: 'Department',
+      entityId: id,
+      entityCode: department.code,
+    });
 
     await loadDepartments();
   } catch (error) {

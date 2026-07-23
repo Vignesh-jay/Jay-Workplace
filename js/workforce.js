@@ -628,7 +628,14 @@ async function saveEmployee() {
 
     await addEmployeeHistoryApi(createdEmployee.id, 'Created', 'Employee onboarded');
 
-    await addActivityApi(`Employee ${employee.firstName} ${employee.lastName} created`);
+    await logActivity({
+      module: 'Employees',
+      action: 'Created',
+      description: `Employee ${employee.firstName} ${employee.lastName} created`,
+      entityType: 'Employee',
+      entityId: createdEmployee.id,
+      entityCode: createdEmployee.employeeId,
+    });
 
     alert(`Employee ${employee.firstName} ${employee.lastName} added successfully`);
 
@@ -650,7 +657,7 @@ async function deleteEmployeeUI(employeeId) {
   if (assignedAssets.length > 0) {
     alert(
       `Cannot delete employee.\n\nOutstanding Assets:\n\n${assignedAssets
-        .map((a) => a.assetName)
+        .map((a) => `${a.asset.assetId} - ${a.asset.name}`)
         .join('\n')}`
     );
 
@@ -661,11 +668,20 @@ async function deleteEmployeeUI(employeeId) {
     return;
   }
 
+  const employee = await getEmployeeApi(employeeId);
+
   await deleteEmployeeApi(employeeId);
 
   await addEmployeeHistoryApi(employeeId, 'Deleted', 'Employee removed');
 
-  await addActivityApi(`Employee with ID ${employeeId} deleted`);
+  await logActivity({
+    module: 'Employees',
+    action: 'Deleted',
+    description: `Employee ${employee.firstName} ${employee.lastName} deleted`,
+    entityType: 'Employee',
+    entityId: employee.id,
+    entityCode: employee.employeeId,
+  });
 
   await loadWorkforce();
 }
@@ -978,8 +994,6 @@ async function saveEmployeeEdit() {
 
   employee.status = document.getElementById('editEmployeeStatus').value;
 
-  await addActivityApi(`Employee ${employee.firstName} ${employee.lastName} updated`);
-
   const changes = [];
 
   if (oldEmployee.firstName !== employee.firstName)
@@ -1045,14 +1059,28 @@ async function saveEmployeeEdit() {
       remarks: 'Location changed via Employee Edit',
     });
 
-    await addActivityApi(
-      `Employee ${employee.name} transferred from ${oldLocation} to ${newLocation}`
-    );
+    await logActivity({
+      module: 'Employees',
+      action: 'Transferred',
+      description: `${employee.firstName} ${employee.lastName} transferred from ${oldLocation} to ${newLocation}`,
+      entityType: 'Employee',
+      entityId: employee.id,
+      entityCode: employee.employeeId,
+    });
 
     await addEmployeeHistoryApi(employee.id, 'Transferred', `${oldLocation} → ${newLocation}`);
   }
 
   await updateEmployeeApi(employee.id, employee);
+
+  await logActivity({
+    module: 'Employees',
+    action: 'Updated',
+    description: `Employee ${employee.firstName} ${employee.lastName} updated`,
+    entityType: 'Employee',
+    entityId: employee.id,
+    entityCode: employee.employeeId,
+  });
 
   await addEmployeeHistoryApi(
     employee.id,
@@ -1480,7 +1508,6 @@ async function viewEmployee(employeeId) {
 
   new bootstrap.Modal(document.getElementById('employeeProfileModal')).show();
 
-  await addActivityApi(`Viewed employee profile: ${employee.firstName} ${employee.lastName}`);
 }
 
 function getTimelineColor(action) {

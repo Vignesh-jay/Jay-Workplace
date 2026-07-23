@@ -138,7 +138,13 @@ router.post('/', async (req, res) => {
 
       await tx.activity.create({
         data: {
-          message: `${asset.name} assigned to ${employee.firstName} ${employee.lastName}`,
+          module: 'Assignments',
+          action: 'Assigned',
+          description: `${asset.name} assigned to ${employee.firstName} ${employee.lastName}`,
+          entityType: 'Assignment',
+          entityId: assignment.id,
+          entityCode: asset.assetId,
+          performedBy: assignedBy || 'System',
         },
       });
 
@@ -231,7 +237,13 @@ router.put('/:id', async (req, res) => {
 
       await tx.activity.create({
         data: {
-          message: `${assignment.asset.name} returned by ${assignment.employee.firstName} ${assignment.employee.lastName}`,
+          module: 'Assignments',
+          action: 'Returned',
+          description: `${assignment.asset.name} returned by ${assignment.employee.firstName} ${assignment.employee.lastName}`,
+          entityType: 'Assignment',
+          entityId: assignment.id,
+          entityCode: assignment.asset.assetId,
+          performedBy: returnedBy || 'System',
         },
       });
 

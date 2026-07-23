@@ -1391,7 +1391,7 @@ async function loadAssets() {
                         </button>
 
                         ${
-                          asset.status !== 'Transferred'
+                          asset.status !== 'Transferred' && asset.status !== 'Assigned'
                             ? `
                             <button
                                 class="btn btn-light btn-sm asset-action-btn"
@@ -2246,7 +2246,19 @@ async function saveAsset() {
       `${createdAsset.name} added to inventory`
     );
 
-    await addActivityApi(`${createdAsset.name} added to inventory`);
+    await logActivity({
+      module: 'Assets',
+
+      action: 'Created',
+
+      description: `${createdAsset.name} added to inventory`,
+
+      entityType: 'Asset',
+
+      entityId: createdAsset.id,
+
+      entityCode: createdAsset.assetId,
+    });
 
     bootstrap.Modal.getInstance(document.getElementById('addAssetModal')).hide();
 
@@ -2399,7 +2411,19 @@ async function updateAsset(assetId) {
       changes.length ? changes.join('<hr class="my-2">') : 'No changes detected.'
     );
 
-    await addActivityApi(`${asset.name} updated`);
+    await logActivity({
+      module: 'Assets',
+
+      action: 'Updated',
+
+      description: `${asset.name} updated`,
+
+      entityType: 'Asset',
+
+      entityId: Number(assetId),
+
+      entityCode: asset.assetId,
+    });
 
     bootstrap.Modal.getInstance(document.getElementById('editAssetModal')).hide();
 
@@ -2438,7 +2462,19 @@ async function deleteAsset(assetId) {
 
   await deleteAssetApi(assetId);
 
-  await addActivityApi(`${asset.name} deleted`);
+  await logActivity({
+    module: 'Assets',
+
+    action: 'Deleted',
+
+    description: `${asset.name} deleted`,
+
+    entityType: 'Asset',
+
+    entityId: asset.id,
+
+    entityCode: asset.assetId,
+  });
 
   await loadAssets();
 }

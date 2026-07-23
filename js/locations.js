@@ -275,7 +275,14 @@ async function saveLocation() {
       state,
     });
 
-    addActivity(`Location ${name} created`);
+    await logActivity({
+      module: 'Locations',
+      action: 'Created',
+      description: `Location ${name} created`,
+      entityType: 'Location',
+      entityId: null,
+      entityCode: code,
+    });
 
     bootstrap.Modal.getInstance(document.getElementById('addLocationModal')).hide();
 
@@ -286,14 +293,54 @@ async function saveLocation() {
 }
 
 async function disableLocationClick(id) {
-  if (!confirm('Disable this location?')) {
-    return;
-  }
+  if (!confirm('Disable this location?')) return;
 
   try {
+    const locations = await getLocations('all');
+    const location = locations.find((loc) => loc.id === id);
+
+    if (!location) {
+      alert('Location not found.');
+      return;
+    }
+
+    const employees = await getEmployeesApi();
+    const assets = await getAssetsApi();
+
+    const assignedEmployees = employees.filter((emp) => emp.location === location.name);
+
+    const assignedAssets = assets.filter((asset) => asset.location === location.name);
+
+    if (assignedEmployees.length > 0 || assignedAssets.length > 0) {
+      let message = `Cannot disable "${location.name}".\n\n`;
+
+      if (assignedEmployees.length > 0) {
+        message += `Employees Assigned:\n`;
+        message += assignedEmployees
+          .map((emp) => `${emp.employeeId} - ${emp.firstName} ${emp.lastName}`)
+          .join('\n');
+        message += '\n\n';
+      }
+
+      if (assignedAssets.length > 0) {
+        message += `Assets Assigned:\n`;
+        message += assignedAssets.map((asset) => `${asset.assetId} - ${asset.name}`).join('\n');
+      }
+
+      alert(message);
+      return;
+    }
+
     await disableLocation(id);
 
-    addActivity('Location disabled');
+    await logActivity({
+      module: 'Locations',
+      action: 'Disabled',
+      description: `Location "${location.name}" disabled`,
+      entityType: 'Location',
+      entityId: location.id,
+      entityCode: location.code,
+    });
 
     await loadLocations();
   } catch (error) {
@@ -437,7 +484,14 @@ async function updateLocationClick(id) {
       status: true,
     });
 
-    addActivity(`Location ${name} updated`);
+    await logActivity({
+      module: 'Locations',
+      action: 'Updated',
+      description: `Location ${name} updated`,
+      entityType: 'Location',
+      entityId: id,
+      entityCode: code,
+    });
 
     bootstrap.Modal.getInstance(document.getElementById('editLocationModal')).hide();
 
@@ -457,9 +511,19 @@ async function enableLocationClick(id) {
   if (!confirm('Enable this location?')) return;
 
   try {
+    const locations = await getLocations('all');
+    const location = locations.find((loc) => loc.id === id);
+
     await enableLocation(id);
 
-    addActivity('Location enabled');
+    await logActivity({
+      module: 'Locations',
+      action: 'Enabled',
+      description: `Location "${location.name}" enabled`,
+      entityType: 'Location',
+      entityId: id,
+      entityCode: location.code,
+    });
 
     await loadLocations();
   } catch (error) {
@@ -468,12 +532,54 @@ async function enableLocationClick(id) {
 }
 
 async function deleteLocationClick(id) {
-  if (!confirm('Permanently delete this location?')) return;
+  if (!confirm('Delete this location permanently?')) return;
 
   try {
+    const locations = await getLocations('all');
+    const location = locations.find((loc) => loc.id === id);
+
+    if (!location) {
+      alert('Location not found.');
+      return;
+    }
+
+    const employees = await getEmployeesApi();
+    const assets = await getAssetsApi();
+
+    const assignedEmployees = employees.filter((emp) => emp.location === location.name);
+
+    const assignedAssets = assets.filter((asset) => asset.location === location.name);
+
+    if (assignedEmployees.length > 0 || assignedAssets.length > 0) {
+      let message = `Cannot delete "${location.name}".\n\n`;
+
+      if (assignedEmployees.length > 0) {
+        message += `Employees Assigned:\n`;
+        message += assignedEmployees
+          .map((emp) => `${emp.employeeId} - ${emp.firstName} ${emp.lastName}`)
+          .join('\n');
+        message += '\n\n';
+      }
+
+      if (assignedAssets.length > 0) {
+        message += `Assets Assigned:\n`;
+        message += assignedAssets.map((asset) => `${asset.assetId} - ${asset.name}`).join('\n');
+      }
+
+      alert(message);
+      return;
+    }
+
     await deleteLocation(id);
 
-    addActivity('Location deleted');
+    await logActivity({
+      module: 'Locations',
+      action: 'Deleted',
+      description: `Location "${location.name}" deleted`,
+      entityType: 'Location',
+      entityId: location.id,
+      entityCode: location.code,
+    });
 
     await loadLocations();
   } catch (error) {

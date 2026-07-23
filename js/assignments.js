@@ -492,6 +492,8 @@ async function returnAsset(assignmentId) {
       remarks: '',
     });
 
+    const assignment = await getAssignmentApi(assignmentId);
+
     alert('Asset returned successfully.');
 
     await loadAssignments();
@@ -733,15 +735,16 @@ async function saveAssignment() {
   }
 
   try {
-    await createAssignmentApi({
+    const assignment = await createAssignmentApi({
       assetId,
-
       employeeId,
-
       assignedBy: 'System',
-
       remarks: '',
     });
+
+    const asset = await getAssetApi(assetId);
+
+    const employee = await getEmployeeApi(employeeId);
 
     bootstrap.Modal.getInstance(document.getElementById('assignAssetModal')).hide();
 

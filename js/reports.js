@@ -625,60 +625,64 @@ async function loadWarrantyReport() {
 async function loadActivityReport() {
   setActiveReport('activity');
 
-  const activities = await getAuditLogsApi();
+  const activities = await getActivitiesApi();
 
   reportActivities = activities;
-
   filteredReportActivities = activities;
 
-  const today = new Date().toDateString();
-
-  const created = activities.filter((activity) => activity.action === 'Created').length;
-
-  const updated = activities.filter((activity) => activity.action === 'Updated').length;
-
-  const deleted = activities.filter((activity) => activity.action === 'Deleted').length;
+  const today = new Date();
 
   const todayActivities = activities.filter((activity) => {
-    const activityDate = new Date(activity.createdAt || activity.date).toDateString();
+    const date = new Date(activity.timestamp);
 
-    return activityDate === today;
+    return date.toDateString() === today.toDateString();
   }).length;
+
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - 7);
+
+  const weekActivities = activities.filter((activity) => {
+    return new Date(activity.timestamp) >= weekStart;
+  }).length;
+
+  const monthActivities = activities.filter((activity) => {
+    const date = new Date(activity.timestamp);
+
+    return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+  }).length;
+
+  const modules = new Set(activities.map((activity) => activity.module).filter(Boolean)).size;
 
   renderReportKPIs([
     {
       title: 'Activities',
       value: activities.length,
-      icon: 'fa-clipboard-list',
+      icon: 'fa-history',
       color: 'text-primary',
     },
-
-    {
-      title: 'Created',
-      value: created,
-      icon: 'fa-plus-circle',
-      color: 'text-success',
-    },
-
-    {
-      title: 'Updated',
-      value: updated,
-      icon: 'fa-pen',
-      color: 'text-warning',
-    },
-
-    {
-      title: 'Deleted',
-      value: deleted,
-      icon: 'fa-trash',
-      color: 'text-danger',
-    },
-
     {
       title: 'Today',
       value: todayActivities,
       icon: 'fa-calendar-day',
+      color: 'text-success',
+    },
+    {
+      title: 'This Week',
+      value: weekActivities,
+      icon: 'fa-calendar-week',
+      color: 'text-warning',
+    },
+    {
+      title: 'This Month',
+      value: monthActivities,
+      icon: 'fa-calendar',
       color: 'text-info',
+    },
+    {
+      title: 'Modules',
+      value: modules,
+      icon: 'fa-layer-group',
+      color: 'text-secondary',
     },
   ]);
 
@@ -1943,10 +1947,12 @@ function renderActivityReport(activities) {
     ...new Set(activities.map((activity) => activity.module).filter(Boolean)),
   ].sort();
 
-  const users = [...new Set(activities.map((activity) => activity.user).filter(Boolean))].sort();
-
   const actions = [
     ...new Set(activities.map((activity) => activity.action).filter(Boolean)),
+  ].sort();
+
+  const users = [
+    ...new Set(activities.map((activity) => activity.performedBy).filter(Boolean)),
   ].sort();
 
   document.getElementById('reportsContent').innerHTML = `
@@ -1965,7 +1971,7 @@ function renderActivityReport(activities) {
 
                 <small class="text-muted">
 
-                    View and monitor all activities performed in the system.
+                    View and analyze all activities performed in the workplace.
 
                 </small>
 
@@ -2051,30 +2057,22 @@ function renderActivityReport(activities) {
 
                 </div>
 
-                <div class="col-lg-3">
+                <div class="col-lg-2">
 
                     <select
                         class="form-select"
                         id="activityModuleFilter"
                         onchange="filterActivityReport()">
 
-                        <option value="">
-
-                            All Modules
-
-                        </option>
+                        <option value="">All Modules</option>
 
                         ${modules
                           .map(
                             (module) => `
-
-                            <option value="${module}">
-
-                                ${module}
-
-                            </option>
-
-                        `
+                                <option value="${module}">
+                                    ${module}
+                                </option>
+                            `
                           )
                           .join('')}
 
@@ -2089,23 +2087,15 @@ function renderActivityReport(activities) {
                         id="activityActionFilter"
                         onchange="filterActivityReport()">
 
-                        <option value="">
-
-                            All Actions
-
-                        </option>
+                        <option value="">All Actions</option>
 
                         ${actions
                           .map(
                             (action) => `
-
-                            <option value="${action}">
-
-                                ${action}
-
-                            </option>
-
-                        `
+                                <option value="${action}">
+                                    ${action}
+                                </option>
+                            `
                           )
                           .join('')}
 
@@ -2113,30 +2103,22 @@ function renderActivityReport(activities) {
 
                 </div>
 
-                <div class="col-lg-2">
+                <div class="col-lg-3">
 
                     <select
                         class="form-select"
                         id="activityUserFilter"
                         onchange="filterActivityReport()">
 
-                        <option value="">
-
-                            All Users
-
-                        </option>
+                        <option value="">All Users</option>
 
                         ${users
                           .map(
                             (user) => `
-
-                            <option value="${user}">
-
-                                ${user}
-
-                            </option>
-
-                        `
+                                <option value="${user}">
+                                    ${user}
+                                </option>
+                            `
                           )
                           .join('')}
 
@@ -2169,39 +2151,23 @@ function renderActivityReport(activities) {
                         <tr>
 
                             <th style="width:18%">
-
                                 Date & Time
-
                             </th>
 
-                            <th>
-
+                            <th style="width:15%">
                                 Module
-
                             </th>
 
-                            <th>
-
+                            <th style="width:15%">
                                 Action
-
                             </th>
 
                             <th>
-
-                                User
-
-                            </th>
-
-                            <th>
-
                                 Description
-
                             </th>
 
-                            <th class="text-end">
-
-                                Actions
-
+                            <th style="width:15%">
+                                Performed By
                             </th>
 
                         </tr>
@@ -2221,6 +2187,113 @@ function renderActivityReport(activities) {
     </div>
 
     `;
+}
+
+function renderActivityTable(activities) {
+  const tbody = document.getElementById('activityReportBody');
+
+  if (!activities.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center text-muted py-4">
+          No activities found.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = activities
+    .map((activity) => {
+      let moduleBadge = '';
+
+      switch (activity.module) {
+        case 'Assets':
+          moduleBadge = `<span class="badge bg-primary">${activity.module}</span>`;
+          break;
+
+        case 'Employees':
+          moduleBadge = `<span class="badge bg-success">${activity.module}</span>`;
+          break;
+
+        case 'Assignments':
+          moduleBadge = `<span class="badge bg-warning text-dark">${activity.module}</span>`;
+          break;
+
+        case 'Departments':
+          moduleBadge = `<span class="badge bg-info">${activity.module}</span>`;
+          break;
+
+        case 'Locations':
+          moduleBadge = `<span class="badge bg-secondary">${activity.module}</span>`;
+          break;
+
+        default:
+          moduleBadge = `<span class="badge bg-dark">${activity.module || '-'}</span>`;
+      }
+
+      let actionBadge = '';
+
+      switch (activity.action) {
+        case 'Created':
+          actionBadge = `<span class="badge bg-success">${activity.action}</span>`;
+          break;
+
+        case 'Updated':
+          actionBadge = `<span class="badge bg-primary">${activity.action}</span>`;
+          break;
+
+        case 'Deleted':
+          actionBadge = `<span class="badge bg-danger">${activity.action}</span>`;
+          break;
+
+        case 'Assigned':
+          actionBadge = `<span class="badge bg-warning text-dark">${activity.action}</span>`;
+          break;
+
+        case 'Returned':
+          actionBadge = `<span class="badge bg-secondary">${activity.action}</span>`;
+          break;
+
+        case 'Enabled':
+          actionBadge = `<span class="badge bg-success">${activity.action}</span>`;
+          break;
+
+        case 'Disabled':
+          actionBadge = `<span class="badge bg-dark">${activity.action}</span>`;
+          break;
+
+        default:
+          actionBadge = `<span class="badge bg-light text-dark">${activity.action}</span>`;
+      }
+
+      return `
+        <tr>
+
+          <td>
+            ${formatDateTime(activity.timestamp)}
+          </td>
+
+          <td>
+            ${moduleBadge}
+          </td>
+
+          <td>
+            ${actionBadge}
+          </td>
+
+          <td>
+            ${activity.description || '-'}
+          </td>
+
+          <td>
+            ${activity.performedBy || '-'}
+          </td>
+
+        </tr>
+      `;
+    })
+    .join('');
 }
 
 async function populateReportFilters(assets) {
@@ -2377,6 +2450,43 @@ function filterWarrantyReport() {
   renderWarrantyTable(filteredReportAssets);
 }
 
+function filterActivityReport() {
+  const search = document.getElementById('activitySearch').value.toLowerCase().trim();
+
+  const module = document.getElementById('activityModuleFilter').value;
+
+  const action = document.getElementById('activityActionFilter').value;
+
+  const user = document.getElementById('activityUserFilter').value;
+
+  filteredReportActivities = reportActivities.filter((activity) => {
+    const description = (activity.description || '').toLowerCase();
+
+    const moduleName = activity.module || '';
+
+    const actionName = activity.action || '';
+
+    const performedBy = activity.performedBy || '';
+
+    const matchesSearch =
+      !search ||
+      description.includes(search) ||
+      moduleName.toLowerCase().includes(search) ||
+      actionName.toLowerCase().includes(search) ||
+      performedBy.toLowerCase().includes(search);
+
+    const matchesModule = !module || moduleName === module;
+
+    const matchesAction = !action || actionName === action;
+
+    const matchesUser = !user || performedBy === user;
+
+    return matchesSearch && matchesModule && matchesAction && matchesUser;
+  });
+
+  renderActivityTable(filteredReportActivities);
+}
+
 async function resetAssetReportFilters() {
   document.getElementById('assetSearch').value = '';
 
@@ -2431,6 +2541,20 @@ function resetWarrantyReportFilters() {
   filteredReportAssets = [...reportAssets];
 
   renderWarrantyTable(filteredReportAssets);
+}
+
+function resetActivityReportFilters() {
+  document.getElementById('activitySearch').value = '';
+
+  document.getElementById('activityModuleFilter').value = '';
+
+  document.getElementById('activityActionFilter').value = '';
+
+  document.getElementById('activityUserFilter').value = '';
+
+  filteredReportActivities = [...reportActivities];
+
+  renderActivityTable(filteredReportActivities);
 }
 
 async function exportAssetsCSV() {
@@ -2618,6 +2742,49 @@ async function exportWarrantyCSV() {
   });
 
   exportReportCSV('Warranty_Report.csv', 'Warranty Report', headers, rows);
+}
+
+function exportActivityCSV() {
+  if (!filteredReportActivities.length) {
+    showToast('No activity data available to export.', 'warning');
+    return;
+  }
+
+  const headers = ['Date & Time', 'Module', 'Action', 'Description', 'Performed By'];
+
+  const rows = filteredReportActivities.map((activity) => [
+    formatDateTime(activity.timestamp),
+    activity.module || '',
+    activity.action || '',
+    activity.description || '',
+    activity.performedBy || '',
+  ]);
+
+  const csvContent = [
+    headers.join(','),
+    ...rows.map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(',')),
+  ].join('\n');
+
+  const blob = new Blob([csvContent], {
+    type: 'text/csv;charset=utf-8;',
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = `Activity_Report_${new Date().toISOString().slice(0, 10)}.csv`;
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+
+  showToast('Activity report exported successfully.', 'success');
 }
 
 function exportReportCSV(filename, title, headers, rows) {
