@@ -18,16 +18,16 @@ function deleteAssetById(assetId) {
   saveAssets(updatedAssets);
 }
 
-function addActivity(message) {
-  const activities = getActivities();
-
-  activities.unshift({
-    message: message,
-
-    timestamp: formatDateTime(),
+async function addActivity(message) {
+  await apiPost('/activities', {
+    message,
   });
+}
 
-  saveActivities(activities);
+async function getActivitiesApi() {
+  const response = await apiGet('/activities');
+
+  return response.data;
 }
 
 async function getExpiringAssets(days = 90) {

@@ -277,7 +277,7 @@ async function saveDepartment() {
       description,
     });
 
-    addActivity(`Department ${name} created`);
+    await addActivity(`Department ${name} created`);
 
     bootstrap.Modal.getInstance(document.getElementById('addDepartmentModal')).hide();
 
@@ -439,7 +439,7 @@ async function updateDepartmentClick(id) {
       status: true,
     });
 
-    addActivity(`Department ${name} updated`);
+    await addActivity(`Department ${name} updated`);
 
     bootstrap.Modal.getInstance(document.getElementById('editDepartmentModal')).hide();
 
@@ -475,7 +475,7 @@ async function deleteDepartmentClick(id) {
   try {
     await deleteDepartment(id);
 
-    addActivity('Department deleted');
+    await addActivity('Department deleted');
 
     await loadDepartments();
   } catch (error) {
