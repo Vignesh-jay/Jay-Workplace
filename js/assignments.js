@@ -536,7 +536,11 @@ async function viewAssignment(assignmentId) {
 
     <div class="asset-image me-4">
 
-        ${getAssetIcon(asset.category)}
+        <div class="asset-icon-large">
+
+            <i class="${getAssetIcon(asset.category)}"></i>
+
+        </div>
 
     </div>
 
