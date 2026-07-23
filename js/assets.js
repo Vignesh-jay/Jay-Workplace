@@ -2712,10 +2712,10 @@ async function viewAsset(assetId) {
                     <strong>${asset.vendor || '-'}</strong>
 
                     <div>Purchase Date</div>
-                    <strong>${formatDate(asset.purchaseDate)}</strong>
+                    <strong>${formatDateTime(asset.purchaseDate)}</strong>
 
                     <div>Warranty Expiry</div>
-                    <strong>${formatDate(asset.warrantyExpiry)}</strong>
+                    <strong>${formatDateTime(asset.warrantyExpiry)}</strong>
 
                     <div>Current Holder</div>
                     <strong>
@@ -2947,13 +2947,13 @@ function buildAssignmentHistory(assignmentHistory) {
 
                     <td>
 
-                        ${formatDate(item.assignedDate)}
+                        ${formatDateTime(item.assignedDate)}
 
                     </td>
 
                     <td>
 
-                        ${formatDate(item.returnedDate) || '-'}
+                        ${formatDateTime(item.returnedDate) || '-'}
 
                     </td>
 
@@ -3037,7 +3037,7 @@ function buildTransferHistory(transferHistory) {
 
                     <td>${item.toLocation}</td>
 
-                    <td>${formatDate(item.transferDate)}</td>
+                    <td>${formatDateTime(item.transferDate)}</td>
 
                 </tr>
 
@@ -3091,7 +3091,7 @@ function buildTimeline(history, asset) {
 
                     <small class="text-muted">
 
-                        ${formatDate(item.createdAt || item.timestamp)}
+                        ${formatDateTime(item.createdAt || item.timestamp)}
 
                     </small>
 
@@ -3120,12 +3120,12 @@ function buildTimeline(history, asset) {
                 <small class="text-muted">
 
                     Date : ${
-                      asset.purchaseDate ? formatDate(asset.purchaseDate) : 'Unknown Date'
+                      asset.purchaseDate ? formatDateTime(asset.purchaseDate) : 'Unknown Date'
                     }<br>
 
                     Warranty Expiry : ${
                       asset.warrantyExpiry
-                        ? formatDate(asset.warrantyExpiry)
+                        ? formatDateTime(asset.warrantyExpiry)
                         : 'Unknown Warranty Expiry'
                     }
 
@@ -3574,14 +3574,4 @@ function toggleTransferMode() {
 
     description.textContent = 'Create a new asset record for the destination location.';
   }
-}
-
-function formatDate(date) {
-  if (!date) return '-';
-
-  return new Date(date).toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
 }

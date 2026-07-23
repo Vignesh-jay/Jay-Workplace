@@ -49,7 +49,7 @@ async function loadAuditLogs() {
 
                 <td>${index + 1}</td>
 
-                <td>${item.timestamp}</td>
+                <td>${formatDateTime(item.timestamp)}</td>
 
                 <td>${item.message}</td>
 

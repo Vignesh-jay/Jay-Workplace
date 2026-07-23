@@ -641,7 +641,9 @@ async function saveEmployee() {
 }
 
 async function deleteEmployeeUI(employeeId) {
-  const assignedAssets = getAssignments().filter(
+  const assignments = await getAssignmentsApi();
+
+  const assignedAssets = assignments.filter(
     (a) => a.employeeId === employeeId && a.status === 'Assigned'
   );
 
@@ -1007,7 +1009,9 @@ async function saveEmployeeEdit() {
   if (oldEmployee.employmentType !== employee.employmentType)
     changes.push(`Employment Type: ${oldEmployee.employmentType} → ${employee.employmentType}`);
 
-  const assignedAssets = getAssignments().filter(
+  const assignments = await getAssignmentsApi();
+
+  const assignedAssets = assignments.filter(
     (a) => a.employeeId === employee.id && a.status === 'Assigned'
   );
 
@@ -1069,14 +1073,14 @@ async function viewEmployee(employeeId) {
 
   const departmentCode = departmentInfo?.code || employee.department;
 
-  const assignments = getAssignments();
+  const assignments = await getAssignmentsApi();
 
   if (!employee) {
     return;
   }
 
   const employeeAssets = assignments.filter(
-    (item) => item.employeeId === employeeId && item.status === 'Assigned'
+    (item) => item.employeeId === employee.id && item.status === 'Assigned'
   );
 
   const history = await getEmployeeHistoryApi(employeeId);
@@ -1345,7 +1349,7 @@ async function viewEmployee(employeeId) {
 
                                         <small>
 
-                                            ${formatActivityDate(item.createdAt)}
+                                            ${formatDateTime(item.createdAt)}
 
                                         </small>
 
@@ -1403,7 +1407,7 @@ async function viewEmployee(employeeId) {
 
                                             <strong>
 
-                                                ${asset.assetName}
+                                                ${asset.asset.name}
 
                                             </strong>
 
@@ -1411,7 +1415,7 @@ async function viewEmployee(employeeId) {
 
                                         <td>
 
-                                            ${asset.assettype}
+                                            ${asset.asset.category}
 
                                         </td>
 
@@ -1495,14 +1499,4 @@ function getTimelineColor(action) {
 
 function getEmployeeName(employee) {
   return [employee.firstName, employee.lastName].join(' ');
-}
-
-function formatActivityDate(date) {
-  return new Date(date).toLocaleString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 }

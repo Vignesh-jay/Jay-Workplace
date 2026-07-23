@@ -1,44 +1,40 @@
 async function loadDashboard() {
   const employees = await getEmployeesApi();
-  const assets = getAssets();
+  const assets = await getAssetsApi();
   const departments = await getDepartments();
   const expiringAssets = await getExpiringAssets(30);
+  const locations = await getLocations();
 
   if (
     employees.length === 0 &&
-    getAssets().length === 0 &&
+    assets.length === 0 &&
     departments.length === 0 &&
-    getLocations().length === 0
+    locations.length === 0
   ) {
     loadFirstRunScreen();
-
     return;
   }
 
   const expiringWarranty = await getExpiringAssets(30);
 
   const employeeList = employees;
-  const assetList = getAssets();
+  const assetList = assets;
 
-  const totalEmployees = employeeList.length;
+  const assignments = await getAssignmentsApi();
 
-  const totalAssets = getAssets().filter(
-    (asset) => asset.status !== 'Retired' && asset.status !== 'Transferred'
-  ).length;
+  const assignedAssets = assignments.filter((a) => a.status === 'Assigned').length;
 
-  const assignedAssets = getAssignments().filter((a) => a.status === 'Assigned').length;
-
-  const activeAssignedAssetIds = getAssignments()
+  const activeAssignedAssetIds = assignments
     .filter((a) => a.status === 'Assigned')
     .map((a) => a.assetId);
 
-  const availableAssets = getAssets().filter(
+  const availableAssets = assetList.filter(
     (asset) => asset.status === 'Available' && !activeAssignedAssetIds.includes(asset.id)
   ).length;
 
-  const retiredAssets = getAssets().filter((a) => a.status === 'Retired').length;
+  const retiredAssets = assetList.filter((a) => a.status === 'Retired').length;
 
-  const transferredAssets = getAssets().filter((a) => a.status === 'Transferred').length;
+  const transferredAssets = assetList.filter((a) => a.status === 'Transferred').length;
 
   const activities = await getActivitiesApi();
 
@@ -216,7 +212,7 @@ async function loadDashboard() {
 
                             <small class="text-muted">
 
-                                ${item.timestamp}
+                                ${formatDateTime(item.timestamp)}
 
                             </small>
 
@@ -243,7 +239,7 @@ async function loadDashboard() {
               expiringAssets
                 .map((asset) => {
                   const daysLeft = Math.ceil(
-                    (new Date(asset.purchase?.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24)
+                    (new Date(asset.warrantyExpiry) - new Date()) / (1000 * 60 * 60 * 24)
                   );
 
                   let badgeClass;
@@ -265,7 +261,7 @@ async function loadDashboard() {
                     <div class="mb-3">
 
                         <strong>
-                            ${asset.name} - ${asset.specifications?.serialNumber || '-'}
+                            ${asset.name} - ${asset.serialNumber || '-'}
                         </strong>
 
                         <br>
@@ -292,7 +288,7 @@ async function loadDashboard() {
 </div>
 
 `;
-  renderCharts(employeeList);
+  await renderCharts(employeeList);
 }
 
 function loadWelcomeDashboard() {
@@ -459,7 +455,7 @@ function loadFirstRunScreen() {
     `;
 }
 
-function renderCharts(employees) {
+async function renderCharts(employees) {
   const departmentCounts = {};
 
   employees.forEach((emp) => {
@@ -500,7 +496,7 @@ function renderCharts(employees) {
 
   const assetCtx = document.getElementById('assetChart');
 
-  const assets = getAssets();
+  const assets = await getAssetsApi();
 
   const laptops = assets.filter((a) => a.category === 'Laptop').length;
 
