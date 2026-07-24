@@ -38,6 +38,10 @@ const assignmentRoutes = require('./routes/assignments');
 
 app.use('/assignments', assignmentRoutes);
 
+const importRoutes = require('./routes/import');
+
+app.use('/api/import', importRoutes);
+
 const PORT = 3000;
 
 const prisma = require('./db');

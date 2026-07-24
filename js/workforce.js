@@ -162,15 +162,29 @@ async function loadWorkforce() {
 
         </select>
 
-        <button
-            class="btn btn-primary"
-            onclick="showAddEmployeeModal()">
+        <div class="d-flex gap-2">
 
-            <i class="fas fa-plus"></i>
+    <button
+        class="btn btn-outline-primary"
+        onclick="showEmployeeImportModal()">
 
-            Add Employee
+        <i class="fas fa-file-import"></i>
 
-        </button>
+        Import Employees
+
+    </button>
+
+    <button
+        class="btn btn-primary"
+        onclick="showAddEmployeeModal()">
+
+        <i class="fas fa-plus"></i>
+
+        Add Employee
+
+    </button>
+
+</div>
 
     </div>
 
@@ -1507,7 +1521,6 @@ async function viewEmployee(employeeId) {
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 
   new bootstrap.Modal(document.getElementById('employeeProfileModal')).show();
-
 }
 
 function getTimelineColor(action) {
