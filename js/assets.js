@@ -3478,7 +3478,19 @@ async function saveAssetTransfer(oldAssetId) {
       `Transferred from ${oldLocation} to ${newLocation}`
     );
 
-    await addActivityApi(`${oldAsset.name} transferred from ${oldLocation} to ${newLocation}`);
+    await logActivity({
+      module: 'Assets',
+
+      action: 'Transferred',
+
+      description: `${oldAsset.name} transferred from ${oldLocation} to ${newLocation}`,
+
+      entityType: 'Asset',
+
+      entityId: oldAsset.id,
+
+      entityCode: oldAsset.assetId,
+    });
 
     const updatedAsset = {
       ...oldAsset,
@@ -3580,7 +3592,19 @@ async function saveAssetTransfer(oldAssetId) {
   await addAssetHistoryApi(createdAsset.id, 'Received', `Received from ${oldAsset.assetId}`);
 
   // Activity Log
-  await addActivityApi(`${oldAsset.assetId} transferred to ${createdAsset.assetId}`);
+  await logActivity({
+    module: 'Assets',
+
+    action: 'Transferred',
+
+    description: `${oldAsset.assetId} transferred to ${createdAsset.assetId}`,
+
+    entityType: 'Asset',
+
+    entityId: createdAsset.id,
+
+    entityCode: createdAsset.assetId,
+  });
 
   alert('Asset transferred successfully.');
 

@@ -48,10 +48,8 @@ function initializeAssetImport() {
 
       document.getElementById('btnAssetImport').disabled = importSession.summary.invalid > 0;
 
-      console.table(importSession.rows);
-      console.log(importSession.summary);
+
     } catch (error) {
-      console.error(error);
 
       alert(error.message);
     }

@@ -15,7 +15,6 @@ async function main() {
     });
   }
 
-  console.log('Asset Statuses Seeded');
 }
 
 main().finally(() => prisma.$disconnect());
