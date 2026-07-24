@@ -55,6 +55,40 @@ function validateEmployees(session) {
 
     employee.valid = employee.errors.length === 0;
   });
+}
 
+function validateAssets(session) {
+  const assetIds = new Set();
 
+  const serialNumbers = new Set();
+
+  session.rows.forEach((asset) => {
+    asset.errors = [];
+
+    if (!asset.assetId) asset.errors.push('Asset ID is required');
+
+    if (!asset.name) asset.errors.push('Asset Name is required');
+
+    if (!asset.category) asset.errors.push('Category is required');
+
+    if (!asset.location) asset.errors.push('Location is required');
+
+    if (asset.assetId) {
+      if (assetIds.has(asset.assetId)) {
+        asset.errors.push('Duplicate Asset ID');
+      } else {
+        assetIds.add(asset.assetId);
+      }
+    }
+
+    if (asset.serialNumber) {
+      if (serialNumbers.has(asset.serialNumber)) {
+        asset.errors.push('Duplicate Serial Number');
+      } else {
+        serialNumbers.add(asset.serialNumber);
+      }
+    }
+
+    asset.valid = asset.errors.length === 0;
+  });
 }

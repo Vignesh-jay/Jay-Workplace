@@ -1257,6 +1257,15 @@ async function loadAssets() {
               .join('')}
 
         </select>
+        <button
+            class="btn btn-success"
+            onclick="showAssetImportModal()">
+
+            <i class="fas fa-file-import"></i>
+
+            Import Assets
+
+        </button>
 
         <button
             class="btn btn-primary"

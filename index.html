@@ -165,6 +165,46 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="assetImportModal" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Import Assets</h5>
+
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label"> Excel File </label>
+
+              <input
+                id="assetImportFile"
+                type="file"
+                class="form-control"
+                accept=".xlsx,.xls,.csv"
+              />
+            </div>
+
+            <button id="btnDownloadAssetTemplate" class="btn btn-outline-secondary">
+              Download Sample Template
+            </button>
+
+            <hr />
+
+            <div id="assetImportPreview">
+              <div class="text-center text-muted py-5">No file selected.</div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+            <button id="btnAssetImport" class="btn btn-primary" disabled>Import Assets</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -215,6 +255,9 @@
     <script src="js/Import/import-handler.js"></script>
     <script src="js/Import/template.js"></script>
     <script src="js/Import/employee-import.js"></script>
+    <script src="js/Import/asset-modal.js"></script>
+    <script src="js/Import/preview-assets.js"></script>
+    <script src="js/Import/asset-session.js"></script>
     <script src="js/Import/asset-import.js"></script>
     <script src="js/Import/import.js"></script>
 

@@ -20,7 +20,7 @@ function initializeEmployeeImport() {
       // Parse Excel
       // -----------------------------
 
-      const parsed = await parseFile(importSession.file);
+      const parsed = await parseFile(importSession.file, 'employee');
 
       importSession.rows = parsed.rows;
 

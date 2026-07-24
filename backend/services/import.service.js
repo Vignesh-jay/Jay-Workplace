@@ -195,7 +195,148 @@ async function importEmployees(rows) {
   };
 }
 
+async function validateAssets(rows) {
+  let valid = 0;
+  let invalid = 0;
+
+  for (const asset of rows) {
+    asset.errors = asset.errors || [];
+
+    const existingAsset = await prisma.asset.findUnique({
+      where: {
+        assetId: asset.assetId,
+      },
+    });
+
+    if (existingAsset) {
+      asset.errors.push(`Asset ID "${asset.assetId}" already exists.`);
+    }
+
+    if (asset.serialNumber) {
+      const existingSerial = await prisma.asset.findFirst({
+        where: {
+          serialNumber: asset.serialNumber,
+        },
+      });
+
+      if (existingSerial) {
+        asset.errors.push(`Serial Number "${asset.serialNumber}" already exists.`);
+      }
+    }
+
+    const location = await prisma.location.findFirst({
+      where: {
+        name: asset.location,
+
+        status: true,
+      },
+    });
+
+    if (!location) {
+      asset.errors.push(`Location "${asset.location}" does not exist.`);
+    }
+
+    asset.valid = asset.errors.length === 0;
+
+    if (asset.valid) valid++;
+    else invalid++;
+  }
+
+  return {
+    success: true,
+
+    summary: {
+      total: rows.length,
+
+      valid,
+
+      invalid,
+    },
+
+    rows,
+  };
+}
+
+async function importAssets(rows) {
+  const validation = await validateAssets(rows);
+
+  if (validation.summary.invalid > 0) return validation;
+
+  await prisma.$transaction(async (tx) => {
+    for (const asset of validation.rows) {
+      const createdAsset = await tx.asset.create({
+        data: {
+          assetId: asset.assetId,
+
+          name: asset.name,
+
+          category: asset.category,
+
+          manufacturer: asset.manufacturer || null,
+
+          model: asset.model || null,
+
+          serialNumber: asset.serialNumber || null,
+
+          purchaseDate: asset.purchaseDate ? new Date(asset.purchaseDate) : null,
+
+          warrantyExpiry: asset.warrantyExpiry ? new Date(asset.warrantyExpiry) : null,
+
+          location: asset.location,
+
+          status: 'Available',
+        },
+      });
+
+      await tx.assetHistory.create({
+        data: {
+          assetId: createdAsset.id,
+
+          action: 'Created',
+
+          details: 'Asset imported from Excel',
+        },
+      });
+
+      await tx.activity.create({
+        data: {
+          module: 'Asset',
+
+          action: 'Import',
+
+          description: `Asset ${createdAsset.assetId} imported from Excel.`,
+
+          entityType: 'Asset',
+
+          entityId: createdAsset.id,
+
+          entityCode: createdAsset.assetId,
+
+          performedBy: 'Administrator',
+        },
+      });
+    }
+  });
+
+  return {
+    success: true,
+
+    summary: {
+      total: validation.rows.length,
+
+      imported: validation.rows.length,
+
+      skipped: 0,
+
+      failed: 0,
+    },
+  };
+}
+
 module.exports = {
   validateEmployees,
   importEmployees,
+
+  validateAssets,
+  importAssets,
 };

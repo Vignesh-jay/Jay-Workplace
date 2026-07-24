@@ -3,10 +3,7 @@
  * (Implementation in next sprint)
  */
 
-/**
- * Parse Employee Excel File
- */
-async function parseFile(file) {
+async function parseFile(file, type = 'employee') {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -22,11 +19,13 @@ async function parseFile(file) {
           defval: '',
         });
 
-        const mappedRows = mapEmployeeRows(rows);
+        const mappedRows = type === 'employee' ? mapEmployeeRows(rows) : mapAssetRows(rows);
 
         resolve({
           rows: mappedRows,
+
           errors: [],
+
           warnings: [],
         });
       } catch (error) {
@@ -62,5 +61,27 @@ function mapEmployeeRows(rows) {
     employmentType: row['Employment Type']?.toString().trim(),
 
     dateOfJoining: row['Date of Joining'],
+  }));
+}
+
+function mapAssetRows(rows) {
+  return rows.map((row) => ({
+    assetId: row['Asset ID']?.toString().trim(),
+
+    name: row['Asset Name']?.toString().trim(),
+
+    category: row['Category']?.toString().trim(),
+
+    manufacturer: row['Brand']?.toString().trim(),
+
+    model: row['Model']?.toString().trim(),
+
+    serialNumber: row['Serial Number']?.toString().trim(),
+
+    purchaseDate: row['Purchase Date'],
+
+    warrantyExpiry: row['Warranty Expiry'],
+
+    location: row['Location']?.toString().trim(),
   }));
 }
