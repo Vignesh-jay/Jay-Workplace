@@ -1,0 +1,31 @@
+body {
+  background: #f5f7fb;
+
+  height: 100vh;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  font-family:
+    Segoe UI,
+    sans-serif;
+}
+
+.login-wrapper {
+  width: 100%;
+
+  max-width: 420px;
+
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+
+  border-radius: 16px;
+
+  padding: 35px;
+}

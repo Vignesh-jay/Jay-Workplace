@@ -1,9 +1,6 @@
 async function loadWorkforce() {
   const employeeList = await getEmployeesApi();
 
-  const raw = await fetch('http://localhost:3000/employees');
-  const json = await raw.json();
-
   const totalEmployees = employeeList.length;
 
   const activeEmployees = employeeList.filter((e) => e.status === 'Active').length;

@@ -1,10 +1,16 @@
 const express = require('express');
 const cors = require('cors');
 
+const bootstrapAdministrator = require('./bootstrap/admin.bootstrap');
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+const authRoutes = require('./routes/auth');
+
+app.use('/auth', authRoutes);
 
 const departmentRoutes = require('./routes/departments');
 
@@ -42,12 +48,25 @@ const importRoutes = require('./routes/import');
 
 app.use('/api/import', importRoutes);
 
-const PORT = 3000;
+const userRoutes = require('./routes/users');
+
+app.use('/users', userRoutes);
+
+const PORT = process.env.PORT || 3000;
 
 const prisma = require('./db');
 
-app.listen(PORT, () => {
-  console.log(
-    `🚀 JAY Workplace Backend v2 - Disable/Enable API Loaded on http://localhost:${PORT}`
-  );
-});
+async function startServer() {
+  try {
+    await bootstrapAdministrator();
+
+    app.listen(PORT, () => {
+      console.log(`🚀 JAY Workplace Backend running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();

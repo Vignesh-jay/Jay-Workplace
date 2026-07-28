@@ -22,6 +22,7 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/user-drawer.css" />
   </head>
   <body>
     <div class="app-container">
@@ -205,6 +206,293 @@
         </div>
       </div>
     </div>
+    <div id="userDrawer" class="user-drawer">
+      <div class="user-drawer-header">
+        <div>
+          <h3 id="drawerUserName">User</h3>
+
+          <small id="drawerUserRole"></small>
+        </div>
+
+        <button class="btn btn-light" onclick="closeUserDrawer()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <button
+            class="nav-link active user-tab-button"
+            data-tab="general"
+            onclick="showUserTab('general')"
+          >
+            General
+          </button>
+        </li>
+
+        <li class="nav-item">
+          <button
+            class="nav-link user-tab-button"
+            data-tab="permissions"
+            onclick="showUserTab('permissions')"
+          >
+            Permissions
+          </button>
+        </li>
+
+        <li class="nav-item">
+          <button
+            class="nav-link user-tab-button"
+            data-tab="locations"
+            onclick="showUserTab('locations')"
+          >
+            Locations
+          </button>
+        </li>
+
+        <li class="nav-item">
+          <button
+            class="nav-link user-tab-button"
+            data-tab="activity"
+            onclick="showUserTab('activity')"
+          >
+            Activity
+          </button>
+        </li>
+      </ul>
+
+      <div id="drawerContent">
+        <div id="general-tab" class="user-tab">
+          <div class="p-4">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Full Name</label>
+                <input id="userFullName" class="form-control" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input id="userEmail" class="form-control" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Role</label>
+                <select id="userRole" class="form-select">
+                  <option value="ADMINISTRATOR">Administrator</option>
+                  <option value="MANAGER">Manager</option>
+                  <option value="ENGINEER">Engineer</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Status</label>
+                <input id="userStatus" class="form-control" readonly />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Employee</label>
+                <input id="userEmployee" class="form-control" readonly />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Department</label>
+                <input id="userDepartment" class="form-control" readonly />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Designation</label>
+                <input id="userDesignation" class="form-control" readonly />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Last Login</label>
+                <input id="userLastLogin" class="form-control" readonly />
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="d-flex gap-2">
+              <button
+                id="btnSaveGeneral"
+                class="btn btn-primary"
+                onclick="saveGeneralChanges()"
+                disabled
+              >
+                Save Changes
+              </button>
+
+              <button id="btnEnableDisable" class="btn btn-warning">Disable</button>
+
+              <button class="btn btn-secondary" onclick="unlockUser()">Unlock</button>
+
+              <button
+                id="btnResetPassword"
+                type="button"
+                class="btn btn-danger"
+                onclick="resetPassword()"
+              >
+                Reset Password
+              </button>
+              <button id="btnDeleteUser" class="btn btn-danger d-none" onclick="deleteUser()">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="permissions-tab" class="user-tab d-none">
+          <div class="p-4">
+            <div id="permissionContainer"></div>
+          </div>
+        </div>
+
+        <div id="locations-tab" class="user-tab d-none">
+          <div class="p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">Accessible Locations</h5>
+
+              <button class="btn btn-primary btn-sm" onclick="saveUserLocations()">
+                Save Locations
+              </button>
+            </div>
+
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div id="userLocationsContainer"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="activity-tab" class="user-tab d-none">
+          <div class="p-4">
+            <h5 class="mb-3">Activity Log</h5>
+
+            <div class="card shadow-sm">
+              <div class="card-body p-0" id="userActivityContainer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="drawerBackdrop" class="drawer-backdrop" onclick="closeUserDrawer()"></div>
+
+    <div class="modal fade" id="createUserModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5>Create User</h5>
+
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label"> Employee </label>
+
+                <select id="createUserEmployee" class="form-select"></select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label"> Email </label>
+
+                <input id="createUserEmail" class="form-control" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label"> Full Name </label>
+
+                <input id="createUserName" class="form-control" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label"> Role </label>
+
+                <select id="createUserRole" class="form-select">
+                  <option value="ADMINISTRATOR">Administrator</option>
+                  <option value="MANAGER">Manager</option>
+                  <option value="ENGINEER">Engineer</option>
+                </select>
+              </div>
+            </div>
+
+            <hr />
+
+            <h6>Accessible Locations</h6>
+
+            <div class="border rounded p-3" id="createUserLocations"></div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+            <button class="btn btn-primary" onclick="createUser()">Create User</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="userCredentialsModal" tabindex="-1">
+      <div class="modal-dialog modal-md">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title" id="credentialModalTitle">
+              <i id="credentialModalIcon" class="bi bi-check-circle-fill me-2"> </i>
+
+              <span id="credentialModalHeading"> User Created Successfully </span>
+            </h5>
+
+            <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <p class="mb-4" id="credentialModalDescription">
+              The user account has been created successfully.
+            </p>
+
+            <h6 class="fw-bold">Login Credentials</h6>
+
+            <div class="mb-3">
+              <label class="form-label"> Portal </label>
+
+              <input id="credentialPortal" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"> Email </label>
+
+              <input id="credentialEmail" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"> Temporary Password </label>
+
+              <input id="credentialPassword" class="form-control" readonly />
+            </div>
+
+            <div class="alert alert-warning mb-0">
+              <strong>Important</strong><br />
+
+              This temporary password is displayed only once. Please copy the credentials now and
+              share them securely with the user. The user must change their password after the first
+              login.
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button id="btnCopyCredentials" class="btn btn-primary" onclick="copyCredentials()">
+              <i class="bi bi-clipboard"></i>
+
+              Copy Credentials
+            </button>
+
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -219,6 +507,7 @@
 
     <script src="js/auditlogs.js"></script>
     <script src="js/api.js"></script>
+    <script src="js/auth/auth.js"></script>
     <script src="js/department.service.js"></script>
     <script src="js/departments.js"></script>
 
@@ -239,7 +528,25 @@
     <script src="js/assets.js"></script>
     <script src="js/assignments.js"></script>
     <script src="js/reports.js"></script>
-    <script src="js/administration.js"></script>
+
+    <script src="js/Administration/api.js"></script>
+
+    <script src="js/Administration/users.js"></script>
+
+    <script src="js/Administration/user-details.js"></script>
+
+    <script src="js/Administration/permission.constants.js"></script>
+
+    <script src="js/Administration/locations.js"></script>
+    <script src="js/Administration/access-control.js"></script>
+    <script src="js/Administration/credentials-modal.js"></script>
+
+    <script src="js/Administration/create-user.js"></script>
+    <script src="js/Administration/security.js"></script>
+
+    <script src="js/Administration/activity.js"></script>
+
+    <script src="js/Administration/administration.js"></script>
 
     <script src="js/search.js"></script>
 

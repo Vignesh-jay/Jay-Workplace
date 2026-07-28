@@ -1,0 +1,102 @@
+.user-drawer {
+  position: fixed;
+
+  top: 0;
+
+  right: -550px;
+
+  width: 550px;
+
+  height: 100vh;
+
+  background: white;
+
+  z-index: 3000;
+
+  transition: 0.25s;
+
+  box-shadow: -10px 0 25px rgba(0, 0, 0, 0.15);
+
+  overflow: auto;
+}
+
+.user-drawer.open {
+  right: 0;
+}
+
+.drawer-backdrop {
+  display: none;
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.35);
+
+  z-index: 2990;
+}
+
+.drawer-backdrop.show {
+  display: block;
+}
+
+.user-drawer-header {
+  padding: 25px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  border-bottom: 1px solid #eee;
+}
+
+.drawer-tabs {
+  display: flex;
+
+  border-bottom: 1px solid #eee;
+}
+
+.drawer-tab {
+  flex: 1;
+
+  border: none;
+
+  background: white;
+
+  padding: 15px;
+
+  cursor: pointer;
+}
+
+.drawer-tab.active {
+  border-bottom: 3px solid #0d6efd;
+
+  font-weight: 600;
+}
+
+.user-drawer {
+    z-index: 1045;
+}
+
+.drawer-backdrop {
+    z-index: 1040;
+}
+
+#userCredentialsModal {
+    z-index: 2000;
+}
+
+#userCredentialsModal + .modal-backdrop,
+.modal-backdrop.show {
+    z-index: 1995;
+}
+
+.modal {
+    z-index: 2000;
+}
+
+.modal-backdrop {
+    z-index: 1995;
+}

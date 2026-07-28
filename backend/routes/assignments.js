@@ -144,7 +144,7 @@ router.post('/', async (req, res) => {
           entityType: 'Assignment',
           entityId: assignment.id,
           entityCode: asset.assetId,
-          performedBy: assignedBy || 'System',
+          performedByName: assignedBy || 'System',
         },
       });
 
@@ -243,7 +243,7 @@ router.put('/:id', async (req, res) => {
           entityType: 'Assignment',
           entityId: assignment.id,
           entityCode: assignment.asset.assetId,
-          performedBy: returnedBy || 'System',
+          performedByName: returnedBy || 'System',
         },
       });
 

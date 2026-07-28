@@ -178,7 +178,7 @@ async function importEmployees(rows) {
           entityId: createdEmployee.id,
           entityCode: createdEmployee.employeeId,
 
-          performedBy: 'Administrator',
+          performedByName: USER_ROLES.ADMINISTRATOR,
         },
       });
     }
@@ -312,7 +312,7 @@ async function importAssets(rows) {
 
           entityCode: createdAsset.assetId,
 
-          performedBy: 'Administrator',
+          performedByName: USER_ROLES.ADMINISTRATOR,
         },
       });
     }
