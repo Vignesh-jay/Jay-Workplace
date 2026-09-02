@@ -1,9 +1,9 @@
 module.exports = Object.freeze({
   // Authentication
-  LOGIN: 'Login',
-  LOGOUT: 'Logout',
-  FAILED_LOGIN: 'Failed Login',
-  CHANGE_PASSWORD: 'Change Password',
+  LOGIN: 'LOGIN',
+  LOGOUT: 'LOGOUT',
+  FAILED_LOGIN: 'FAILED_LOGIN',
+  CHANGE_PASSWORD: 'CHANGE_PASSWORD',
 
   // User Management
   CREATE_USER: 'Create User',

@@ -1,8 +1,10 @@
 const prisma = require('../db');
 
-/**
- * Validate Employee Import
- */
+const USER_STATUS = require('../constants/userStatus');
+const ASSET_STATUS = require('../constants/assetStatus');
+
+const activityService = require('./activity.service');
+
 async function validateEmployees(rows) {
   // -----------------------------
   // Load Master Data
@@ -125,10 +127,6 @@ async function validateEmployees(rows) {
   };
 }
 
-/**
- * Import Employees
- */
-
 async function importEmployees(rows) {
   // Validate Again
   const validation = await validateEmployees(rows);
@@ -156,7 +154,7 @@ async function importEmployees(rows) {
 
           joiningDate: new Date(employee.dateOfJoining),
 
-          status: 'Active',
+          status: USER_STATUS.ACTIVE,
         },
       });
 
@@ -168,19 +166,19 @@ async function importEmployees(rows) {
         },
       });
 
-      await tx.activity.create({
-        data: {
+      await activityService.logActivity(
+        {
           module: 'Employee',
           action: 'Import',
           description: `Employee ${createdEmployee.employeeId} imported from Excel.`,
-
           entityType: 'Employee',
           entityId: createdEmployee.id,
           entityCode: createdEmployee.employeeId,
-
-          performedByName: USER_ROLES.ADMINISTRATOR,
+          performedByName: 'System',
+          performedByUserId: null,
         },
-      });
+        tx
+      );
     }
   });
 
@@ -284,7 +282,7 @@ async function importAssets(rows) {
 
           location: asset.location,
 
-          status: 'Available',
+          status: ASSET_STATUS.AVAILABLE,
         },
       });
 
@@ -298,23 +296,19 @@ async function importAssets(rows) {
         },
       });
 
-      await tx.activity.create({
-        data: {
+      await activityService.logActivity(
+        {
           module: 'Asset',
-
           action: 'Import',
-
           description: `Asset ${createdAsset.assetId} imported from Excel.`,
-
           entityType: 'Asset',
-
           entityId: createdAsset.id,
-
           entityCode: createdAsset.assetId,
-
-          performedByName: USER_ROLES.ADMINISTRATOR,
+          performedByName: 'System',
+          performedByUserId: null,
         },
-      });
+        tx
+      );
     }
   });
 
@@ -331,6 +325,24 @@ async function importAssets(rows) {
       failed: 0,
     },
   };
+}
+
+async function logActivity(activity, prismaClient = prisma) {
+  console.log('LOGGING ACTIVITY');
+  console.log(activity);
+
+  return prismaClient.activity.create({
+    data: {
+      module: activity.module,
+      action: activity.action,
+      description: activity.description,
+      entityType: activity.entityType ?? null,
+      entityId: activity.entityId ?? null,
+      entityCode: activity.entityCode ?? null,
+      performedByName: activity.performedByName,
+      performedByUserId: activity.performedByUserId ?? null,
+    },
+  });
 }
 
 module.exports = {

@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/auth.routes');
 
 app.use('/auth', authRoutes);
 
@@ -51,6 +51,10 @@ app.use('/api/import', importRoutes);
 const userRoutes = require('./routes/users');
 
 app.use('/users', userRoutes);
+
+const errorHandler = require('./middleware/errorHandler');
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 

@@ -89,15 +89,40 @@
             <div id="globalSearchResults" class="global-search-results d-none"></div>
           </div>
 
-          <div class="user-profile">
-            <div class="avatar">A</div>
+          <div class="user-dropdown">
+            <button id="userMenuButton" class="user-profile">
+              <div class="avatar" id="currentUserAvatar"></div>
 
-            <div class="user-details">
-              <div class="user-name">Admin User</div>
-              <div class="user-role">Administrator</div>
+              <div class="user-details">
+                <div class="user-name" id="currentUserName"></div>
+
+                <div class="user-role" id="currentUserRole"></div>
+              </div>
+
+              <i id="userMenuArrow" class="fas fa-chevron-down"> </i>
+            </button>
+
+            <div id="userDropdownMenu" class="user-dropdown-menu">
+              <button class="dropdown-item" disabled title="Coming Soon">
+                <i class="fas fa-user"></i>
+
+                My Profile
+              </button>
+
+              <button class="dropdown-item" onclick="window.location = 'change-password.html'">
+                <i class="fas fa-key"></i>
+
+                Change Password
+              </button>
+
+              <div class="dropdown-divider"></div>
+
+              <button id="logoutButton" class="dropdown-item logout">
+                <i class="fas fa-right-from-bracket"></i>
+
+                Logout
+              </button>
             </div>
-
-            <i class="fas fa-chevron-down"></i>
           </div>
         </header>
 
@@ -508,6 +533,7 @@
     <script src="js/auditlogs.js"></script>
     <script src="js/api.js"></script>
     <script src="js/auth/auth.js"></script>
+    <script src="js/auth/user-menu.js"></script>
     <script src="js/department.service.js"></script>
     <script src="js/departments.js"></script>
 
