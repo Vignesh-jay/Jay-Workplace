@@ -1,65 +1,145 @@
 const API_URL = 'http://localhost:3000';
 
-async function apiGet(endpoint) {
-  const response = await fetch(`${API_URL}${endpoint}`);
+/**
+ * Returns JWT Token
+ */
+function getToken() {
+  return localStorage.getItem('jw_token') || sessionStorage.getItem('jw_token');
+}
 
-  const result = await response.json();
+/**
+ * Default Request Headers
+ */
+function getHeaders() {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
 
+  const token = getToken();
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  return headers;
+}
+
+/**
+ * Common Response Handler
+ */
+async function handleResponse(response) {
+  let result = {};
+
+  try {
+    result = await response.json();
+  } catch {
+    result = {};
+  }
+
+  // Session expired / Invalid token
+  if (response.status === 401) {
+    if (typeof clearSession === 'function') {
+      clearSession();
+    }
+
+    if (!window.location.pathname.endsWith('login.html')) {
+      window.location.replace('login.html');
+    }
+
+    throw new Error('Your session has expired.');
+  }
+
+  // Forbidden
+  if (response.status === 403) {
+    throw new Error(result.message || 'You do not have permission to perform this action.');
+  }
+
+  // Other API Errors
   if (!response.ok) {
-    throw new Error(result.message || result.error || 'API Error');
+    throw new Error(result.message || result.error || 'Unexpected server error.');
   }
 
   return result;
 }
 
-async function apiPost(endpoint, data) {
+/**
+ * GET
+ */
+async function apiGet(endpoint) {
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    method: 'GET',
+    headers: getHeaders(),
+  });
+
+  return handleResponse(response);
+}
+
+/**
+ * POST
+ */
+async function apiPost(endpoint, data = {}) {
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getHeaders(),
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message || result.error || 'API Error');
-  }
-
-  return result;
+  return handleResponse(response);
 }
 
+/**
+ * PUT
+ */
 async function apiPut(endpoint, data = {}) {
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getHeaders(),
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message || result.error || 'API Error');
-  }
-
-  return result;
+  return handleResponse(response);
 }
 
+/**
+ * PATCH
+ */
+async function apiPatch(endpoint, data = {}) {
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    method: 'PATCH',
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  return handleResponse(response);
+}
+
+/**
+ * DELETE
+ */
 async function apiDelete(endpoint) {
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: 'DELETE',
+    headers: getHeaders(),
   });
 
-  return await response.json();
+  return handleResponse(response);
 }
 
-async function apiDisable(endpoint) {
-  return await apiPut(endpoint, {});
+/**
+ * Convenience Helpers
+ */
+function apiEnable(endpoint) {
+  return apiPost(endpoint);
 }
 
-async function apiEnable(endpoint) {
-  return await apiPut(endpoint, {});
+function apiDisable(endpoint) {
+  return apiPost(endpoint);
+}
+
+function apiUnlock(endpoint) {
+  return apiPost(endpoint);
+}
+
+function apiResetPassword(endpoint) {
+  return apiPost(endpoint);
 }

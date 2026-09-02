@@ -37,12 +37,11 @@ router.post('/', async (req, res) => {
       module,
       action,
       description,
-
       entityType,
       entityId,
       entityCode,
-
-      performedBy,
+      performedByName,
+      performedByUserId,
     } = req.body;
 
     const activity = await prisma.activity.create({
@@ -50,12 +49,11 @@ router.post('/', async (req, res) => {
         module,
         action,
         description,
-
         entityType,
         entityId,
         entityCode,
-
-        performedBy,
+        performedByName,
+        performedByUserId,
       },
     });
 
@@ -64,11 +62,12 @@ router.post('/', async (req, res) => {
       data: activity,
     });
   } catch (error) {
+    console.error('CREATE ACTIVITY ERROR');
     console.error(error);
 
     res.status(500).json({
       success: false,
-      message: 'Failed to create activity.',
+      message: error.message,
     });
   }
 });

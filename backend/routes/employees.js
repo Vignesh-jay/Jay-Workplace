@@ -1,9 +1,14 @@
 const express = require('express');
 const prisma = require('../db');
 
+const authenticate = require('../middleware/authenticate');
+const authorize = require('../middleware/authorize');
+
+const PERMISSIONS = require('../constants/permissions');
+
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', authenticate, authorize(PERMISSIONS.EMPLOYEE_VIEW), async (req, res) => {
   try {
     const { status } = req.query;
 
@@ -35,7 +40,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authenticate, authorize(PERMISSIONS.EMPLOYEE_CREATE), async (req, res) => {
   try {
     const {
       employeeId,
@@ -90,7 +95,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticate, authorize(PERMISSIONS.EMPLOYEE_EDIT), async (req, res) => {
   const id = Number(req.params.id);
 
   if (isNaN(id)) {
@@ -164,7 +169,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, authorize(PERMISSIONS.EMPLOYEE_DELETE), async (req, res) => {
   const id = Number(req.params.id);
 
   if (isNaN(id)) {
@@ -194,7 +199,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, authorize(PERMISSIONS.EMPLOYEE_VIEW), async (req, res) => {
   const id = Number(req.params.id);
 
   const employee = await prisma.employee.findUnique({

@@ -40,11 +40,13 @@ router.post('/employees', async (req, res) => {
 
     res.json(result);
   } catch (error) {
+    console.error('EMPLOYEE IMPORT ERROR');
     console.error(error);
 
     res.status(500).json({
       success: false,
-      message: 'Employee import failed.',
+      message: error.message,
+      stack: error.stack,
     });
   }
 });
@@ -57,11 +59,13 @@ router.post('/assets/validate', async (req, res) => {
 
     res.json(result);
   } catch (error) {
+    console.error('ASSET IMPORT ERROR');
     console.error(error);
 
     res.status(500).json({
       success: false,
-      message: 'Asset validation failed.',
+      message: error.message,
+      stack: error.stack,
     });
   }
 });

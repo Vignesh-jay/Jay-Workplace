@@ -6,32 +6,22 @@ async function getActivitiesApi() {
 
 async function addActivityApi({
   module,
-
   action,
-
   description,
-
   entityType = null,
-
   entityId = null,
-
   entityCode = null,
-
-  performedBy = 'System',
+  performedByName = 'System',
+  performedByUserId = null,
 }) {
   return await apiPost('/activities', {
     module,
-
     action,
-
     description,
-
     entityType,
-
     entityId,
-
     entityCode,
-
-    performedBy,
+    performedByName,
+    performedByUserId,
   });
 }
