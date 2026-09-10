@@ -400,15 +400,13 @@ function loadFirstRunScreen() {
                 <div class="card h-100 p-4">
 
                     <h4>
-                        📥 Import Existing Data
+                        ♻️ Restore Backup
                     </h4>
 
                     <p class="text-muted">
-
-                        Restore employees,
-                        assets, assignments,
-                        locations and history.
-
+                        Restore a complete Jay Workplace
+                        backup including employees,
+                        assets, assignments and settings.
                     </p>
 
                     <input
@@ -417,10 +415,10 @@ function loadFirstRunScreen() {
                         class="form-control">
 
                     <button
-                        class="btn btn-success mt-3"
+                        class="btn btn-warning mt-3"
                         onclick="startupRestoreBackup()">
 
-                        Import Backup
+                        Restore Backup
 
                     </button>
 
@@ -543,52 +541,40 @@ async function renderCharts(employees) {
   });
 }
 
-function startupRestoreBackup() {
-  document.getElementById('restoreFile')?.remove();
-
+async function startupRestoreBackup() {
   const file = document.getElementById('startupRestoreFile').files[0];
 
   if (!file) {
     alert('Select a backup file');
-
     return;
   }
 
-  const reader = new FileReader();
+  const confirmed = confirm('This will restore the selected backup.\n\nContinue?');
 
-  reader.onload = function (e) {
-    try {
-      const backup = JSON.parse(e.target.result);
+  if (!confirmed) return;
 
-      saveEmployees(backup.employees || []);
+  try {
+    const formData = new FormData();
 
-      saveAssets(backup.assets || []);
+    formData.append('backup', file);
 
-      saveAssignments(backup.assignments || []);
+    const response = await fetch('http://localhost:3000/api/admin/restore', {
+      method: 'POST',
+      body: formData,
+    });
 
-      saveActivities(backup.activities || []);
+    const result = await response.json();
 
-      saveDepartments(backup.departments || []);
-
-      saveLocations(backup.locations || []);
-
-      saveAuditLogs(backup.auditLogs || []);
-
-      saveAssetTransfers(backup.assetTransfers || []);
-
-      saveAssetHistory(backup.assetHistory || []);
-
-      saveEmployeeHistory(backup.employeeHistory || []);
-
-      saveAssignmentHistory(backup.assignmentHistory || []);
-
-      alert('Backup restored successfully');
-
-      location.reload();
-    } catch (error) {
-      alert('Invalid backup file');
+    if (!result.success) {
+      throw new Error(result.message);
     }
-  };
 
-  reader.readAsText(file);
+    alert('Backup restored successfully');
+
+    window.location.href = 'login.html';
+  } catch (error) {
+    console.error(error);
+
+    alert(error.message);
+  }
 }

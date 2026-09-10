@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { startBackupScheduler } = require('./services/backupScheduler');
 
 const bootstrapAdministrator = require('./bootstrap/admin.bootstrap');
 
@@ -52,6 +53,10 @@ const userRoutes = require('./routes/users');
 
 app.use('/users', userRoutes);
 
+const adminRoutes = require('./routes/admin.routes');
+
+app.use('/api/admin', adminRoutes);
+
 const errorHandler = require('./middleware/errorHandler');
 
 app.use(errorHandler);
@@ -72,5 +77,5 @@ async function startServer() {
     process.exit(1);
   }
 }
-
+startBackupScheduler();
 startServer();
